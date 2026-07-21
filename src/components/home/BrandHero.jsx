@@ -8,6 +8,7 @@ export default function BrandHero() {
           src="https://media.base44.com/images/public/6a5f78595b9383901d7402b6/25ed0c0d0_IMG_0471.jpg"
           alt="Seluna"
           className="w-full h-full object-cover"
+          style={{ objectPosition: 'center 26%' }}
         />
       </div>
 
