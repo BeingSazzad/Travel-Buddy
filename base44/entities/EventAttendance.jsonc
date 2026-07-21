@@ -10,6 +10,19 @@
       "type": "string",
       "description": "The attending member"
     },
+    "host_id": {
+      "type": "string",
+      "description": "The event host (denormalized) so the host can read attendance"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "going",
+        "pending"
+      ],
+      "default": "going",
+      "description": "Confirmed attendee or pending approval request"
+    },
     "event_title": {
       "type": "string",
       "description": "Denormalized for the member's joined-events list"
@@ -24,11 +37,20 @@
   },
   "required": [
     "event_id",
-    "user_id"
+    "user_id",
+    "host_id",
+    "status"
   ],
   "rls": {
     "read": {
-      "created_by_id": "{{user.id}}"
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.host_id": "{{user.id}}"
+        }
+      ]
     },
     "create": {
       "created_by_id": "{{user.id}}"
