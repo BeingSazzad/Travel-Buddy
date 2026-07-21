@@ -1,0 +1,43 @@
+{
+  "name": "EventAttendance",
+  "type": "object",
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "The joined event"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "The attending member"
+    },
+    "event_title": {
+      "type": "string",
+      "description": "Denormalized for the member's joined-events list"
+    },
+    "event_image": {
+      "type": "string"
+    },
+    "event_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "event_id",
+    "user_id"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
