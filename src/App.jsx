@@ -12,6 +12,7 @@ import Trips from '@/pages/Trips';
 import Friends from '@/pages/Friends';
 import Events from '@/pages/Events';
 import Profile from '@/pages/Profile';
+import Category from '@/pages/Category';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -46,6 +47,11 @@ const AuthenticatedApp = () => {
         <Route path="/friends" element={<Friends />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/cafes" element={<Category category="Cafés" />} />
+        <Route path="/restaurants" element={<Category category="Restaurants" />} />
+        <Route path="/hotels" element={<Category category="Hotels" />} />
+        <Route path="/reviews" element={<Category category="Reviews" />} />
+        <Route path="/deals" element={<Category category="Deals" />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
