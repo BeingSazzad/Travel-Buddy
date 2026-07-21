@@ -13,6 +13,7 @@
         "restaurant",
         "hotel",
         "destination",
+        "activity",
         "deal",
         "event"
       ]
@@ -28,15 +29,33 @@
       "description": "Star rating from 1 to 5"
     },
     "text": {
-      "type": "string"
+      "type": "string",
+      "description": "The written review"
+    },
+    "visit_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When the author visited the place"
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Optional photo URLs uploaded by the author"
     },
     "author_name": {
       "type": "string",
-      "description": "Reviewer display name (denormalized)"
+      "description": "Author first name (denormalized)"
     },
     "author_avatar": {
       "type": "string",
-      "description": "Reviewer avatar URL (denormalized)"
+      "description": "Author profile image URL (denormalized)"
+    },
+    "helpful_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Cached count of helpful votes"
     }
   },
   "required": [
@@ -56,7 +75,16 @@
       "created_by_id": "{{user.id}}"
     },
     "delete": {
-      "created_by_id": "{{user.id}}"
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
     }
   }
 }
