@@ -32,7 +32,11 @@
     },
     "time": {
       "type": "string",
-      "description": "Human-readable time, e.g. 19:30"
+      "description": "Start time, e.g. 19:30"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "End time, e.g. 21:30"
     },
     "location": {
       "type": "string",
@@ -60,6 +64,44 @@
     "max_attendees": {
       "type": "number",
       "default": 10
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "public",
+        "approval"
+      ],
+      "default": "public"
+    },
+    "pricing": {
+      "type": "string",
+      "enum": [
+        "free",
+        "paid_external"
+      ],
+      "default": "free"
+    },
+    "external_link": {
+      "type": "string",
+      "description": "External ticket/booking link when paid externally"
+    },
+    "age_min": {
+      "type": "number",
+      "description": "Minimum age, if relevant"
+    },
+    "age_max": {
+      "type": "number",
+      "description": "Maximum age, if relevant"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "agreed_rules": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
