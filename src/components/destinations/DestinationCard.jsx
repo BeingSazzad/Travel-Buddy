@@ -1,6 +1,7 @@
 import React from "react";
 import { MapPin, Users, Coffee, UtensilsCrossed, Building2, CalendarHeart, Tag } from "lucide-react";
 import { Image } from "@/components/ui/image";
+import { useNavigate } from "react-router-dom";
 
 function Stat({ icon: Icon, value }) {
   return (
@@ -13,8 +14,12 @@ function Stat({ icon: Icon, value }) {
 
 export default function DestinationCard({ destination, large = false }) {
   const { city, country, image, description, stats } = destination;
+  const navigate = useNavigate();
   return (
-    <div className={`relative rounded-3xl overflow-hidden border border-border shadow-soft bg-card ${large ? "h-72" : "h-64"}`}>
+    <div
+      onClick={() => navigate(`/destinations/${encodeURIComponent(city)}`)}
+      className={`relative rounded-3xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer ${large ? "h-72" : "h-64"}`}
+    >
       <Image src={image} alt={city} fittingType="fill" className="w-full h-full" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 p-5">

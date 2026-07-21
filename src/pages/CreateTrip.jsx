@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -43,6 +43,11 @@ export default function CreateTrip() {
   const [data, setData] = useState(EMPTY);
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(null);
+
+  useEffect(() => {
+    const c = new URLSearchParams(window.location.search).get("city");
+    if (c) setData((d) => ({ ...d, city: c }));
+  }, []);
 
   const set = (k, v) => setData((d) => ({ ...d, [k]: v }));
   const toggleLooking = (v) =>

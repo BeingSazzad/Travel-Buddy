@@ -28,6 +28,7 @@ import CreateTrip from '@/pages/CreateTrip';
 import CreateEvent from '@/pages/CreateEvent';
 import EventDetail from '@/pages/EventDetail';
 import Destinations from '@/pages/Destinations';
+import DestinationDetail from '@/pages/DestinationDetail';
 import Discover from '@/pages/Discover';
 import Conversation from '@/pages/Conversation';
 import Messages from '@/pages/Messages';
@@ -122,6 +123,7 @@ const AuthenticatedApp = () => {
         <Route path="/restaurants" element={<Category category="Restaurants" />} />
         <Route path="/hotels" element={<Category category="Hotels" />} />
         <Route path="/destinations" element={<Destinations />} />
+        <Route path="/destinations/:city" element={<DestinationDetail />} />
         <Route path="/reviews" element={<Category category="Reviews" />} />
         <Route path="/deals" element={<Category category="Deals" />} />
       </Route>
