@@ -1,20 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 import Stripe from 'npm:stripe@14.25.0';
-
-function mapSubscriptionStatus(subscription) {
-  const status = subscription?.status;
-  const cancelAtEnd = subscription?.cancel_at_period_end === true;
-  const periodEndMs = (subscription?.current_period_end || 0) * 1000;
-  const nowMs = Date.now();
-
-  if (status === 'active' || status === 'trialing') {
-    if (cancelAtEnd && periodEndMs > nowMs) return 'cancelled_active';
-    return 'active';
-  }
-  if (status === 'past_due' || status === 'unpaid') return 'payment_failed';
-  if (status === 'canceled' || status === 'expired' || status === 'incomplete_expired') return 'expired';
-  return 'none';
-}
+import { buildSubscriptionUpdate } from '../../shared/stripe-subscription.ts';
 
 async function syncSubscription(base44, subscription) {
   const userId = subscription?.metadata?.user_id;
@@ -22,14 +8,7 @@ async function syncSubscription(base44, subscription) {
     console.error('stripe-webhook: no user_id in subscription metadata');
     return;
   }
-  const plan = subscription?.metadata?.plan;
-  const update = {
-    subscription_status: mapSubscriptionStatus(subscription),
-    subscription_plan: plan,
-  };
-  if (subscription?.current_period_end) {
-    update.subscription_current_period_end = new Date(subscription.current_period_end * 1000).toISOString();
-  }
+  const update = buildSubscriptionUpdate(subscription);
   await base44.asServiceRole.entities.User.update(userId, update);
 }
 

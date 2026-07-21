@@ -36,6 +36,7 @@ import RestaurantDetail from '@/pages/RestaurantDetail';
 import Hotels from '@/pages/Hotels';
 import HotelDetail from '@/pages/HotelDetail';
 import Deals from '@/pages/Deals';
+import SubscriptionManagement from '@/pages/SubscriptionManagement';
 import Discover from '@/pages/Discover';
 import Conversation from '@/pages/Conversation';
 import Messages from '@/pages/Messages';
@@ -136,6 +137,7 @@ const AuthenticatedApp = () => {
         <Route path="/destinations/:city" element={<DestinationDetail />} />
         <Route path="/reviews" element={<Category category="Reviews" />} />
         <Route path="/deals" element={<Deals />} />
+        <Route path="/subscription-management" element={<SubscriptionManagement />} />
       </Route>
       <Route path="/welcome" element={<Welcome />} />
       <Route path="/onboarding" element={<Onboarding />} />

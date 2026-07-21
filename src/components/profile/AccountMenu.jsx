@@ -32,7 +32,7 @@ export default function AccountMenu() {
         <Row icon={Plane} label="My trips" onClick={() => navigate("/trips")} />
         <Row icon={CalendarHeart} label="My events" onClick={() => navigate("/events")} />
         <Row icon={MessageCircle} label="Messages" onClick={() => navigate("/messages")} />
-        <Row icon={Crown} label="Subscription" onClick={() => navigate("/subscription")} />
+        <Row icon={Crown} label="Subscription" onClick={() => navigate("/subscription-management")} />
         <Row icon={Shield} label="Privacy" onClick={() => setSheet("privacy")} />
         <Row icon={Bell} label="Notifications" onClick={() => setSheet("notifications")} />
         <Row icon={Ban} label="Blocked users" onClick={() => setSheet("blocked")} />
