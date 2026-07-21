@@ -21,12 +21,21 @@ export function useConversation(conversationId) {
         200
       );
       setMessages(msgs);
+
+      // Mark my unread count as cleared when I open the conversation
+      const myUnread = conv.unread?.[user?.id] || 0;
+      if (myUnread > 0) {
+        await base44.entities.Conversation.update(conversationId, {
+          unread: { ...conv.unread, [user.id]: 0 },
+        });
+        setConversation({ ...conv, unread: { ...conv.unread, [user.id]: 0 } });
+      }
     } catch (e) {
       setConversation(null);
     } finally {
       setLoading(false);
     }
-  }, [conversationId]);
+  }, [conversationId, user]);
 
   useEffect(() => {
     load();
@@ -56,10 +65,17 @@ export function useConversation(conversationId) {
           sender_id: user?.id,
           text: trimmed,
         });
+        const otherId = conversation.participant_ids.find((p) => p !== user?.id);
+        const nextUnread = {
+          ...(conversation.unread || {}),
+          [otherId]: (conversation.unread?.[otherId] || 0) + 1,
+        };
         await base44.entities.Conversation.update(conversationId, {
           last_message: trimmed,
           last_message_at: new Date().toISOString(),
+          unread: nextUnread,
         });
+        setConversation((c) => (c ? { ...c, last_message: trimmed, last_message_at: new Date().toISOString(), unread: nextUnread } : c));
       } finally {
         setSending(false);
       }

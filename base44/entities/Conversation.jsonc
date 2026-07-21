@@ -33,6 +33,10 @@
     "last_message_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "unread": {
+      "type": "object",
+      "description": "Map of participant_id -> unread message count"
     }
   },
   "required": [
