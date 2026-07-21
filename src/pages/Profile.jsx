@@ -5,7 +5,7 @@ export default function Profile() {
     <div className="px-5 pt-12">
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display font-semibold text-2xl">Profile</h1>
-        <button className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-muted-foreground">
+        <button className="w-10 h-10 rounded-full border border-border shadow-soft flex items-center justify-center text-muted-foreground">
           <Settings className="w-5 h-5" />
         </button>
       </div>
@@ -43,7 +43,7 @@ export default function Profile() {
           { label: 'Friends', value: 24 },
           { label: 'Events', value: 11 },
         ].map((s) => (
-          <div key={s.label} className="bg-card border border-border rounded-2xl py-4 text-center">
+          <div key={s.label} className="bg-card border border-border shadow-soft rounded-2xl py-4 text-center">
             <p className="font-display font-semibold text-xl">{s.value}</p>
             <p className="text-[11px] text-muted-foreground">{s.label}</p>
           </div>
@@ -58,7 +58,7 @@ export default function Profile() {
             { text: 'Joined Sunset Yoga Meetup', date: '2 days ago', icon: Calendar },
             { text: 'Added a new trip: Bali Retreat', date: '5 days ago', icon: MapPin },
           ].map((a, i) => (
-            <div key={i} className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3">
+            <div key={i} className="flex items-center gap-3 bg-card border border-border shadow-soft rounded-2xl px-4 py-3">
               <div className="w-8 h-8 rounded-full bg-foreground/5 flex items-center justify-center">
                 <a.icon className="w-4 h-4 text-muted-foreground" />
               </div>

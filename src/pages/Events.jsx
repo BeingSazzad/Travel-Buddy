@@ -21,7 +21,7 @@ export default function Events() {
 
       <div className="space-y-4">
         {events.map((e) => (
-          <div key={e.title} className="rounded-2xl overflow-hidden border border-border bg-card">
+          <div key={e.title} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card">
             <div className="h-40 relative">
               <img src={e.img} alt={e.title} className="w-full h-full object-cover" />
             </div>

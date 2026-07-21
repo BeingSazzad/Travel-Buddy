@@ -19,7 +19,7 @@ export default function Friends() {
       <h1 className="font-display font-semibold text-2xl mb-1">Friends</h1>
       <p className="text-sm text-muted-foreground mb-4">Women exploring like you</p>
 
-      <div className="flex items-center gap-2 bg-card border border-border rounded-2xl px-4 py-3 mb-5">
+      <div className="flex items-center gap-2 bg-card border border-border shadow-soft rounded-2xl px-4 py-3 mb-5">
         <Search className="w-4 h-4 text-muted-foreground" />
         <input placeholder="Find travelers" className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
       </div>
@@ -32,7 +32,7 @@ export default function Friends() {
               <p className="font-semibold text-sm">{f.name}</p>
               <p className="text-xs text-muted-foreground">{f.loc}</p>
             </div>
-            <button className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground">
+            <button className="w-9 h-9 rounded-full border border-border shadow-soft flex items-center justify-center text-muted-foreground">
               <MessageCircle className="w-4 h-4" />
             </button>
           </div>

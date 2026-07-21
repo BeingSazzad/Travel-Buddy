@@ -21,7 +21,7 @@ export default function Trips() {
 
       <div className="space-y-4">
         {trips.map((t) => (
-          <div key={t.name} className="rounded-2xl overflow-hidden border border-border bg-card">
+          <div key={t.name} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card">
             <div className="h-40 relative">
               <img src={t.img} alt={t.name} className="w-full h-full object-cover" />
               <span className="absolute top-3 right-3 text-[11px] font-semibold bg-white/90 backdrop-blur text-foreground px-2.5 py-1 rounded-full">

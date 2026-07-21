@@ -29,7 +29,7 @@ export default function Home() {
 
       {/* Search */}
       <div className="px-5 -mt-6 relative z-10">
-        <div className="flex items-center gap-2 bg-card border border-border rounded-2xl px-4 py-3 shadow-lg">
+        <div className="flex items-center gap-2 bg-card border border-border shadow-soft rounded-2xl px-4 py-3">
           <Search className="w-4 h-4 text-muted-foreground" />
           <input
             placeholder="Search destinations, events, friends"
@@ -45,7 +45,7 @@ export default function Home() {
           { label: 'Meet Women', emoji: '🫶' },
           { label: 'Discover', emoji: '✨' },
         ].map((q) => (
-          <div key={q.label} className="flex flex-col items-center gap-1.5 bg-card border border-border rounded-2xl py-4">
+          <div key={q.label} className="flex flex-col items-center gap-1.5 bg-card border border-border shadow-soft rounded-2xl py-4">
             <span className="text-2xl">{q.emoji}</span>
             <span className="text-[11px] font-medium text-center text-muted-foreground">{q.label}</span>
           </div>
@@ -82,7 +82,7 @@ export default function Home() {
             { place: 'Café Lumi', loc: 'Paris', text: 'Cozy, safe and the staff were so welcoming.' },
             { place: 'Riad Yasmine', loc: 'Marrakech', text: 'Best solo stay — met two friends here.' },
           ].map((r) => (
-            <div key={r.place} className="bg-card border border-border rounded-2xl p-4">
+            <div key={r.place} className="bg-card border border-border shadow-soft rounded-2xl p-4">
               <div className="flex items-center justify-between mb-1">
                 <span className="font-semibold text-sm">{r.place}</span>
                 <span className="text-[11px] text-muted-foreground">{r.loc}</span>
