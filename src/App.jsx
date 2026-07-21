@@ -33,6 +33,8 @@ import Cafes from '@/pages/Cafes';
 import CafeDetail from '@/pages/CafeDetail';
 import Restaurants from '@/pages/Restaurants';
 import RestaurantDetail from '@/pages/RestaurantDetail';
+import Hotels from '@/pages/Hotels';
+import HotelDetail from '@/pages/HotelDetail';
 import Discover from '@/pages/Discover';
 import Conversation from '@/pages/Conversation';
 import Messages from '@/pages/Messages';
@@ -127,7 +129,8 @@ const AuthenticatedApp = () => {
         <Route path="/cafes/:name" element={<CafeDetail />} />
         <Route path="/restaurants" element={<Restaurants />} />
         <Route path="/restaurants/:name" element={<RestaurantDetail />} />
-        <Route path="/hotels" element={<Category category="Hotels" />} />
+        <Route path="/hotels" element={<Hotels />} />
+        <Route path="/hotels/:name" element={<HotelDetail />} />
         <Route path="/destinations" element={<Destinations />} />
         <Route path="/destinations/:city" element={<DestinationDetail />} />
         <Route path="/reviews" element={<Category category="Reviews" />} />
