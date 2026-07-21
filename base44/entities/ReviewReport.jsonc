@@ -1,0 +1,54 @@
+{
+  "name": "ReviewReport",
+  "type": "object",
+  "properties": {
+    "review_id": {
+      "type": "string",
+      "description": "The reported review"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "spam",
+        "abusive",
+        "false_info",
+        "inappropriate_image",
+        "conflict_of_interest"
+      ],
+      "description": "Why the review was reported"
+    },
+    "note": {
+      "type": "string",
+      "description": "Optional context from the reporter"
+    }
+  },
+  "required": [
+    "review_id",
+    "reason"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
