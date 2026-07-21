@@ -31,10 +31,10 @@ export default function BottomNav() {
                 <div
                   className={cn(
                     'flex items-center justify-center w-10 h-8 rounded-full transition-all duration-200',
-                    isActive && 'bg-foreground/5'
+                    isActive && 'bg-accent/40'
                   )}
                 >
-                  <Icon className={cn('w-5 h-5 transition-transform duration-200', isActive && 'scale-110')} strokeWidth={isActive ? 2.5 : 2} />
+                  <Icon className={cn('w-5 h-5 transition-transform duration-200', isActive && 'scale-110')} strokeWidth={isActive ? 2.5 : 1.75} />
                 </div>
                 <span className={cn('text-[10px] font-medium tracking-tight', isActive && 'font-semibold')}>{label}</span>
               </>
