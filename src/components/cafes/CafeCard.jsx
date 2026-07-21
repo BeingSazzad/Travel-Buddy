@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { MapPin, Star, Bookmark } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { useSaved } from "@/lib/SavedContext";
@@ -7,11 +8,12 @@ import { PRICE_LABELS } from "@/lib/cafes";
 
 export default function CafeCard({ cafe }) {
   const { isSaved, toggle } = useSaved();
+  const navigate = useNavigate();
   const key = `cafe:${cafe.name}`;
   const saved = isSaved(key);
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card">
+    <div onClick={() => navigate(`/cafes/${encodeURIComponent(cafe.name)}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer">
       <div className="relative h-40">
         <Image src={cafe.image} alt={cafe.name} fittingType="fill" className="w-full h-full" />
         <button
