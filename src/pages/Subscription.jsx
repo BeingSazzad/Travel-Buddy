@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Moon, Check, Loader2, LogOut } from "lucide-react";
+import { Moon, Check, Loader2, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 
 const PLANS = [
@@ -15,18 +15,56 @@ export default function Subscription() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const status = new URLSearchParams(window.location.search).get("status");
+
   const handleConfirm = async () => {
     setError("");
+    // Stripe checkout cannot complete inside the preview iframe
+    if (window.self !== window.top) {
+      setError("Checkout works only from the published app. Please open the app in a new tab to subscribe.");
+      return;
+    }
     setLoading(true);
     try {
-      await base44.auth.updateMe({ subscription_status: "active", subscription_plan: selected });
-      window.location.href = "/";
+      const res = await base44.functions.invoke("create-checkout", { plan: selected });
+      if (res?.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        setError("Could not start checkout. Please try again.");
+      }
     } catch (err) {
-      setError(err.message || "Could not start membership");
+      setError(err?.message || "Could not start checkout");
     } finally {
       setLoading(false);
     }
   };
+
+  if (status === "success") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
+        <div className="w-full max-w-md text-center">
+          <div className="flex justify-center mb-5">
+            <Moon className="w-6 h-6 text-[#A1846B]" strokeWidth={1.5} />
+          </div>
+          <h1 className="font-display font-semibold text-3xl tracking-[0.08em] text-[#A1846B] mb-4">SELUNA</h1>
+          <div className="bg-card rounded-2xl shadow-premium border border-border p-8">
+            <div className="flex justify-center mb-4">
+              <div className="w-14 h-14 rounded-full bg-success/20 flex items-center justify-center">
+                <ShieldCheck className="w-7 h-7 text-success" />
+              </div>
+            </div>
+            <h2 className="font-display font-semibold text-xl text-foreground">Payment received</h2>
+            <p className="text-sm text-muted-foreground mt-2">
+              We're activating your membership. If this page doesn't take you to the app shortly, continue below.
+            </p>
+            <Button className="w-full h-12 mt-6 font-medium" onClick={() => { window.location.href = "/"; }}>
+              Enter Seluna
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
@@ -41,6 +79,12 @@ export default function Subscription() {
           <p className="text-sm text-muted-foreground mt-1">
             Seluna is a members-only community. Choose a plan to activate your account and start exploring.
           </p>
+
+          {status === "cancelled" && (
+            <div className="mt-4 p-3 rounded-lg bg-muted text-foreground text-sm">
+              Your payment was cancelled. Choose a plan to try again.
+            </div>
+          )}
 
           <div className="mt-6 space-y-3">
             {PLANS.map((plan) => {
@@ -87,14 +131,14 @@ export default function Subscription() {
 
           <Button onClick={handleConfirm} disabled={loading} className="w-full h-12 mt-6 font-medium">
             {loading ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Starting membership...</>
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Starting secure checkout...</>
             ) : (
-              "Start membership"
+              "Subscribe with Stripe"
             )}
           </Button>
 
           <p className="text-[11px] text-muted-foreground text-center mt-3">
-            You can cancel anytime. By continuing you authorise Seluna to charge your selected payment method.
+            Secure payment via Stripe. You can cancel anytime.
           </p>
         </div>
 
