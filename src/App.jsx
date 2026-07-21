@@ -13,6 +13,8 @@ import Friends from '@/pages/Friends';
 import Events from '@/pages/Events';
 import Profile from '@/pages/Profile';
 import Category from '@/pages/Category';
+import Welcome from '@/pages/Welcome';
+import Onboarding from '@/pages/Onboarding';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -53,6 +55,8 @@ const AuthenticatedApp = () => {
         <Route path="/reviews" element={<Category category="Reviews" />} />
         <Route path="/deals" element={<Category category="Deals" />} />
       </Route>
+      <Route path="/welcome" element={<Welcome />} />
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
