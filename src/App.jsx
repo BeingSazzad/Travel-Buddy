@@ -22,6 +22,7 @@ import ResetPassword from '@/pages/ResetPassword';
 import Subscription from '@/pages/Subscription';
 import AccountPending from '@/pages/AccountPending';
 import ProfileSetup from '@/pages/ProfileSetup';
+import Search from '@/pages/Search';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -98,6 +99,7 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/trips" element={<Trips />} />
         <Route path="/friends" element={<Friends />} />
         <Route path="/events" element={<Events />} />
