@@ -29,6 +29,7 @@ import CreateEvent from '@/pages/CreateEvent';
 import EventDetail from '@/pages/EventDetail';
 import Destinations from '@/pages/Destinations';
 import DestinationDetail from '@/pages/DestinationDetail';
+import Cafes from '@/pages/Cafes';
 import Discover from '@/pages/Discover';
 import Conversation from '@/pages/Conversation';
 import Messages from '@/pages/Messages';
@@ -119,7 +120,7 @@ const AuthenticatedApp = () => {
         <Route path="/messages" element={<Messages />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/cafes" element={<Category category="Cafés" />} />
+        <Route path="/cafes" element={<Cafes />} />
         <Route path="/restaurants" element={<Category category="Restaurants" />} />
         <Route path="/hotels" element={<Category category="Hotels" />} />
         <Route path="/destinations" element={<Destinations />} />
