@@ -4,14 +4,17 @@ import { Plus } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useTrips } from "@/hooks/useTrips";
+import { useMatches } from "@/hooks/useMatches";
 import { tripStatus, tripsOverlap } from "@/lib/trip-utils";
 import TripCard from "@/components/trips/TripCard";
 import TripForm from "@/components/trips/TripForm";
+import MatchSuggestions from "@/components/trips/MatchSuggestions";
 
 const STATUS_ORDER = ["active", "upcoming", "previous"];
 
 export default function Trips() {
   const { trips, loading, user, create, update, remove } = useTrips();
+  const { matches: matchList, loading: matchesLoading, blockMember } = useMatches();
   const navigate = useNavigate();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -27,21 +30,6 @@ export default function Trips() {
     myTrips.forEach((t) => g[tripStatus(t)].push(t));
     return g;
   }, [myTrips]);
-
-  const nearby = useMemo(() => {
-    const map = {};
-    otherTrips.forEach((o) => {
-      const m = myTrips.find((mt) => tripsOverlap(mt, o));
-      if (m) {
-        const key = o.created_by_id;
-        if (!map[key]) {
-          map[key] = { handle: (o.created_by || "traveler").split("@")[0], trips: [] };
-        }
-        map[key].trips.push({ ...o, match: m.name });
-      }
-    });
-    return Object.values(map);
-  }, [myTrips, otherTrips]);
 
   const openNew = () => navigate("/trips/new");
   const openEdit = (trip) => { setEditing(trip); setFormOpen(true); };
@@ -122,36 +110,17 @@ export default function Trips() {
           {myTrips.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border p-8 text-center">
               <p className="font-display font-semibold">Add a trip to find women nearby</p>
-              <p className="text-sm text-muted-foreground mt-1">We'll show women whose travel dates overlap with yours.</p>
+              <p className="text-sm text-muted-foreground mt-1">We'll suggest members travelling to the same place around the same time.</p>
             </div>
-          ) : nearby.length === 0 ? (
+          ) : matchesLoading ? (
+            <p className="text-sm text-muted-foreground">Finding matches…</p>
+          ) : matchList.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-              <p className="font-display font-semibold">No overlapping trips yet</p>
-              <p className="text-sm text-muted-foreground mt-1">No other women are travelling on your dates right now.</p>
+              <p className="font-display font-semibold">No matches yet</p>
+              <p className="text-sm text-muted-foreground mt-1">No members are travelling to your destinations on your dates right now.</p>
             </div>
           ) : (
-            <div className="space-y-5">
-              {nearby.map((w, i) => (
-                <div key={i}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-[#A1846B]/15 flex items-center justify-center text-[#A1846B] font-medium text-sm">
-                      {(w.handle || "?")[0].toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">@{w.handle}</p>
-                      <p className="text-[11px] text-muted-foreground">
-                        {w.trips.length} overlapping {w.trips.length === 1 ? "trip" : "trips"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-3 pl-3 border-l-2 border-[#A1846B]/20 ml-3">
-                    {w.trips.map((t) => (
-                      <TripCard key={t.id} trip={t} note={`Matches your "${t.match}"`} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <MatchSuggestions matches={matchList} onBlock={blockMember} />
           )}
         </TabsContent>
       </Tabs>

@@ -1,0 +1,40 @@
+{
+  "name": "BlockedMember",
+  "type": "object",
+  "properties": {
+    "blocked_user_id": {
+      "type": "string",
+      "description": "The id of the blocked or reported member"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "block",
+        "report"
+      ],
+      "description": "Whether the member was blocked or reported"
+    },
+    "note": {
+      "type": "string",
+      "description": "Optional context for the block/report"
+    }
+  },
+  "required": [
+    "blocked_user_id",
+    "reason"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
