@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectTrigger, SelectContent, SelectItem, SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Moon, Loader2, LogOut, ArrowRight, ArrowLeft, Check } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import {
@@ -24,7 +26,25 @@ function getAge(dob) {
   return age;
 }
 
-const STEPS = ["About you", "Your travel", "Photos"];
+function ToggleRow({ id, label, description, checked, onCheck }) {
+  return (
+    <div className="flex items-start justify-between gap-4 py-3 border-b border-border last:border-0">
+      <div className="flex-1">
+        <Label htmlFor={id} className="text-sm font-medium">{label}</Label>
+        {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
+      </div>
+      <Switch id={id} checked={checked} onCheckedChange={onCheck} />
+    </div>
+  );
+}
+
+const LOCATION_OPTIONS = [
+  { value: "exact_city", label: "Show exact city" },
+  { value: "approximate", label: "Show approximate location only" },
+  { value: "hidden", label: "Hide current location" },
+];
+
+const STEPS = ["About you", "Your travel", "Privacy", "Photos"];
 
 export default function ProfileSetup() {
   const { logout } = useAuth();
@@ -43,6 +63,12 @@ export default function ProfileSetup() {
   const [interests, setInterests] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [mainPhoto, setMainPhoto] = useState(null);
+  const [locationVisibility, setLocationVisibility] = useState("approximate");
+  const [showAge, setShowAge] = useState(true);
+  const [showUpcomingTrips, setShowUpcomingTrips] = useState(true);
+  const [allowMatches, setAllowMatches] = useState(true);
+  const [allowInvitations, setAllowInvitations] = useState(true);
+  const [allowNotifications, setAllowNotifications] = useState(true);
 
   const age = dob ? getAge(dob) : null;
 
@@ -62,6 +88,8 @@ export default function ProfileSetup() {
       if (travelStyle.length === 0) return setError("Select at least one travel style");
       if (interests.length === 0) return setError("Select at least one interest");
       setStep(2);
+    } else if (step === 2) {
+      setStep(3);
     }
   };
 
@@ -83,6 +111,12 @@ export default function ProfileSetup() {
         interests,
         profile_photos: photos,
         main_photo: finalMain,
+        location_visibility: locationVisibility,
+        show_age: showAge,
+        show_upcoming_trips: showUpcomingTrips,
+        allow_match_suggestions: allowMatches,
+        allow_event_invitations: allowInvitations,
+        allow_notifications: allowNotifications,
         profile_completed: true,
       });
       window.location.href = "/";
@@ -196,6 +230,36 @@ export default function ProfileSetup() {
           )}
 
           {step === 2 && (
+            <div className="mt-4 space-y-5">
+              <div className="space-y-2">
+                <Label>Location visibility</Label>
+                <RadioGroup value={locationVisibility} onValueChange={setLocationVisibility} className="gap-2">
+                  {LOCATION_OPTIONS.map((o) => (
+                    <label
+                      key={o.value}
+                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${locationVisibility === o.value ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border"}`}
+                    >
+                      <RadioGroupItem value={o.value} />
+                      <span className="text-sm">{o.label}</span>
+                    </label>
+                  ))}
+                </RadioGroup>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Location is only used for destination matching, nearby events and relevant recommendations. Your exact home address is never shown.
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <ToggleRow id="showAge" label="Show my age" description="Display your age on your profile" checked={showAge} onCheck={setShowAge} />
+                <ToggleRow id="showTrips" label="Show upcoming trips" description="Let others see your planned trips" checked={showUpcomingTrips} onCheck={setShowUpcomingTrips} />
+                <ToggleRow id="matches" label="Allow match suggestions" description="Receive suggested travel companions" checked={allowMatches} onCheck={setAllowMatches} />
+                <ToggleRow id="invitations" label="Allow event invitations" description="Other members can invite you to events" checked={allowInvitations} onCheck={setAllowInvitations} />
+                <ToggleRow id="notifications" label="Allow notifications" description="Receive app notifications" checked={allowNotifications} onCheck={setAllowNotifications} />
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
             <div className="mt-4">
               <PhotoManager
                 photos={photos}
@@ -216,7 +280,7 @@ export default function ProfileSetup() {
                 <ArrowLeft className="w-4 h-4" /> Back
               </Button>
             )}
-            {step < 2 ? (
+            {step < 3 ? (
               <Button className="h-11 flex-1" onClick={goNext}>
                 Continue <ArrowRight className="w-4 h-4" />
               </Button>

@@ -77,6 +77,41 @@
       "type": "string",
       "description": "URL of the user's main profile photo (must be present in profile_photos)"
     },
+    "location_visibility": {
+      "type": "string",
+      "description": "How the user's current location is shown to others (never an exact home address)",
+      "enum": [
+        "exact_city",
+        "approximate",
+        "hidden"
+      ],
+      "default": "approximate"
+    },
+    "show_age": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the user's age is displayed on their profile"
+    },
+    "show_upcoming_trips": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the user's upcoming trips are visible to others"
+    },
+    "allow_match_suggestions": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the user receives travel companion match suggestions"
+    },
+    "allow_event_invitations": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether other members can send the user event invitations"
+    },
+    "allow_notifications": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the user receives app notifications"
+    },
     "is_email_verified": {
       "type": "boolean",
       "default": false,
