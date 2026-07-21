@@ -27,6 +27,7 @@ import Search from '@/pages/Search';
 import CreateTrip from '@/pages/CreateTrip';
 import CreateEvent from '@/pages/CreateEvent';
 import EventDetail from '@/pages/EventDetail';
+import Destinations from '@/pages/Destinations';
 import Discover from '@/pages/Discover';
 import Conversation from '@/pages/Conversation';
 import Messages from '@/pages/Messages';
@@ -120,7 +121,7 @@ const AuthenticatedApp = () => {
         <Route path="/cafes" element={<Category category="Cafés" />} />
         <Route path="/restaurants" element={<Category category="Restaurants" />} />
         <Route path="/hotels" element={<Category category="Hotels" />} />
-        <Route path="/destinations" element={<Category category="Destinations" />} />
+        <Route path="/destinations" element={<Destinations />} />
         <Route path="/reviews" element={<Category category="Reviews" />} />
         <Route path="/deals" element={<Category category="Deals" />} />
       </Route>
