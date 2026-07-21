@@ -1,0 +1,64 @@
+{
+  "name": "SavedItem",
+  "type": "object",
+  "properties": {
+    "item_key": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "image": {
+      "type": "string"
+    },
+    "info": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number"
+    },
+    "price": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "distance": {
+      "type": "number"
+    },
+    "interests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "item_key",
+    "type",
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

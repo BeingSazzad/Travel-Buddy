@@ -1,4 +1,5 @@
 import { Settings, Crown, MapPin, Calendar } from 'lucide-react';
+import SavedSection from '@/components/profile/SavedSection';
 
 export default function Profile() {
   return (
@@ -49,6 +50,8 @@ export default function Profile() {
           </div>
         ))}
       </div>
+
+      <SavedSection />
 
       {/* Recent activity */}
       <div className="mt-7">

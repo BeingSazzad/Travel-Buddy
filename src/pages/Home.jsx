@@ -36,7 +36,7 @@ export default function Home() {
           key={s.title}
           title={s.title}
           items={s.items}
-          renderCard={(item) => <ContentCard {...item} />}
+          renderCard={(item) => <ContentCard item={item} />}
         />
       ))}
     </div>

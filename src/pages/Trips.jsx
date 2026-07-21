@@ -1,4 +1,5 @@
 import { Plus, MapPin } from 'lucide-react';
+import SaveButton from '@/components/common/SaveButton';
 
 export default function Trips() {
   const trips = [
@@ -24,6 +25,10 @@ export default function Trips() {
           <div key={t.name} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card">
             <div className="h-40 relative">
               <img src={t.img} alt={t.name} className="w-full h-full object-cover" />
+              <SaveButton
+                item={{ type: 'trip', title: t.name, location: t.dest, image: t.img, info: t.date }}
+                className="absolute top-3 left-3"
+              />
               <span className="absolute top-3 right-3 text-[11px] font-semibold bg-white/90 backdrop-blur text-foreground px-2.5 py-1 rounded-full">
                 {t.status}
               </span>
