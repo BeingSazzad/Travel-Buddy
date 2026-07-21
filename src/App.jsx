@@ -20,6 +20,7 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Subscription from '@/pages/Subscription';
+import AccountPending from '@/pages/AccountPending';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -54,9 +55,25 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Authenticated but no active subscription: require membership first
-  const needsSubscription = user?.role !== 'admin' && user?.subscription_status !== 'active';
-  if (needsSubscription) {
+  // Access control: only verified, terms-accepted, active-subscription users may use the app
+  const GRANTED_SUBSCRIPTIONS = ['active', 'cancelled_active'];
+  const isAdmin = user?.role === 'admin';
+  const accountVerified = !!user?.is_email_verified;
+  const termsAccepted = !!user?.accepted_terms_at;
+  const subscriptionOk = GRANTED_SUBSCRIPTIONS.includes(user?.subscription_status);
+
+  // Step 1: account must be verified and terms accepted
+  if (!isAdmin && (!accountVerified || !termsAccepted)) {
+    return (
+      <Routes>
+        <Route path="/account-pending" element={<AccountPending />} />
+        <Route path="*" element={<Navigate to="/account-pending" replace />} />
+      </Routes>
+    );
+  }
+
+  // Step 2: subscription must be active (or cancelled but still within the billing period)
+  if (!isAdmin && !subscriptionOk) {
     return (
       <Routes>
         <Route path="/subscription" element={<Subscription />} />

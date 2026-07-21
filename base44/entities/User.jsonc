@@ -29,6 +29,11 @@
       "type": "string",
       "description": "The user's preferred app language (ISO-639-1 code)"
     },
+    "is_email_verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user has verified their email address"
+    },
     "accepted_terms_at": {
       "type": "string",
       "format": "date-time",
@@ -51,13 +56,20 @@
         "none",
         "pending",
         "active",
-        "cancelled"
+        "cancelled_active",
+        "expired",
+        "payment_failed"
       ],
       "default": "none"
     },
     "subscription_plan": {
       "type": "string",
       "description": "The active subscription plan id (monthly/yearly)"
+    },
+    "subscription_current_period_end": {
+      "type": "string",
+      "format": "date-time",
+      "description": "End of the current billing period (drives grace access for cancelled_active)"
     }
   },
   "required": [

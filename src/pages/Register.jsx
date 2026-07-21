@@ -124,6 +124,7 @@ export default function Register() {
         date_of_birth: dateOfBirth,
         country,
         preferred_language: preferredLanguage,
+        is_email_verified: true,
         accepted_terms_at: now,
         accepted_privacy_at: now,
         accepted_community_guidelines_at: now,
