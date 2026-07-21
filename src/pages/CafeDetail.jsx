@@ -1,15 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, MapPin, Star, Clock, Phone, Globe, Navigation, Share2, Bookmark, Pencil } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { ArrowLeft, MapPin, Star, Clock, Phone, Globe, Navigation, Share2, Bookmark } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
 import { CAFES, PRICE_LABELS, FACILITY_LABELS } from "@/lib/cafes";
 import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
-
-const AV = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=120&q=80`;
+import ReviewSection from "@/components/reviews/ReviewSection";
 
 export default function CafeDetail() {
   const { name } = useParams();
@@ -17,23 +15,7 @@ export default function CafeDetail() {
   const { isSaved, toggle } = useSaved();
   const cafe = useMemo(() => CAFES.find((c) => c.name.toLowerCase() === name?.toLowerCase()), [name]);
 
-  const [reviews, setReviews] = useState([]);
-  const [loadingReviews, setLoadingReviews] = useState(true);
-  const [writing, setWriting] = useState(false);
-  const [newRating, setNewRating] = useState(5);
-  const [newText, setNewText] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
   const itemKey = cafe ? `cafe:${cafe.name}` : "";
-
-  useEffect(() => {
-    if (!cafe) return;
-    setLoadingReviews(true);
-    base44.entities.Review.filter({ item_key: itemKey }, "-created_date")
-      .then(setReviews)
-      .catch(() => {})
-      .finally(() => setLoadingReviews(false));
-  }, [cafe, itemKey]);
 
   if (!cafe)
     return (
@@ -52,23 +34,6 @@ export default function CafeDetail() {
       if (navigator.share) await navigator.share({ title: cafe.name, text: cafe.description, url: window.location.href });
       else { await navigator.clipboard.writeText(window.location.href); alert("Link copied"); }
     } catch (e) {}
-  };
-
-  const submitReview = async () => {
-    if (!newText.trim()) return;
-    setSubmitting(true);
-    try {
-      const me = await base44.auth.me();
-      const review = await base44.entities.Review.create({
-        item_key: itemKey, item_type: "cafe", item_title: cafe.name,
-        rating: newRating, text: newText.trim(),
-        author_name: me.full_name || "Seluna member",
-        author_avatar: me.avatar || AV("1521119989659-a83eee488004"),
-      });
-      setReviews((r) => [review, ...r]);
-      setNewText(""); setNewRating(5); setWriting(false);
-    } catch (e) { alert("Please log in to post a review."); }
-    finally { setSubmitting(false); }
   };
 
   return (
@@ -134,55 +99,7 @@ export default function CafeDetail() {
             <EventMap query={cafe.address} />
           </section>
 
-          {/* Reviews */}
-          <section className="mt-5">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="font-display font-semibold text-base">Member reviews ({reviews.length})</h2>
-              <button onClick={() => setWriting((w) => !w)} className="text-sm text-[#A1846B] flex items-center gap-1"><Pencil className="w-3.5 h-3.5" strokeWidth={1.5} /> Write review</button>
-            </div>
-
-            {writing && (
-              <div className="rounded-2xl border border-border bg-card p-3 mb-3 space-y-2">
-                <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <button key={n} onClick={() => setNewRating(n)}>
-                      <Star className={cn("w-5 h-5", n <= newRating ? "fill-[#A1846B] text-[#A1846B]" : "text-border")} strokeWidth={0} />
-                    </button>
-                  ))}
-                </div>
-                <textarea value={newText} onChange={(e) => setNewText(e.target.value)} placeholder="Share your experience…" rows={3} className="w-full rounded-xl border border-border bg-background p-2 text-sm resize-none" />
-                <div className="flex gap-2 justify-end">
-                  <button onClick={() => setWriting(false)} className="px-3 py-1.5 text-sm rounded-full border border-border">Cancel</button>
-                  <button onClick={submitReview} disabled={submitting || !newText.trim()} className="px-4 py-1.5 text-sm rounded-full bg-foreground text-background disabled:opacity-50">Post</button>
-                </div>
-              </div>
-            )}
-
-            {loadingReviews ? (
-              <p className="text-sm text-muted-foreground">Loading reviews…</p>
-            ) : reviews.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No reviews yet — be the first to review {cafe.name}.</p>
-            ) : (
-              <div className="space-y-2">
-                {reviews.map((r) => (
-                  <div key={r.id} className="rounded-2xl border border-border bg-card p-3">
-                    <div className="flex items-center gap-2">
-                      <img src={r.author_avatar} alt={r.author_name} className="w-8 h-8 rounded-full object-cover" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{r.author_name}</p>
-                        <span className="flex items-center gap-0.5">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star key={i} className={cn("w-3 h-3", i < r.rating ? "fill-[#A1846B] text-[#A1846B]" : "text-border")} strokeWidth={0} />
-                          ))}
-                        </span>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{r.text}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+          <ReviewSection itemKey={itemKey} itemType="cafe" itemTitle={cafe.name} />
         </div>
       </div>
 

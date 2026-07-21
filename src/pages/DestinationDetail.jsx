@@ -6,7 +6,7 @@ import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
 import VenueRow from "@/components/destinations/VenueRow";
-import ReviewItem from "@/components/destinations/ReviewItem";
+import ReviewSection from "@/components/reviews/ReviewSection";
 import EventCard from "@/components/events/EventCard";
 import { DESTINATIONS } from "@/lib/destinations";
 import { contentFor } from "@/lib/destination-content";
@@ -192,8 +192,8 @@ export default function DestinationDetail() {
           </Section>
 
           {/* Reviews */}
-          <Section icon={Users} title="Reviews">
-            <div className="space-y-2">{content.reviews.map((r, i) => <ReviewItem key={i} review={r} />)}</div>
+          <Section icon={Users} title="Member reviews">
+            <ReviewSection itemKey={`destination:${dest.city}`} itemType="destination" itemTitle={dest.city} />
           </Section>
         </div>
       </div>
