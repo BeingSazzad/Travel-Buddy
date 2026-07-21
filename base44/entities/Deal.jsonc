@@ -1,0 +1,80 @@
+{
+  "name": "Deal",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "partner": {
+      "type": "string",
+      "description": "Partner brand or venue name"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "hotels",
+        "restaurants",
+        "cafes",
+        "tours",
+        "activities",
+        "beach_clubs",
+        "travel_insurance",
+        "coworking",
+        "transport"
+      ]
+    },
+    "image": {
+      "type": "string",
+      "description": "Partner image or logo URL"
+    },
+    "discount": {
+      "type": "string",
+      "description": "Discount % or benefit, e.g. '20% off' or 'Free breakfast'"
+    },
+    "city": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "expiration_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "terms": {
+      "type": "string",
+      "description": "Redemption terms & conditions"
+    },
+    "code_prefix": {
+      "type": "string",
+      "description": "Prefix used when generating member redeem codes"
+    }
+  },
+  "required": [
+    "title",
+    "partner",
+    "category",
+    "image",
+    "discount",
+    "city",
+    "expiration_date"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
