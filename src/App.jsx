@@ -19,10 +19,11 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import Subscription from '@/pages/Subscription';
 // Add page imports here
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, user, navigateToLogin } = useAuth();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -49,6 +50,17 @@ const AuthenticatedApp = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="*" element={<Navigate to="/welcome" replace />} />
+      </Routes>
+    );
+  }
+
+  // Authenticated but no active subscription: require membership first
+  const needsSubscription = user?.role !== 'admin' && user?.subscription_status !== 'active';
+  if (needsSubscription) {
+    return (
+      <Routes>
+        <Route path="/subscription" element={<Subscription />} />
+        <Route path="*" element={<Navigate to="/subscription" replace />} />
       </Routes>
     );
   }

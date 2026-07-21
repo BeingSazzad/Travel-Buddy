@@ -7,6 +7,57 @@
         "admin",
         "user"
       ]
+    },
+    "first_name": {
+      "type": "string",
+      "description": "The user's first name"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "The user's last name"
+    },
+    "date_of_birth": {
+      "type": "string",
+      "format": "date",
+      "description": "The user's date of birth (must be 18+)"
+    },
+    "country": {
+      "type": "string",
+      "description": "The user's country of residence"
+    },
+    "preferred_language": {
+      "type": "string",
+      "description": "The user's preferred app language (ISO-639-1 code)"
+    },
+    "accepted_terms_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the user accepted the Terms and Conditions"
+    },
+    "accepted_privacy_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the user accepted the Privacy Policy"
+    },
+    "accepted_community_guidelines_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the user accepted the Community Guidelines"
+    },
+    "subscription_status": {
+      "type": "string",
+      "description": "Current membership subscription status",
+      "enum": [
+        "none",
+        "pending",
+        "active",
+        "cancelled"
+      ],
+      "default": "none"
+    },
+    "subscription_plan": {
+      "type": "string",
+      "description": "The active subscription plan id (monthly/yearly)"
     }
   },
   "required": [
