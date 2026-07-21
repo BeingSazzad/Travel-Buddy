@@ -16,23 +16,76 @@
       "type": "string",
       "description": "The user's last name"
     },
+    "profile_name": {
+      "type": "string",
+      "description": "Public display name shown on the user's profile"
+    },
     "date_of_birth": {
       "type": "string",
       "format": "date",
       "description": "The user's date of birth (must be 18+)"
     },
+    "current_city": {
+      "type": "string",
+      "description": "The city where the user currently lives"
+    },
     "country": {
       "type": "string",
       "description": "The user's country of residence"
+    },
+    "nationality": {
+      "type": "string",
+      "description": "The user's nationality"
     },
     "preferred_language": {
       "type": "string",
       "description": "The user's preferred app language (ISO-639-1 code)"
     },
+    "languages_spoken": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Languages the user speaks"
+    },
+    "biography": {
+      "type": "string",
+      "description": "A short biography for the user's profile"
+    },
+    "travel_style": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The user's preferred travel styles"
+    },
+    "interests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The user's interests"
+    },
+    "profile_photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Ordered list of profile photo URLs (minimum 2, maximum 8)"
+    },
+    "main_photo": {
+      "type": "string",
+      "description": "URL of the user's main profile photo (must be present in profile_photos)"
+    },
     "is_email_verified": {
       "type": "boolean",
       "default": false,
       "description": "Whether the user has verified their email address"
+    },
+    "profile_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user has completed the post-subscription profile setup"
     },
     "accepted_terms_at": {
       "type": "string",

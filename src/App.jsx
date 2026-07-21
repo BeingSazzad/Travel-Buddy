@@ -21,6 +21,7 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Subscription from '@/pages/Subscription';
 import AccountPending from '@/pages/AccountPending';
+import ProfileSetup from '@/pages/ProfileSetup';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -78,6 +79,16 @@ const AuthenticatedApp = () => {
       <Routes>
         <Route path="/subscription" element={<Subscription />} />
         <Route path="*" element={<Navigate to="/subscription" replace />} />
+      </Routes>
+    );
+  }
+
+  // Step 3: profile must be completed before using the app
+  if (!isAdmin && !user?.profile_completed) {
+    return (
+      <Routes>
+        <Route path="/profile-setup" element={<ProfileSetup />} />
+        <Route path="*" element={<Navigate to="/profile-setup" replace />} />
       </Routes>
     );
   }
