@@ -1,13 +1,13 @@
 import { Coffee, UtensilsCrossed, Building2, Plane, Gift, Users, Star, Heart } from 'lucide-react';
 
 const items = [
-  { label: 'Caféer', icon: Coffee },
-  { label: 'Restauranter', icon: UtensilsCrossed },
-  { label: 'Hoteller', icon: Building2 },
-  { label: 'Rejser', icon: Plane },
+  { label: 'Cafés', icon: Coffee },
+  { label: 'Restaurants', icon: UtensilsCrossed },
+  { label: 'Hotels', icon: Building2 },
+  { label: 'Trips', icon: Plane },
   { label: 'Events', icon: Gift },
-  { label: 'Veninder', icon: Users },
-  { label: 'Anmeldelser', icon: Star },
+  { label: 'Friends', icon: Users },
+  { label: 'Reviews', icon: Star },
   { label: 'Deals', icon: Heart },
 ];
 

@@ -14,7 +14,7 @@ export default function Home() {
         <div className="flex items-center gap-2 bg-card border border-border rounded-full px-5 py-3.5 shadow-soft">
           <Search className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
           <input
-            placeholder="Søg på café, restaurant, hotel, rejse..."
+            placeholder="Search cafés, restaurants, hotels, trips..."
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </div>
@@ -23,8 +23,8 @@ export default function Home() {
       {/* Explore */}
       <section className="px-5 mt-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display font-semibold text-lg">Udforsk</h2>
-          <span className="text-xs font-medium text-accent">Se alle</span>
+          <h2 className="font-display font-semibold text-lg">Explore</h2>
+          <span className="text-xs font-medium text-accent">See all</span>
         </div>
         <ExploreGrid />
       </section>
@@ -32,8 +32,8 @@ export default function Home() {
       {/* Recommended */}
       <section className="px-5 mt-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display font-semibold text-lg">Anbefalet til dig</h2>
-          <span className="text-xs font-medium text-accent">Se alle</span>
+          <h2 className="font-display font-semibold text-lg">Recommended for you</h2>
+          <span className="text-xs font-medium text-accent">See all</span>
         </div>
         <RecommendedCard />
       </section>
