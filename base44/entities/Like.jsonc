@@ -1,0 +1,36 @@
+{
+  "name": "Like",
+  "type": "object",
+  "properties": {
+    "liked_user_id": {
+      "type": "string",
+      "description": "The member this like/pass action targets"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "like",
+        "pass"
+      ],
+      "description": "Whether the user liked or passed on the member"
+    }
+  },
+  "required": [
+    "liked_user_id",
+    "action"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

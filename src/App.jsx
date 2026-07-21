@@ -25,6 +25,7 @@ import AccountPending from '@/pages/AccountPending';
 import ProfileSetup from '@/pages/ProfileSetup';
 import Search from '@/pages/Search';
 import CreateTrip from '@/pages/CreateTrip';
+import Discover from '@/pages/Discover';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -104,6 +105,7 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
         <Route path="/trips" element={<Trips />} />
+        <Route path="/discover" element={<Discover />} />
         <Route path="/friends" element={<Friends />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />

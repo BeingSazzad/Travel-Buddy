@@ -1,0 +1,50 @@
+{
+  "name": "Match",
+  "type": "object",
+  "properties": {
+    "match_user_id": {
+      "type": "string",
+      "description": "The other member in this travel-friend match"
+    },
+    "match_name": {
+      "type": "string",
+      "description": "Display name of the matched member (denormalized)"
+    },
+    "match_avatar": {
+      "type": "string",
+      "description": "Avatar URL of the matched member (denormalized)"
+    },
+    "city": {
+      "type": "string",
+      "description": "City context for the match (optional)"
+    },
+    "dates": {
+      "type": "string",
+      "description": "Human-readable travel dates context (optional)"
+    }
+  },
+  "required": [
+    "match_user_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.match_user_id": "{{user.id}}"
+        }
+      ]
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
