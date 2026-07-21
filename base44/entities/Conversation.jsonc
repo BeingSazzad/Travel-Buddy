@@ -41,6 +41,13 @@
     "typing": {
       "type": "object",
       "description": "Map of participant_id -> timestamp (ms) of last typing signal"
+    },
+    "hidden_for": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Participant ids who have deleted/hidden this conversation"
     }
   },
   "required": [

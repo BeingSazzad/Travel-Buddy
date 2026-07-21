@@ -11,8 +11,12 @@ Deno.serve(async (req) => {
 
     const likes = await base44.entities.Like.list("-created_date", 500);
     const acted = new Set(likes.map((l) => l.liked_user_id));
-    const blocked = await base44.entities.BlockedMember.list("-created_date", 200);
-    const blockedIds = new Set(blocked.map((b) => b.blocked_user_id));
+    const allBlocks = await base44.asServiceRole.entities.BlockedMember.list("-created_date", 1000);
+    const blockedIds = new Set();
+    for (const b of allBlocks) {
+      if (b.created_by_id === user.id) blockedIds.add(b.blocked_user_id);
+      if (b.blocked_user_id === user.id) blockedIds.add(b.created_by_id);
+    }
 
     const allTrips = await base44.asServiceRole.entities.Trip.list("-start_date", 500);
     const users = await base44.asServiceRole.entities.User.list();

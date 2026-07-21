@@ -44,7 +44,14 @@
       "created_by_id": "{{user.id}}"
     },
     "delete": {
-      "created_by_id": "{{user.id}}"
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.match_user_id": "{{user.id}}"
+        }
+      ]
     }
   }
 }
