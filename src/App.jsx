@@ -24,6 +24,7 @@ import Subscription from '@/pages/Subscription';
 import AccountPending from '@/pages/AccountPending';
 import ProfileSetup from '@/pages/ProfileSetup';
 import Search from '@/pages/Search';
+import CreateTrip from '@/pages/CreateTrip';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -98,6 +99,7 @@ const AuthenticatedApp = () => {
   // Authenticated: render the main app
   return (
     <Routes>
+      <Route path="/trips/new" element={<CreateTrip />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />

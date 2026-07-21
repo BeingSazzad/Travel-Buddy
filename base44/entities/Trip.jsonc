@@ -24,6 +24,23 @@
     },
     "cover_image": {
       "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "looking_for": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "public",
+        "hidden"
+      ],
+      "default": "public"
     }
   },
   "required": [

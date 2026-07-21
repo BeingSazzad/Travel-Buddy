@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectTrigger, SelectContent, SelectItem, SelectValue,
 } from "@/components/ui/select";
-import { COUNTRIES, TRAVEL_STYLES } from "@/lib/profile-options";
+import { COUNTRIES } from "@/lib/profile-options";
+import { TRAVEL_STYLES } from "@/lib/trip-options";
 import { imageForCity } from "@/lib/trip-utils";
 
 const EMPTY = { name: "", city: "", country: "", start_date: "", end_date: "", travel_style: "" };

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ const STATUS_ORDER = ["active", "upcoming", "previous"];
 
 export default function Trips() {
   const { trips, loading, user, create, update, remove } = useTrips();
+  const navigate = useNavigate();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
@@ -41,7 +43,7 @@ export default function Trips() {
     return Object.values(map);
   }, [myTrips, otherTrips]);
 
-  const openNew = () => { setEditing(null); setFormOpen(true); };
+  const openNew = () => navigate("/trips/new");
   const openEdit = (trip) => { setEditing(trip); setFormOpen(true); };
   const submit = async (data) => {
     if (editing) await update(editing.id, data);
