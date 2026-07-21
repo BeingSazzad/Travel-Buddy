@@ -19,12 +19,48 @@
     },
     "text": {
       "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "text",
+        "image",
+        "content"
+      ],
+      "default": "text"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Uploaded image URL for image messages"
+    },
+    "content_type": {
+      "type": "string",
+      "enum": [
+        "destination",
+        "trip",
+        "cafe",
+        "restaurant",
+        "hotel",
+        "event",
+        "deal",
+        "meeting"
+      ],
+      "description": "The kind of Seluna content shared"
+    },
+    "content_data": {
+      "type": "object",
+      "description": "Snapshot of the shared content (title, location, image, etc.)"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the recipient has seen this message"
     }
   },
   "required": [
     "conversation_id",
     "participant_ids",
-    "text"
+    "type"
   ],
   "rls": {
     "read": {
@@ -38,7 +74,11 @@
       }
     },
     "update": {
-      "created_by_id": "{{user.id}}"
+      "data.participant_ids": {
+        "$in": [
+          "{{user.id}}"
+        ]
+      }
     },
     "delete": {
       "created_by_id": "{{user.id}}"
