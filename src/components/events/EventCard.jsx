@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { MapPin, Calendar, Clock, Users, UserCircle } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { capitalize, fmtEventDate } from "@/lib/event-options";
 
 export default function EventCard({ event, joined, onRsvp }) {
   const full = (event.attendees_count || 0) >= (event.max_attendees || 0);
+  const navigate = useNavigate();
   const item = {
     type: "event",
     title: event.title,
@@ -17,7 +19,7 @@ export default function EventCard({ event, joined, onRsvp }) {
   };
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card">
+    <div onClick={() => navigate(`/events/${event.id}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer">
       <div className="relative h-40">
         <Image src={event.image} alt={event.title} fittingType="fill" className="w-full h-full" />
         <div className="absolute top-3 left-3">
@@ -44,7 +46,7 @@ export default function EventCard({ event, joined, onRsvp }) {
           <Button
             size="sm"
             variant={joined ? "outline" : "default"}
-            onClick={() => onRsvp(event, joined ? "leave" : "join")}
+            onClick={(e) => { e.stopPropagation(); onRsvp(event, joined ? "leave" : "join"); }}
             disabled={!joined && full}
             className={joined ? "" : "bg-foreground text-background"}
           >

@@ -26,6 +26,7 @@ import ProfileSetup from '@/pages/ProfileSetup';
 import Search from '@/pages/Search';
 import CreateTrip from '@/pages/CreateTrip';
 import CreateEvent from '@/pages/CreateEvent';
+import EventDetail from '@/pages/EventDetail';
 import Discover from '@/pages/Discover';
 import Conversation from '@/pages/Conversation';
 import Messages from '@/pages/Messages';
@@ -105,6 +106,7 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route path="/trips/new" element={<CreateTrip />} />
       <Route path="/events/new" element={<CreateEvent />} />
+      <Route path="/events/:id" element={<EventDetail />} />
       <Route path="/conversations/:id" element={<Conversation />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />

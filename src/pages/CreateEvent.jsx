@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,25 @@ export default function CreateEvent() {
   const [step, setStep] = useState(1);
   const [data, setData] = useState(EMPTY);
   const [creating, setCreating] = useState(false);
+  const editId = new URLSearchParams(window.location.search).get("edit");
+
+  useEffect(() => {
+    if (!editId) return;
+    (async () => {
+      try {
+        const e = await base44.entities.Event.get(editId);
+        setData({
+          title: e.title || "", category: e.category || "", description: e.description || "",
+          date: e.date || "", start_time: e.time || "", end_time: e.end_time || "",
+          city: e.city || "", country: e.country || "", location: e.location || "",
+          image: e.image || "", max_attendees: e.max_attendees || 10,
+          visibility: e.visibility || "public", pricing: e.pricing || "free",
+          external_link: e.external_link || "", age_min: e.age_min || "", age_max: e.age_max || "",
+          languages: e.languages || [], agreed_rules: true,
+        });
+      } catch (err) { /* ignore */ }
+    })();
+  }, [editId]);
 
   const set = (k, v) => setData((d) => ({ ...d, [k]: v }));
   const toggleLang = (v) =>
@@ -81,7 +100,7 @@ export default function CreateEvent() {
   const finish = async () => {
     setCreating(true);
     try {
-      await base44.entities.Event.create({
+      const payload = {
         title: data.title.trim(),
         category: data.category,
         description: data.description.trim(),
@@ -100,10 +119,12 @@ export default function CreateEvent() {
         age_max: data.age_max ? Number(data.age_max) : null,
         languages: data.languages,
         agreed_rules: true,
-        host_name: user?.full_name || "Seluna host",
-        host_id: user?.id,
-        attendees_count: 0,
-      });
+      };
+      if (editId) {
+        await base44.entities.Event.update(editId, payload);
+      } else {
+        await base44.entities.Event.create({ ...payload, host_name: user?.full_name || "Seluna host", host_id: user?.id, attendees_count: 0 });
+      }
       navigate("/events");
     } finally {
       setCreating(false);
@@ -125,7 +146,7 @@ export default function CreateEvent() {
           <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
         </button>
         <div>
-          <h1 className="font-display font-semibold text-lg">Host an event</h1>
+          <h1 className="font-display font-semibold text-lg">{editId ? "Edit event" : "Host an event"}</h1>
           <p className="text-xs text-muted-foreground">Step {step} of {TOTAL}</p>
         </div>
       </header>
@@ -328,7 +349,7 @@ export default function CreateEvent() {
         {step < TOTAL ? (
           <Button className="flex-1 bg-foreground text-background" onClick={next} disabled={!valid}>Next</Button>
         ) : (
-          <Button className="flex-1 bg-foreground text-background" onClick={finish} disabled={creating}>{creating ? "Publishing…" : "Publish event"}</Button>
+          <Button className="flex-1 bg-foreground text-background" onClick={finish} disabled={creating}>{creating ? "Saving…" : editId ? "Save changes" : "Publish event"}</Button>
         )}
       </div>
     </div>
