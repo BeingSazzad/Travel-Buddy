@@ -1,7 +1,12 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
-import { buildProfile, formatDates } from "../../shared/member-profile.ts";
+import { buildProfile } from "../../shared/member-profile.ts";
 
-function arr(a) { return Array.isArray(a) ? a : []; }
+async function findConversation(base44, a, b) {
+  const list = await base44.asServiceRole.entities.Conversation.filter({
+    "data.participant_ids": { $all: [a, b] },
+  });
+  return list[0] || null;
+}
 
 Deno.serve(async (req) => {
   try {
@@ -16,39 +21,55 @@ Deno.serve(async (req) => {
     }
 
     await base44.entities.Like.create({ liked_user_id, action });
-
     if (action !== "like") return Response.json({ matched: false });
 
-    // Already matched?
+    const myProf = buildProfile(user);
+    const users = await base44.asServiceRole.entities.User.list();
+    const them = users.find((u) => u.id === liked_user_id);
+    const theirProf = buildProfile(them);
+
+    // Existing match?
+    let match = null;
     const existing = await base44.asServiceRole.entities.Match.filter({
       $or: [
         { created_by_id: user.id, "data.match_user_id": liked_user_id },
         { created_by_id: liked_user_id, "data.match_user_id": user.id },
       ],
     });
-    if (existing.length) return Response.json({ matched: true, match: existing[0] });
+    if (existing.length) {
+      match = existing[0];
+    } else {
+      const theirLikes = await base44.asServiceRole.entities.Like.filter({
+        created_by_id: liked_user_id,
+        "data.action": "like",
+      });
+      const mutual = theirLikes.some((l) => l.liked_user_id === user.id);
+      if (!mutual) return Response.json({ matched: false });
 
-    // Did they already like me?
-    const theirLikes = await base44.asServiceRole.entities.Like.filter({
-      created_by_id: liked_user_id,
-      "data.action": "like",
-    });
-    const mutual = theirLikes.some((l) => l.liked_user_id === user.id);
-    if (!mutual) return Response.json({ matched: false });
+      match = await base44.entities.Match.create({
+        match_user_id: liked_user_id,
+        match_name: theirProf?.name || "",
+        match_avatar: theirProf?.avatar || "",
+        city: theirProf?.current_city || "",
+        dates: "",
+      });
+    }
 
-    const users = await base44.asServiceRole.entities.User.list();
-    const them = users.find((u) => u.id === liked_user_id);
-    const prof = buildProfile(them);
+    // Ensure a private conversation exists between the two members
+    let conversation_id = null;
+    let conv = await findConversation(base44, user.id, liked_user_id);
+    if (!conv) {
+      conv = await base44.entities.Conversation.create({
+        participant_ids: [user.id, liked_user_id],
+        participant_names: [myProf?.name || "", theirProf?.name || ""],
+        participant_avatars: [myProf?.avatar || "", theirProf?.avatar || ""],
+        match_id: match.id,
+        last_message: "",
+      });
+    }
+    conversation_id = conv.id;
 
-    const match = await base44.entities.Match.create({
-      match_user_id: liked_user_id,
-      match_name: prof?.name || "",
-      match_avatar: prof?.avatar || "",
-      city: prof?.current_city || "",
-      dates: "",
-    });
-
-    return Response.json({ matched: true, match });
+    return Response.json({ matched: true, match: { ...match, conversation_id } });
   } catch (error) {
     console.error("record-like error", error);
     return Response.json({ error: error.message }, { status: 500 });

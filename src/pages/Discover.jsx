@@ -1,32 +1,33 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles, Plane } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
 import { useDiscover } from "@/hooks/useDiscover";
 import SwipeCard from "@/components/swipe/SwipeCard";
+import MatchModal from "@/components/swipe/MatchModal";
 import MemberProfileSheet from "@/components/swipe/MemberProfileSheet";
-import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 
 export default function Discover() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const {
     deck, loading, matched, setMatched,
     profile, setProfile, profileLoading, viewProfile,
     swipe, reload,
   } = useDiscover();
-  const { toast } = useToast();
 
-  useEffect(() => {
-    if (matched) {
-      toast({
-        title: "It's a travel friendship!",
-        description: `You and ${matched.name} can now plan a trip together.`,
-      });
-      setMatched(null);
-    }
-  }, [matched, setMatched, toast]);
-
+  const myAvatar = user?.main_photo || user?.profile_photos?.[0] || "";
   const current = deck[0];
+
+  const handleProfile = () => {
+    if (!matched) return;
+    const m = { user_id: matched.match_user_id, name: matched.name };
+    setMatched(null);
+    viewProfile(m);
+  };
+
+  const handleKeepExploring = () => setMatched(null);
 
   return (
     <div className="px-5 pt-12 pb-24 min-h-screen flex flex-col">
@@ -69,6 +70,15 @@ export default function Discover() {
           />
         )}
       </div>
+
+      <MatchModal
+        open={!!matched}
+        myAvatar={myAvatar}
+        theirAvatar={matched?.avatar || ""}
+        onMessage={() => matched?.conversation_id && navigate(`/conversations/${matched.conversation_id}`)}
+        onProfile={handleProfile}
+        onKeepExploring={handleKeepExploring}
+      />
 
       <MemberProfileSheet
         open={!!profile}

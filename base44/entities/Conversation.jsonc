@@ -1,0 +1,67 @@
+{
+  "name": "Conversation",
+  "type": "object",
+  "properties": {
+    "participant_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "The two member ids in this 1:1 conversation"
+    },
+    "participant_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Display names denormalized for headers"
+    },
+    "participant_avatars": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Avatar URLs denormalized for headers"
+    },
+    "match_id": {
+      "type": "string",
+      "description": "The Match record this conversation was created from"
+    },
+    "last_message": {
+      "type": "string"
+    },
+    "last_message_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "participant_ids"
+  ],
+  "rls": {
+    "read": {
+      "data.participant_ids": "{{user.id}}"
+    },
+    "create": {
+      "data.participant_ids": {
+        "$in": [
+          "{{user.id}}"
+        ]
+      }
+    },
+    "update": {
+      "data.participant_ids": {
+        "$in": [
+          "{{user.id}}"
+        ]
+      }
+    },
+    "delete": {
+      "data.participant_ids": {
+        "$in": [
+          "{{user.id}}"
+        ]
+      }
+    }
+  }
+}

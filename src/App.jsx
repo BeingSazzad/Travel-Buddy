@@ -26,6 +26,7 @@ import ProfileSetup from '@/pages/ProfileSetup';
 import Search from '@/pages/Search';
 import CreateTrip from '@/pages/CreateTrip';
 import Discover from '@/pages/Discover';
+import Conversation from '@/pages/Conversation';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -101,6 +102,7 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/trips/new" element={<CreateTrip />} />
+      <Route path="/conversations/:id" element={<Conversation />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
