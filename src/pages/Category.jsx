@@ -43,6 +43,12 @@ const samples = {
     { name: 'Bali Retreat Deal', loc: 'Ubud', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80' },
     { name: 'Paris Dinner 2-for-1', loc: 'Paris', img: 'https://images.unsplash.com/photo-1517248135467-4c7edcad2f99?auto=format&fit=crop&w=500&q=80' },
   ],
+  Destinations: [
+    { name: 'Lisbon', loc: 'Portugal', img: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=500&q=80' },
+    { name: 'Bali', loc: 'Indonesia', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80' },
+    { name: 'Marrakech', loc: 'Morocco', img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=500&q=80' },
+    { name: 'Copenhagen', loc: 'Denmark', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=500&q=80' },
+  ],
 };
 
 export default function Category({ category }) {
