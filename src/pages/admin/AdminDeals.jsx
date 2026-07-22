@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { SectionHeader, ListState } from "@/components/admin/AdminUI";
 import { Plus, Trash2, Loader2, Tag } from "lucide-react";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 
 const CATEGORIES = ["hotels", "restaurants", "cafes", "tours", "activities", "beach_clubs", "travel_insurance", "coworking", "transport"];
 
@@ -79,10 +80,14 @@ export default function AdminDeals() {
             <Field label="Code prefix" value={form.code_prefix} onChange={(v) => setForm({ ...form, code_prefix: v })} placeholder="SELUNA" />
             <div>
               <label className="text-[11px] text-muted-foreground">Category</label>
-              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none">
-                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-              </select>
+              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                <SelectTrigger className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <Field label="Terms" value={form.terms} onChange={(v) => setForm({ ...form, terms: v })} textarea />

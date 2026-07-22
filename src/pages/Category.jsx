@@ -56,7 +56,7 @@ export default function Category({ category }) {
   const list = samples[category] || [];
 
   return (
-    <div className="px-5 pt-12">
+    <div className="px-5 safe-pt">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4"

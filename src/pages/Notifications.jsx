@@ -49,7 +49,7 @@ export default function Notifications() {
   };
 
   return (
-    <div className="px-5 pt-12 pb-6 min-h-screen">
+    <div className="px-5 safe-pt pb-6 min-h-screen">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center active:scale-95 transition">

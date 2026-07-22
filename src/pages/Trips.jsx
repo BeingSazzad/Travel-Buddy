@@ -44,7 +44,7 @@ export default function Trips() {
   };
 
   return (
-    <div className="px-5 pt-12 pb-6">
+    <div className="px-5 safe-pt pb-6">
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="font-display font-semibold text-2xl">Trips</h1>

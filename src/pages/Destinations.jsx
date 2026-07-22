@@ -6,6 +6,7 @@ import DestinationCard from "@/components/destinations/DestinationCard";
 import { cn } from "@/lib/utils";
 import { MapPin } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
+import FilterPicker from "@/components/common/FilterPicker";
 
 const emptyTags = () => Object.fromEntries(TAG_FILTERS.map((t) => [t.key, false]));
 
@@ -53,7 +54,7 @@ export default function Destinations() {
   const toggle = (k) => setTags((t) => ({ ...t, [k]: !t[k] }));
 
   return (
-    <div className="px-5 pt-12 pb-6">
+    <div className="px-5 safe-pt pb-6">
       <h1 className="font-display font-semibold text-2xl">Destinations</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-5">Curated cities, loved by women who travel</p>
 
@@ -93,13 +94,7 @@ export default function Destinations() {
             {t.label}
           </button>
         ))}
-        <select
-          value={weather}
-          onChange={(e) => setWeather(e.target.value)}
-          className="px-3 py-1.5 rounded-full text-xs border border-border bg-background text-foreground"
-        >
-          {WEATHERS.map((w) => <option key={w} value={w}>Weather: {w}</option>)}
-        </select>
+        <FilterPicker title="Weather" value={weather} onChange={setWeather} options={WEATHERS.map((w) => ({ value: w, label: w }))} />
       </div>
 
       {/* Results */}

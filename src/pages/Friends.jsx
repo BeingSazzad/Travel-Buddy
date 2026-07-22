@@ -17,7 +17,7 @@ export default function Friends() {
   ];
 
   return (
-    <div className="px-5 pt-12">
+    <div className="px-5 safe-pt">
       <h1 className="font-display font-semibold text-2xl mb-1">Friends</h1>
       <p className="text-sm text-muted-foreground mb-4">Women exploring like you</p>
 

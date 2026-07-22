@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { Home, Map, Users, Calendar, User, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +12,7 @@ const tabs = [
 ];
 
 export default function BottomNav() {
+  const { pathname } = useLocation();
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-50 bg-card/90 backdrop-blur-lg border-t border-border">
       <div className="flex items-stretch justify-around px-2 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
@@ -20,6 +21,13 @@ export default function BottomNav() {
             key={to}
             to={to}
             end={to === '/'}
+            onClick={() => {
+              const isCurrent = to === '/' ? pathname === '/' : pathname === to;
+              if (isCurrent) {
+                const el = document.querySelector('.overflow-y-auto:not(.hidden)');
+                if (el) el.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
             className={({ isActive }) =>
               cn(
                 'flex flex-col items-center justify-center gap-1 flex-1 py-1.5 rounded-2xl transition-all duration-200',

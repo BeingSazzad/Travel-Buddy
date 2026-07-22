@@ -40,7 +40,7 @@ export default function Hotels() {
   }, [hotels, tags, price, stars, rating, sort]);
 
   if (loading) return (
-    <div className="px-5 pt-12 pb-6">
+    <div className="px-5 safe-pt pb-6">
       <h1 className="font-display font-semibold text-2xl">Hotels</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Stays curated for women who travel</p>
       <ListSkeleton count={4} />
@@ -48,7 +48,7 @@ export default function Hotels() {
   );
 
   return (
-    <div className="px-5 pt-12 pb-6">
+    <div className="px-5 safe-pt pb-6">
       <h1 className="font-display font-semibold text-2xl">Hotels</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Stays curated for women who travel</p>
 

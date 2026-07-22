@@ -13,7 +13,7 @@ export default function Profile() {
   const photos = user?.profile_photos || [];
 
   return (
-    <div className="px-5 pt-12 pb-10">
+    <div className="px-5 safe-pt pb-10">
       <h1 className="font-display font-semibold text-2xl mb-4">Profile</h1>
 
       <ProfileHeader />

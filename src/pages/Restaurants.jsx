@@ -32,7 +32,7 @@ export default function Restaurants() {
   }, [restaurants, tags, cuisine, price, rating, sort]);
 
   if (loading) return (
-    <div className="px-5 pt-12 pb-6">
+    <div className="px-5 safe-pt pb-6">
       <h1 className="font-display font-semibold text-2xl">Restaurants</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Where to eat, curated for women who travel</p>
       <ListSkeleton count={4} />
@@ -40,7 +40,7 @@ export default function Restaurants() {
   );
 
   return (
-    <div className="px-5 pt-12 pb-6">
+    <div className="px-5 safe-pt pb-6">
       <h1 className="font-display font-semibold text-2xl">Restaurants</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Where to eat, curated for women who travel</p>
 

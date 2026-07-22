@@ -37,7 +37,7 @@ export default function Deals() {
   }, [deals, category]);
 
   return (
-    <div className="px-5 pt-12 pb-6">
+    <div className="px-5 safe-pt pb-6">
       <div className="flex items-center gap-1.5 text-[#A1846B] mb-1">
         <span className="text-xs font-medium uppercase tracking-wide">Seluna members only</span>
       </div>

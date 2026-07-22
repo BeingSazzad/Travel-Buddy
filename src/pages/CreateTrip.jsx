@@ -108,7 +108,7 @@ export default function CreateTrip() {
   return (
     <div className="max-w-md mx-auto min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="px-5 pt-12 pb-3 flex items-center gap-3">
+      <header className="px-5 safe-pt pb-3 flex items-center gap-3">
         <button onClick={back} className="w-9 h-9 rounded-full flex items-center justify-center">
           <ArrowLeft className="w-5 h-5" />
         </button>
