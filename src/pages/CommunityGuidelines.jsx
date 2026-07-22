@@ -55,7 +55,7 @@ export default function CommunityGuidelines() {
   const onAccept = async () => {
     setBusy(true);
     try {
-      await base44.auth.updateMe({ accepted_guidelines_at: new Date().toISOString() });
+      await base44.auth.updateMe({ accepted_community_guidelines_at: new Date().toISOString() });
       setAccepted(true);
       setTimeout(() => navigate("/"), 600);
     } finally {

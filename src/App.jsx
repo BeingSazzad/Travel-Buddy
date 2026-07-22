@@ -42,7 +42,10 @@ import Conversation from '@/pages/Conversation';
 import Messages from '@/pages/Messages';
 import Notifications from '@/pages/Notifications';
 import AdminReports from '@/pages/AdminReports';
+import AdminUsers from '@/pages/AdminUsers';
 import CommunityGuidelines from '@/pages/CommunityGuidelines';
+import { ShieldAlert } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -115,12 +118,26 @@ const AuthenticatedApp = () => {
   }
 
   // Step 4: community guidelines must be accepted before social features
-  if (!isAdmin && !user?.accepted_guidelines_at) {
+  if (!isAdmin && !user?.accepted_community_guidelines_at) {
     return (
       <Routes>
         <Route path="/community-guidelines" element={<CommunityGuidelines />} />
         <Route path="*" element={<Navigate to="/community-guidelines" replace />} />
       </Routes>
+    );
+  }
+
+  // Step 5: suspended or banned accounts are blocked from the app
+  if (!isAdmin && (user?.account_status === "suspended" || user?.account_status === "banned")) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center px-6 text-center gap-3 bg-background">
+        <ShieldAlert className="w-9 h-9 text-muted-foreground" strokeWidth={1.5} />
+        <p className="font-display font-semibold text-xl capitalize">Account {user.account_status}</p>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          Your Seluna account has been {user.account_status}. If you believe this is a mistake, please contact Seluna support.
+        </p>
+        <button onClick={() => base44.auth.logout()} className="mt-2 text-sm text-[#A1846B] underline">Log out</button>
+      </div>
     );
   }
 
@@ -140,6 +157,7 @@ const AuthenticatedApp = () => {
         <Route path="/messages" element={<Messages />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/admin/reports" element={<AdminReports />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/community-guidelines" element={<CommunityGuidelines />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />

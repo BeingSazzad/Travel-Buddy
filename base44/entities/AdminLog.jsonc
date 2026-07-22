@@ -1,0 +1,59 @@
+{
+  "name": "AdminLog",
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "warn",
+        "suspend",
+        "ban",
+        "reactivate",
+        "remove_photo",
+        "remove_content",
+        "verify",
+        "note"
+      ],
+      "description": "The admin action performed"
+    },
+    "target_user_id": {
+      "type": "string",
+      "description": "The user the action was performed on"
+    },
+    "target_user_name": {
+      "type": "string",
+      "description": "Display name of the target user (denormalized)"
+    },
+    "detail": {
+      "type": "string",
+      "description": "Optional context (photo url, review id, note text, etc.)"
+    }
+  },
+  "required": [
+    "action",
+    "target_user_id",
+    "target_user_name"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

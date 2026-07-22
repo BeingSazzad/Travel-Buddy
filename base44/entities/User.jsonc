@@ -208,6 +208,30 @@
       "type": "boolean",
       "default": false,
       "description": "Set when the user requested account deletion"
+    },
+    "account_status": {
+      "type": "string",
+      "description": "Admin-controlled account standing",
+      "enum": [
+        "active",
+        "suspended",
+        "banned"
+      ],
+      "default": "active"
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Admin-marked verified profile badge"
+    },
+    "warning_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of admin warnings issued"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "Internal admin notes (append-only log of notes)"
     }
   },
   "required": [

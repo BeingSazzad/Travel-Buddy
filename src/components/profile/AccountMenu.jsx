@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Pencil, Plane, CalendarHeart, MessageCircle, Crown, Shield, Bell,
-  Ban, HelpCircle, FileText, ShieldCheck, Trash2, LogOut, ChevronRight, ShieldAlert,
+  Ban, HelpCircle, FileText, ShieldCheck, Trash2, LogOut, ChevronRight, ShieldAlert, Users,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import PrivacySheet from "@/components/profile/PrivacySheet";
@@ -34,6 +34,7 @@ export default function AccountMenu() {
         <Row icon={MessageCircle} label="Messages" onClick={() => navigate("/messages")} />
         <Row icon={Crown} label="Subscription" onClick={() => navigate("/subscription-management")} />
         {user?.role === "admin" && <Row icon={ShieldAlert} label="Reports dashboard" onClick={() => navigate("/admin/reports")} />}
+        {user?.role === "admin" && <Row icon={Users} label="User management" onClick={() => navigate("/admin/users")} />}
         <Row icon={Shield} label="Privacy" onClick={() => setSheet("privacy")} />
         <Row icon={Bell} label="Notifications" onClick={() => setSheet("notifications")} />
         <Row icon={Ban} label="Blocked users" onClick={() => setSheet("blocked")} />
