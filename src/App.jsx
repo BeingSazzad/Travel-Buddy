@@ -43,6 +43,19 @@ import Messages from '@/pages/Messages';
 import Notifications from '@/pages/Notifications';
 import AdminReports from '@/pages/AdminReports';
 import AdminUsers from '@/pages/AdminUsers';
+import AdminLayout from '@/components/admin/AdminLayout';
+import Dashboard from '@/pages/admin/Dashboard';
+import AdminSubscriptions from '@/pages/admin/Subscriptions';
+import AdminEvents from '@/pages/admin/AdminEvents';
+import AdminDestinations from '@/pages/admin/AdminDestinations';
+import AdminCafes from '@/pages/admin/AdminCafes';
+import AdminRestaurants from '@/pages/admin/AdminRestaurants';
+import AdminHotels from '@/pages/admin/AdminHotels';
+import AdminReviews from '@/pages/admin/AdminReviews';
+import AdminDeals from '@/pages/admin/AdminDeals';
+import Partners from '@/pages/admin/Partners';
+import AdminNotifications from '@/pages/admin/AdminNotifications';
+import ContentManagement from '@/pages/admin/ContentManagement';
 import CommunityGuidelines from '@/pages/CommunityGuidelines';
 import { ShieldAlert } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -156,8 +169,6 @@ const AuthenticatedApp = () => {
         <Route path="/friends" element={<Friends />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/notifications" element={<Notifications />} />
-        <Route path="/admin/reports" element={<AdminReports />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/community-guidelines" element={<CommunityGuidelines />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
@@ -172,6 +183,22 @@ const AuthenticatedApp = () => {
         <Route path="/reviews" element={<Category category="Reviews" />} />
         <Route path="/deals" element={<Deals />} />
         <Route path="/subscription-management" element={<SubscriptionManagement />} />
+      </Route>
+      <Route element={<AdminLayout />}>
+        <Route path="/admin" element={<Dashboard />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
+        <Route path="/admin/reports" element={<AdminReports />} />
+        <Route path="/admin/events" element={<AdminEvents />} />
+        <Route path="/admin/destinations" element={<AdminDestinations />} />
+        <Route path="/admin/cafes" element={<AdminCafes />} />
+        <Route path="/admin/restaurants" element={<AdminRestaurants />} />
+        <Route path="/admin/hotels" element={<AdminHotels />} />
+        <Route path="/admin/reviews" element={<AdminReviews />} />
+        <Route path="/admin/deals" element={<AdminDeals />} />
+        <Route path="/admin/partners" element={<Partners />} />
+        <Route path="/admin/notifications" element={<AdminNotifications />} />
+        <Route path="/admin/content" element={<ContentManagement />} />
       </Route>
       <Route path="/welcome" element={<Welcome />} />
       <Route path="/onboarding" element={<Onboarding />} />

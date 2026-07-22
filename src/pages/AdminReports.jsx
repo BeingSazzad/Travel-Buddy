@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, ShieldAlert } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { useAuth } from "@/lib/AuthContext";
 import { REPORT_REASONS } from "@/components/reports/ReportSheet";
-import { Button } from "@/components/ui/button";
+import { SectionHeader, ListState } from "@/components/admin/AdminUI";
 
 const TYPE_LABEL = {
   profile: "Profile", message: "Message", event: "Event",
@@ -20,8 +17,6 @@ const STATUS_STYLE = {
 const STATUSES = ["pending", "reviewing", "resolved", "dismissed"];
 
 export default function AdminReports() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("pending");
@@ -38,21 +33,10 @@ export default function AdminReports() {
   }, []);
 
   useEffect(() => {
-    if (user?.role !== "admin") { setLoading(false); return; }
     load();
     const unsub = base44.entities.Report.subscribe(load);
     return unsub;
-  }, [load, user?.role]);
-
-  if (user?.role !== "admin") {
-    return (
-      <div className="px-5 pt-20 text-center">
-        <ShieldAlert className="w-8 h-8 text-muted-foreground mx-auto mb-3" strokeWidth={1.5} />
-        <p className="font-display font-semibold">Admins only</p>
-        <p className="text-sm text-muted-foreground mt-1">You don't have access to this page.</p>
-      </div>
-    );
-  }
+  }, [load]);
 
   const counts = reports.reduce((acc, r) => { acc[r.status] = (acc[r.status] || 0) + 1; return acc; }, {});
   const shown = filter === "all" ? reports : reports.filter((r) => r.status === filter);
@@ -62,18 +46,10 @@ export default function AdminReports() {
   };
 
   return (
-    <div className="px-5 pt-12 pb-6 min-h-screen">
-      <div className="flex items-center gap-3 mb-5">
-        <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center active:scale-95 transition">
-          <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
-        </button>
-        <div>
-          <h1 className="font-display font-semibold text-xl">Reports</h1>
-          <p className="text-xs text-muted-foreground">{reports.length} total · admin dashboard</p>
-        </div>
-      </div>
+    <div>
+      <SectionHeader title="Reports" subtitle={`${reports.length} total · moderation queue`} />
 
-      <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-2 mb-2">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-2">
         {[{ k: "pending", l: "Pending" }, { k: "reviewing", l: "Reviewing" }, { k: "resolved", l: "Resolved" }, { k: "dismissed", l: "Dismissed" }, { k: "all", l: "All" }].map((s) => (
           <button
             key={s.k}
@@ -85,11 +61,7 @@ export default function AdminReports() {
         ))}
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center py-16"><Loader2 className="w-5 h-5 text-muted-foreground animate-spin" /></div>
-      ) : shown.length === 0 ? (
-        <p className="text-sm text-muted-foreground text-center mt-16">No reports in this view.</p>
-      ) : (
+      <ListState loading={loading} empty={shown.length === 0} emptyText="No reports in this view.">
         <div className="space-y-3">
           {shown.map((r) => (
             <div key={r.id} className="rounded-2xl border border-border bg-card p-4">
@@ -105,7 +77,6 @@ export default function AdminReports() {
               <p className="text-[11px] text-muted-foreground mt-2">
                 {new Date(r.created_date).toLocaleString()} · by {r.created_by_id?.slice(-6)}
               </p>
-
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {STATUSES.map((s) => (
                   <button
@@ -120,7 +91,7 @@ export default function AdminReports() {
             </div>
           ))}
         </div>
-      )}
+      </ListState>
     </div>
   );
 }
