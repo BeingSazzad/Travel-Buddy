@@ -7,6 +7,7 @@ import SwipeCard from "@/components/swipe/SwipeCard";
 import MatchModal from "@/components/swipe/MatchModal";
 import MemberProfileSheet from "@/components/swipe/MemberProfileSheet";
 import { Button } from "@/components/ui/button";
+import EmptyState from "@/components/common/EmptyState";
 
 export default function Discover() {
   const navigate = useNavigate();
@@ -49,18 +50,13 @@ export default function Discover() {
         {loading ? (
           <p className="text-sm text-muted-foreground">Loading travel friends…</p>
         ) : !current ? (
-          <div className="text-center max-w-xs">
-            <div className="w-14 h-14 rounded-full bg-[#A1846B]/10 flex items-center justify-center mx-auto mb-3">
-              <Plane className="w-6 h-6 text-[#A1846B]" strokeWidth={1.5} />
-            </div>
-            <p className="font-display font-semibold text-lg">You're all caught up</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              No more travel friends to discover right now. Check back soon for new members.
-            </p>
-            <Button className="mt-4" variant="outline" onClick={reload}>
-              <Sparkles className="w-4 h-4 mr-1.5" strokeWidth={1.5} /> Refresh
-            </Button>
-          </div>
+          <EmptyState
+            icon={Plane}
+            title="You're all caught up"
+            description="No more travel friends to discover right now. Check back soon for new members."
+            actionLabel="Refresh"
+            onAction={reload}
+          />
         ) : (
           <SwipeCard
             key={current.user_id}

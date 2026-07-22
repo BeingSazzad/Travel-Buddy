@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, MapPinned, Compass, Sparkles } from "lucide-react";
+import EmptyState from "@/components/common/EmptyState";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useTrips } from "@/hooks/useTrips";
@@ -65,11 +66,7 @@ export default function Trips() {
           {loading ? (
             <p className="text-sm text-muted-foreground">Loading…</p>
           ) : myTrips.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-              <p className="font-display font-semibold">No trips yet</p>
-              <p className="text-sm text-muted-foreground mt-1">Create your first trip to start planning.</p>
-              <Button className="mt-4" onClick={openNew}>New trip</Button>
-            </div>
+            <EmptyState icon={MapPinned} title="No trips yet" description="Plan your first trip to start matching with women heading the same way." actionLabel="New trip" onAction={openNew} />
           ) : (
             <div className="space-y-6">
               {STATUS_ORDER.filter((s) => grouped[s].length).map((s) => (
@@ -91,10 +88,7 @@ export default function Trips() {
         {/* Discover Trips */}
         <TabsContent value="discover" className="mt-5">
           {otherTrips.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-              <p className="font-display font-semibold">No trips to discover yet</p>
-              <p className="text-sm text-muted-foreground mt-1">Community trips from other women will appear here.</p>
-            </div>
+            <EmptyState icon={Compass} title="No trips to discover yet" description="Community trips from other women will appear here once they're planned." />
           ) : (
             <div className="space-y-4">
               {otherTrips.map((t) => {
@@ -108,17 +102,11 @@ export default function Trips() {
         {/* Women Nearby */}
         <TabsContent value="nearby" className="mt-5">
           {myTrips.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-              <p className="font-display font-semibold">Add a trip to find women nearby</p>
-              <p className="text-sm text-muted-foreground mt-1">We'll suggest members travelling to the same place around the same time.</p>
-            </div>
+            <EmptyState icon={MapPinned} title="Add a trip to find women nearby" description="We'll suggest members travelling to the same place around the same time." actionLabel="New trip" onAction={openNew} />
           ) : matchesLoading ? (
             <p className="text-sm text-muted-foreground">Finding matches…</p>
           ) : matchList.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border p-8 text-center">
-              <p className="font-display font-semibold">No matches yet</p>
-              <p className="text-sm text-muted-foreground mt-1">No members are travelling to your destinations on your dates right now.</p>
-            </div>
+            <EmptyState icon={Sparkles} title="No matches yet" description="No members are travelling to your destinations on your dates right now. Try a trip with different dates." />
           ) : (
             <MatchSuggestions matches={matchList} onBlock={blockMember} />
           )}

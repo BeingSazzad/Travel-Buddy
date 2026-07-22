@@ -4,20 +4,25 @@ import { ArrowLeft, BellOff, CheckCheck, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import NotificationItem from "@/components/notifications/NotificationItem";
+import EmptyState from "@/components/common/EmptyState";
+import ErrorState from "@/components/common/ErrorState";
 
 export default function Notifications() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [filter, setFilter] = useState("all");
 
   const load = useCallback(async () => {
     try {
       const list = await base44.entities.Notification.list("-created_date", 60);
       setItems(list);
+      setError(false);
     } catch (e) {
       setItems([]);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -80,14 +85,16 @@ export default function Notifications() {
         <div className="flex items-center justify-center py-16">
           <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />
         </div>
+      ) : error ? (
+        <ErrorState onRetry={load} />
       ) : shown.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-4">
-            <BellOff className="w-6 h-6 text-muted-foreground" strokeWidth={1.5} />
-          </div>
-          <p className="font-display font-semibold">{filter === "unread" ? "No unread notifications" : "No notifications yet"}</p>
-          <p className="text-sm text-muted-foreground mt-1">New matches, messages and updates will show here.</p>
-        </div>
+        <EmptyState
+          icon={BellOff}
+          title={filter === "unread" ? "No unread notifications" : "No notifications yet"}
+          description="New matches, messages and updates will show here."
+          actionLabel={filter === "unread" ? "View all" : undefined}
+          onAction={filter === "unread" ? () => setFilter("all") : undefined}
+        />
       ) : (
         <div className="space-y-2.5">
           {shown.map((n) => (

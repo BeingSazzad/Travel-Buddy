@@ -3,6 +3,7 @@ import { Bookmark, Trash2, MapPin } from "lucide-react";
 import { useSaved } from "@/lib/SavedContext";
 import { Image } from "@/components/ui/image";
 import { SEARCH_TYPES } from "@/lib/search-data";
+import EmptyState from "@/components/common/EmptyState";
 
 export default function SavedSection() {
   const { items, loading, remove } = useSaved();
@@ -18,13 +19,11 @@ export default function SavedSection() {
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading saved items…</p>
       ) : groups.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border p-6 text-center">
-          <Bookmark className="w-6 h-6 text-muted-foreground mx-auto mb-2" strokeWidth={1.5} />
-          <p className="text-sm text-foreground font-medium">No saved items yet</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Tap the bookmark on any place to save it here.
-          </p>
-        </div>
+        <EmptyState
+          icon={Bookmark}
+          title="No saved places yet"
+          description="Tap the bookmark on any café, restaurant, hotel or destination to keep it here for later."
+        />
       ) : (
         <div className="space-y-5">
           {groups.map((g) => (

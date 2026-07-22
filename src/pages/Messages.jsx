@@ -4,6 +4,8 @@ import { Search, MessageCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import ConversationRow from "@/components/messages/ConversationRow";
+import EmptyState from "@/components/common/EmptyState";
+import ErrorState from "@/components/common/ErrorState";
 
 function timeLabel(iso) {
   if (!iso) return "";
@@ -26,11 +28,13 @@ export default function Messages() {
   const [conversations, setConversations] = useState([]);
   const [blockedIds, setBlockedIds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [query, setQuery] = useState("");
 
   const load = useCallback(async () => {
     try {
       setLoading(true);
+      setError(false);
       const [convs, blocked] = await Promise.all([
         base44.entities.Conversation.list("-updated_date", 100),
         base44.entities.BlockedMember.list("-created_date", 200),
@@ -39,6 +43,7 @@ export default function Messages() {
       setBlockedIds(new Set(blocked.map((b) => b.blocked_user_id)));
     } catch (e) {
       setConversations([]);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -95,16 +100,17 @@ export default function Messages() {
 
       {loading ? (
         <p className="text-sm text-muted-foreground py-10 text-center">Loading…</p>
+      ) : error ? (
+        <ErrorState className="mt-6" onRetry={load} />
       ) : rows.length === 0 ? (
-        <div className="py-16 text-center">
-          <div className="w-14 h-14 rounded-full bg-[#A1846B]/10 flex items-center justify-center mx-auto mb-3">
-            <MessageCircle className="w-6 h-6 text-[#A1846B]" strokeWidth={1.5} />
-          </div>
-          <p className="font-display font-semibold">No conversations yet</p>
-          <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto">
-            Match with a travel friend to start chatting.
-          </p>
-        </div>
+        <EmptyState
+          className="mt-6"
+          icon={MessageCircle}
+          title="No conversations yet"
+          description="Match with a travel friend to start chatting."
+          actionLabel="Find travel friends"
+          onAction={() => navigate("/discover")}
+        />
       ) : (
         <div>
           {rows.map((r) => (

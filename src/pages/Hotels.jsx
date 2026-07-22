@@ -3,6 +3,8 @@ import { HOTEL_TAG_FILTERS, STAR_OPTIONS } from "@/lib/hotels";
 import { useHotels } from "@/lib/useContent";
 import HotelCard from "@/components/hotels/HotelCard";
 import { cn } from "@/lib/utils";
+import { BedDouble } from "lucide-react";
+import EmptyState from "@/components/common/EmptyState";
 
 const emptyTags = () => Object.fromEntries(HOTEL_TAG_FILTERS.map((t) => [t.key, false]));
 
@@ -85,7 +87,13 @@ export default function Hotels() {
 
       <div className="space-y-4">
         {filtered.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-10">No hotels match your filters.</p>
+          <EmptyState
+            icon={BedDouble}
+            title="No hotels match your filters"
+            description="Try removing a filter or widening your search to see more stays."
+            actionLabel="Reset filters"
+            onAction={() => { setTags(emptyTags()); setPrice("All"); setStars("All"); setRating("All"); }}
+          />
         ) : (
           filtered.map((h) => <HotelCard key={h.name} hotel={h} />)
         )}

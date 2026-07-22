@@ -3,6 +3,8 @@ import { CAFE_TAG_FILTERS, PRICE_LABELS } from "@/lib/cafes";
 import { useCafes } from "@/lib/useContent";
 import CafeCard from "@/components/cafes/CafeCard";
 import { cn } from "@/lib/utils";
+import { Coffee } from "lucide-react";
+import EmptyState from "@/components/common/EmptyState";
 
 const emptyTags = () => Object.fromEntries(CAFE_TAG_FILTERS.map((t) => [t.key, false]));
 
@@ -69,7 +71,13 @@ export default function Cafes() {
 
       <div className="space-y-4">
         {filtered.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-10">No cafés match your filters.</p>
+          <EmptyState
+            icon={Coffee}
+            title="No cafés match your filters"
+            description="Try removing a filter or widening your search to see more spots."
+            actionLabel="Reset filters"
+            onAction={() => { setTags(emptyTags()); setPrice("All"); setRating("All"); }}
+          />
         ) : (
           filtered.map((c) => <CafeCard key={c.name} cafe={c} />)
         )}

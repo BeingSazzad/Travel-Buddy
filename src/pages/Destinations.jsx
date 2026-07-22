@@ -4,6 +4,8 @@ import { CONTINENTS, WEATHERS, TAG_FILTERS } from "@/lib/destinations";
 import { useDestinations } from "@/lib/useContent";
 import DestinationCard from "@/components/destinations/DestinationCard";
 import { cn } from "@/lib/utils";
+import { MapPin } from "lucide-react";
+import EmptyState from "@/components/common/EmptyState";
 
 const emptyTags = () => Object.fromEntries(TAG_FILTERS.map((t) => [t.key, false]));
 
@@ -103,7 +105,13 @@ export default function Destinations() {
       {/* Results */}
       <div className="mt-5 space-y-4">
         {filtered.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-10">No destinations match your filters.</p>
+          <EmptyState
+            icon={MapPin}
+            title="No destinations match your filters"
+            description="Try a different continent or remove a filter to explore more cities."
+            actionLabel="Reset filters"
+            onAction={() => { setTags(emptyTags()); setContinent("All"); setWeather("All"); }}
+          />
         ) : (
           filtered.map((d) => <DestinationCard key={d.city} destination={d} />)
         )}

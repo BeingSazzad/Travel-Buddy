@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, CalendarOff, CalendarHeart } from "lucide-react";
+import EmptyState from "@/components/common/EmptyState";
 import { useEvents } from "@/hooks/useEvents";
 import EventCard from "@/components/events/EventCard";
 import EventRow from "@/components/events/EventRow";
@@ -51,7 +52,7 @@ export default function Events() {
         <p className="text-sm text-muted-foreground mt-8">Loading events…</p>
       ) : filtered ? (
         filtered.length === 0 ? (
-          <p className="text-sm text-muted-foreground mt-8">No {capitalize(category)} events yet.</p>
+          <EmptyState className="mt-6" icon={CalendarOff} title={`No ${capitalize(category)} events yet`} description={`Be the first to host a ${capitalize(category)} meetup in your area.`} />
         ) : (
           <div className="space-y-4 mt-5">
             {filtered.map((e) => (
@@ -67,16 +68,14 @@ export default function Events() {
           {joined.length > 0 && <Section title="Joined by you" events={joined} />}
           {saved.length > 0 && <Section title="Saved events" events={saved} />}
           {nearby.length === 0 && atTrips.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-border p-8 text-center mt-6">
-              <p className="font-display font-semibold">No events yet</p>
-              <p className="text-sm text-muted-foreground mt-1">Host the first meetup in your city.</p>
-              <button
-                onClick={() => navigate("/events/new")}
-                className="mt-4 px-4 py-2 rounded-full bg-foreground text-background text-sm"
-              >
-                Host an event
-              </button>
-            </div>
+            <EmptyState
+              className="mt-6"
+              icon={CalendarHeart}
+              title="No events nearby"
+              description="Be the first to host a meetup in your city."
+              actionLabel="Host an event"
+              onAction={() => navigate("/events/new")}
+            />
           )}
         </>
       )}

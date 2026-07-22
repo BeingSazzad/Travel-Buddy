@@ -3,6 +3,8 @@ import { RESTAURANT_TAG_FILTERS, PRICE_LABELS, CUISINES } from "@/lib/restaurant
 import { useRestaurants } from "@/lib/useContent";
 import RestaurantCard from "@/components/restaurants/RestaurantCard";
 import { cn } from "@/lib/utils";
+import { UtensilsCrossed } from "lucide-react";
+import EmptyState from "@/components/common/EmptyState";
 
 const emptyTags = () => Object.fromEntries(RESTAURANT_TAG_FILTERS.map((t) => [t.key, false]));
 
@@ -73,7 +75,13 @@ export default function Restaurants() {
 
       <div className="space-y-4">
         {filtered.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-10">No restaurants match your filters.</p>
+          <EmptyState
+            icon={UtensilsCrossed}
+            title="No restaurants match your filters"
+            description="Try removing a filter or widening your search to see more places."
+            actionLabel="Reset filters"
+            onAction={() => { setTags(emptyTags()); setCuisine("All"); setPrice("All"); setRating("All"); }}
+          />
         ) : (
           filtered.map((r) => <RestaurantCard key={r.name} restaurant={r} />)
         )}

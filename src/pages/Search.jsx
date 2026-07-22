@@ -4,6 +4,7 @@ import { ArrowLeft, Search as SearchIcon, SlidersHorizontal, X } from "lucide-re
 import { SEARCH_TYPES, SEARCH_CORPUS } from "@/lib/search-data";
 import FilterSheet from "@/components/search/FilterSheet";
 import ResultRow from "@/components/search/ResultRow";
+import EmptyState from "@/components/common/EmptyState";
 
 const EMPTY_FILTERS = {
   location: "", date: "", categories: [], rating: 0, prices: [], distance: 0, interests: [],
@@ -109,17 +110,14 @@ export default function Search() {
       {/* Results */}
       <div className="pb-6">
         {results.length === 0 ? (
-          <div className="px-5 pt-20 text-center">
-            <SearchIcon className="w-8 h-8 text-muted-foreground mx-auto mb-3" strokeWidth={1.5} />
-            <p className="font-display font-semibold text-lg text-foreground">No results found</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {hasQuery ? "Try a different search or adjust your filters." : "Start typing to search across Seluna."}
-            </p>
-            {activeCount > 0 && (
-              <button onClick={() => setFilters(EMPTY_FILTERS)} className="mt-4 text-sm text-[#A1846B] font-medium">
-                Clear all filters
-              </button>
-            )}
+          <div className="px-5 pt-20">
+            <EmptyState
+              icon={SearchIcon}
+              title="No results found"
+              description={hasQuery ? "Try a different search or adjust your filters." : "Start typing to search across Seluna."}
+              actionLabel={activeCount > 0 ? "Clear all filters" : undefined}
+              onAction={activeCount > 0 ? () => setFilters(EMPTY_FILTERS) : undefined}
+            />
           </div>
         ) : (
           results.map((group) => (
