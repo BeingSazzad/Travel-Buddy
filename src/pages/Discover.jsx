@@ -1,12 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles, Plane } from "lucide-react";
+import { ArrowLeft, Plane } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useDiscover } from "@/hooks/useDiscover";
 import SwipeCard from "@/components/swipe/SwipeCard";
 import MatchModal from "@/components/swipe/MatchModal";
 import MemberProfileSheet from "@/components/swipe/MemberProfileSheet";
-import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/common/EmptyState";
 
 export default function Discover() {

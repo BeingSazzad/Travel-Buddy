@@ -7,6 +7,18 @@
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; -webkit-font-smoothing: antialiased; }
+button, a, [role="button"] { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+img { -webkit-user-drag: none; }
+
+/* Safe-area helpers (require viewport-fit=cover) */
+.safe-pt { padding-top: calc(env(safe-area-inset-top) + 0.75rem); }
+.safe-pb { padding-bottom: calc(env(safe-area-inset-bottom) + 0.75rem); }
+.safe-top { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-x { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+
 @layer base {
   :root {
     --background: 38 36% 96%;

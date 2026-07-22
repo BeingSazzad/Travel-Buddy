@@ -163,6 +163,10 @@ const AuthenticatedApp = () => {
       <Route path="/trips/new" element={<CreateTrip />} />
       <Route path="/events/new" element={<CreateEvent />} />
       <Route path="/events/:id" element={<EventDetail />} />
+      <Route path="/cafes/:name" element={<CafeDetail />} />
+      <Route path="/restaurants/:name" element={<RestaurantDetail />} />
+      <Route path="/hotels/:name" element={<HotelDetail />} />
+      <Route path="/destinations/:city" element={<DestinationDetail />} />
       <Route path="/conversations/:id" element={<Conversation />} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
@@ -176,13 +180,9 @@ const AuthenticatedApp = () => {
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/cafes" element={<Cafes />} />
-        <Route path="/cafes/:name" element={<CafeDetail />} />
         <Route path="/restaurants" element={<Restaurants />} />
-        <Route path="/restaurants/:name" element={<RestaurantDetail />} />
         <Route path="/hotels" element={<Hotels />} />
-        <Route path="/hotels/:name" element={<HotelDetail />} />
         <Route path="/destinations" element={<Destinations />} />
-        <Route path="/destinations/:city" element={<DestinationDetail />} />
         <Route path="/reviews" element={<Category category="Reviews" />} />
         <Route path="/deals" element={<Deals />} />
         <Route path="/subscription-management" element={<SubscriptionManagement />} />

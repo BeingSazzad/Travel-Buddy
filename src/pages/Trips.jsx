@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Plus, MapPinned, Compass, Sparkles } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { useTrips } from "@/hooks/useTrips";
 import { useMatches } from "@/hooks/useMatches";
 import { tripStatus, tripsOverlap } from "@/lib/trip-utils";

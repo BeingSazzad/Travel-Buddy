@@ -106,8 +106,8 @@ export default function EventDetail() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen flex flex-col bg-background">
-      <header className="sticky top-0 z-20 px-4 pt-10 pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
+    <div className="max-w-md mx-auto min-h-dvh flex flex-col bg-background">
+      <header className="sticky top-0 z-20 px-4 safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-1">
           <button onClick={share} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground"><Share2 className="w-5 h-5" strokeWidth={1.5} /></button>
@@ -227,7 +227,7 @@ export default function EventDetail() {
 
       {/* Action bar */}
       {!isHost && (
-        <div className="sticky bottom-0 px-5 py-3 bg-background/95 backdrop-blur border-t border-border flex items-center gap-2 pb-6">
+        <div className="sticky bottom-0 px-5 pt-3 safe-pb bg-background/95 backdrop-blur border-t border-border flex items-center gap-2">
           <button
             onClick={() => toggle(savedItem)}
             className="w-11 h-11 rounded-full border border-border flex items-center justify-center shrink-0"

@@ -51,8 +51,8 @@ export default function HotelDetail() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen flex flex-col bg-background">
-      <header className="sticky top-0 z-20 px-4 pt-10 pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
+    <div className="max-w-md mx-auto min-h-dvh flex flex-col bg-background">
+      <header className="sticky top-0 z-20 px-4 safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-2">
           <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
@@ -63,7 +63,7 @@ export default function HotelDetail() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto pb-28">
+      <div className="flex-1 overflow-y-auto pb-6">
         <div className="relative h-64">
           <Image src={h.gallery[0]} alt={h.name} fittingType="fill" className="w-full h-full" />
           <span className="absolute top-3 left-3 text-[11px] px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">€{h.pricePerNight}/night</span>
@@ -136,7 +136,7 @@ export default function HotelDetail() {
         </div>
       </div>
 
-      <div className="sticky bottom-0 px-5 py-3 bg-background/95 backdrop-blur border-t border-border flex gap-2 pb-6">
+      <div className="sticky bottom-0 px-5 pt-3 safe-pb bg-background/95 backdrop-blur border-t border-border flex gap-2">
         <Button variant="outline" className="flex-1" onClick={() => toggle({ type: "hotel", title: h.name, location: h.city, country: h.country, image: h.image, rating: h.memberRating })}>
           <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "")} strokeWidth={1.5} /> {saved ? "Saved" : "Save"}
         </Button>

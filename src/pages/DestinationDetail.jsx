@@ -90,8 +90,8 @@ export default function DestinationDetail() {
     );
 
   return (
-    <div className="max-w-md mx-auto min-h-screen flex flex-col bg-background">
-      <header className="sticky top-0 z-20 px-4 pt-10 pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
+    <div className="max-w-md mx-auto min-h-dvh flex flex-col bg-background">
+      <header className="sticky top-0 z-20 px-4 safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-1">
           <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
@@ -99,7 +99,7 @@ export default function DestinationDetail() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto pb-28">
+      <div className="flex-1 overflow-y-auto pb-6">
         {/* Hero */}
         <div className="relative h-72">
           <Image src={dest.image} alt={dest.city} fittingType="fill" className="w-full h-full" />
@@ -210,7 +210,7 @@ export default function DestinationDetail() {
       </div>
 
       {/* CTA */}
-      <div className="sticky bottom-0 px-5 py-4 bg-background/95 backdrop-blur border-t border-border pb-6">
+      <div className="sticky bottom-0 px-5 pt-4 safe-pb bg-background/95 backdrop-blur border-t border-border">
         <Button className="w-full h-12 bg-foreground text-background" onClick={() => navigate(`/trips/new?city=${encodeURIComponent(dest.city)}`)}>
           Create trip to {dest.city}
         </Button>

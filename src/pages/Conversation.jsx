@@ -37,13 +37,13 @@ export default function Conversation() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center text-sm text-muted-foreground">Loading conversation…</div>
+      <div className="h-dvh flex items-center justify-center text-sm text-muted-foreground">Loading conversation…</div>
     );
   }
 
   if (!conversation) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center gap-3 px-6 text-center">
+      <div className="h-dvh flex flex-col items-center justify-center gap-3 px-6 text-center">
         <p className="font-display font-semibold">Conversation not found</p>
         <button onClick={() => navigate("/messages")} className="text-sm text-[#A1846B] underline">
           Back to messages
@@ -112,8 +112,8 @@ export default function Conversation() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <header className="px-3 pt-10 pb-3 flex items-center gap-2 border-b border-border bg-card">
+    <div className="h-dvh flex flex-col">
+      <header className="px-3 safe-pt pb-3 flex items-center gap-2 border-b border-border bg-card">
         <button onClick={() => navigate(-1)} className="w-9 h-9 flex items-center justify-center">
           <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
         </button>
@@ -169,7 +169,7 @@ export default function Conversation() {
         </div>
       )}
 
-      <form onSubmit={onSubmit} className="px-3 py-3 border-t border-border bg-card flex items-center gap-1.5 pb-6">
+      <form onSubmit={onSubmit} className="px-3 pt-3 safe-pb border-t border-border bg-card flex items-center gap-1.5">
         <button type="button" onClick={() => setShareOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground">
           <Plus className="w-5 h-5" strokeWidth={1.5} />
         </button>

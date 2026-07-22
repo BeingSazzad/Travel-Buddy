@@ -62,7 +62,7 @@ export default function Search() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-md px-4 py-3 flex items-center gap-2">
+      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-md px-4 safe-pt pb-3 flex items-center gap-2">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center shrink-0">
           <ArrowLeft className="w-5 h-5" />
         </button>
