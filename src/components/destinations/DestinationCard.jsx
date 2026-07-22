@@ -18,7 +18,7 @@ export default function DestinationCard({ destination, large = false }) {
   return (
     <div
       onClick={() => navigate(`/destinations/${encodeURIComponent(city)}`)}
-      className={`relative rounded-3xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer ${large ? "h-72" : "h-64"}`}
+      className={`relative rounded-3xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer card-press ${large ? "h-72" : "h-64"}`}
     >
       <Image src={image} alt={city} fittingType="fill" className="w-full h-full" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />

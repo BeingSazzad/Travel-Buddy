@@ -2,24 +2,45 @@ import React from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import { Heart, MessageCircle, User, Compass } from "lucide-react";
 
 export default function MatchModal({ open, myAvatar, theirAvatar, onMessage, onProfile, onKeepExploring }) {
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onKeepExploring()}>
       <DialogContent className="max-w-[340px] p-6 text-center rounded-3xl border-0 shadow-premium bg-card">
-        <div className="flex justify-center items-center">
-          <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-card shadow-soft -mr-5 z-10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 22 }}
+          className="flex justify-center items-center"
+        >
+          <motion.div
+            initial={{ x: -16, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.05, type: "spring", stiffness: 300, damping: 24 }}
+            className="w-24 h-24 rounded-full overflow-hidden border-4 border-card shadow-soft -mr-5 z-10"
+          >
             <Image src={myAvatar} alt="You" fittingType="fill" className="w-full h-full" />
-          </div>
-          <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-card shadow-soft">
+          </motion.div>
+          <motion.div
+            initial={{ x: 16, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.05, type: "spring", stiffness: 300, damping: 24 }}
+            className="w-24 h-24 rounded-full overflow-hidden border-4 border-card shadow-soft"
+          >
             <Image src={theirAvatar} alt="Match" fittingType="fill" className="w-full h-full" />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        <div className="w-12 h-12 rounded-full bg-[#A1846B] mx-auto -mt-6 flex items-center justify-center text-white shadow-soft relative z-20">
+        <motion.div
+          initial={{ scale: 0, rotate: -30 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 14 }}
+          className="w-12 h-12 rounded-full bg-[#A1846B] mx-auto -mt-6 flex items-center justify-center text-white shadow-soft relative z-20"
+        >
           <Heart className="w-6 h-6 fill-white" strokeWidth={0} />
-        </div>
+        </motion.div>
 
         <h2 className="font-display font-semibold text-2xl mt-3">You matched!</h2>
         <p className="text-sm text-muted-foreground mt-1">Start planning, chatting or meeting safely.</p>

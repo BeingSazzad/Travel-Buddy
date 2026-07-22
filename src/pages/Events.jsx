@@ -5,6 +5,7 @@ import EmptyState from "@/components/common/EmptyState";
 import { useEvents } from "@/hooks/useEvents";
 import EventCard from "@/components/events/EventCard";
 import EventRow from "@/components/events/EventRow";
+import ListSkeleton from "@/components/common/ListSkeleton";
 import { EVENT_CATEGORIES, capitalize } from "@/lib/event-options";
 
 export default function Events() {
@@ -49,7 +50,7 @@ export default function Events() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground mt-8">Loading events…</p>
+        <ListSkeleton className="mt-5" count={3} />
       ) : filtered ? (
         filtered.length === 0 ? (
           <EmptyState className="mt-6" icon={CalendarOff} title={`No ${capitalize(category)} events yet`} description={`Be the first to host a ${capitalize(category)} meetup in your area.`} />

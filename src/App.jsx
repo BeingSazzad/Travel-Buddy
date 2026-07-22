@@ -62,6 +62,7 @@ import ContentManagement from '@/pages/admin/ContentManagement';
 import CommunityGuidelines from '@/pages/CommunityGuidelines';
 import { ShieldAlert } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import PageTransition from "@/components/PageTransition";
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -160,14 +161,14 @@ const AuthenticatedApp = () => {
   // Authenticated: render the main app
   return (
     <Routes>
-      <Route path="/trips/new" element={<CreateTrip />} />
-      <Route path="/events/new" element={<CreateEvent />} />
-      <Route path="/events/:id" element={<EventDetail />} />
-      <Route path="/cafes/:name" element={<CafeDetail />} />
-      <Route path="/restaurants/:name" element={<RestaurantDetail />} />
-      <Route path="/hotels/:name" element={<HotelDetail />} />
-      <Route path="/destinations/:city" element={<DestinationDetail />} />
-      <Route path="/conversations/:id" element={<Conversation />} />
+      <Route path="/trips/new" element={<PageTransition><CreateTrip /></PageTransition>} />
+      <Route path="/events/new" element={<PageTransition><CreateEvent /></PageTransition>} />
+      <Route path="/events/:id" element={<PageTransition><EventDetail /></PageTransition>} />
+      <Route path="/cafes/:name" element={<PageTransition><CafeDetail /></PageTransition>} />
+      <Route path="/restaurants/:name" element={<PageTransition><RestaurantDetail /></PageTransition>} />
+      <Route path="/hotels/:name" element={<PageTransition><HotelDetail /></PageTransition>} />
+      <Route path="/destinations/:city" element={<PageTransition><DestinationDetail /></PageTransition>} />
+      <Route path="/conversations/:id" element={<PageTransition><Conversation /></PageTransition>} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />

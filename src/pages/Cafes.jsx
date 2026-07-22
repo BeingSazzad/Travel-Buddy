@@ -5,6 +5,7 @@ import CafeCard from "@/components/cafes/CafeCard";
 import { cn } from "@/lib/utils";
 import { Coffee } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
+import ListSkeleton from "@/components/common/ListSkeleton";
 
 const emptyTags = () => Object.fromEntries(CAFE_TAG_FILTERS.map((t) => [t.key, false]));
 
@@ -27,7 +28,13 @@ export default function Cafes() {
     return list;
   }, [cafes, tags, price, rating, sort]);
 
-  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
+  if (loading) return (
+    <div className="px-5 pt-12 pb-6">
+      <h1 className="font-display font-semibold text-2xl">Cafés</h1>
+      <p className="text-sm text-muted-foreground mt-0.5 mb-4">Curated coffee spots for women who travel</p>
+      <ListSkeleton count={4} />
+    </div>
+  );
 
   return (
     <div className="px-5 pt-12 pb-6">

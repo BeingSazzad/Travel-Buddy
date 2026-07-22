@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { X, Copy, Check, Sparkles, ShieldCheck } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import SuccessCheck from "@/components/common/SuccessCheck";
 
 export default function RedeemSheet({ deal, onClose }) {
   const [loading, setLoading] = useState(true);
@@ -47,6 +48,7 @@ export default function RedeemSheet({ deal, onClose }) {
 
         {result && (
           <div className="mt-4 space-y-3">
+            <SuccessCheck />
             <div className="rounded-2xl border-2 border-dashed border-[#A1846B] p-4 text-center">
               <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Your redeem code</p>
               <p className="font-mono text-2xl font-semibold tracking-wider text-foreground">{result.code}</p>

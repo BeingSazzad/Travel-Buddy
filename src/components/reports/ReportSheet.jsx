@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Flag, Ban, Loader2 } from "lucide-react";
+import SuccessCheck from "@/components/common/SuccessCheck";
 import { base44 } from "@/api/base44Client";
 
 export const REPORT_REASONS = [
@@ -73,9 +74,7 @@ export default function ReportSheet({ open, onOpenChange, target }) {
       <DialogContent className="max-w-sm rounded-3xl">
         {done ? (
           <div className="text-center py-4">
-            <div className="w-14 h-14 rounded-full bg-[#A1846B]/10 flex items-center justify-center mx-auto mb-3">
-              <Flag className="w-6 h-6 text-[#A1846B]" strokeWidth={1.5} />
-            </div>
+            <SuccessCheck className="mb-3" />
             <p className="font-display font-semibold text-lg">Report submitted</p>
             <p className="text-sm text-muted-foreground mt-1">Our team will review this {TYPE_LABEL[target.type] || "content"} and take action if needed.</p>
             <Button className="w-full h-11 mt-5" onClick={() => onOpenChange(false)}>Done</Button>

@@ -29,7 +29,8 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
         dragConstraints={{ left: 0, right: 0 }}
         dragElastic={0.7}
         style={{ x, rotate }}
-        animate={{ x: targetX, opacity: fly ? 0 : 1 }}
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ x: targetX, opacity: fly ? 0 : 1, scale: fly ? 0.94 : 1 }}
         transition={{ type: "spring", stiffness: 320, damping: 32 }}
         onDragEnd={onDragEnd}
         onAnimationComplete={() => { if (fly) onSwipe(fly); }}

@@ -22,10 +22,12 @@ export default function SaveButton({ item, className }) {
       )}
       aria-label={saved ? "Unsave" : "Save"}
     >
-      <Bookmark
-        className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")}
-        strokeWidth={1.5}
-      />
+      <span key={saved ? "on" : "off"} className={cn("inline-flex", saved && "save-pop")}>
+        <Bookmark
+          className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")}
+          strokeWidth={1.5}
+        />
+      </span>
     </button>
   );
 }

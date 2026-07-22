@@ -19,7 +19,7 @@ export default function EventCard({ event, joined, onRsvp }) {
   };
 
   return (
-    <div onClick={() => navigate(`/events/${event.id}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer">
+    <div onClick={() => navigate(`/events/${event.id}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer card-press">
       <div className="relative h-40">
         <Image src={event.image} alt={event.title} fittingType="fill" className="w-full h-full" />
         <div className="absolute top-3 left-3">

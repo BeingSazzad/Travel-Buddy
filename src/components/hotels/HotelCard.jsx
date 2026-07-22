@@ -23,7 +23,7 @@ export default function HotelCard({ hotel }) {
   const saved = isSaved(key);
 
   return (
-    <div onClick={() => navigate(`/hotels/${encodeURIComponent(h.name)}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer">
+    <div onClick={() => navigate(`/hotels/${encodeURIComponent(h.name)}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer card-press">
       <div className="relative h-40">
         <Image src={h.image} alt={h.name} fittingType="fill" className="w-full h-full" />
         <button
@@ -32,7 +32,9 @@ export default function HotelCard({ hotel }) {
           className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center active:scale-90 transition"
           aria-label={saved ? "Unsave" : "Save"}
         >
-          <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
+          <span key={saved ? "on" : "off"} className={cn("inline-flex", saved && "save-pop")}>
+            <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
+          </span>
         </button>
         <span className="absolute top-2 left-2 text-[11px] px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">€{h.pricePerNight}/night</span>
       </div>

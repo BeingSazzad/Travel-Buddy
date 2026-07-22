@@ -34,7 +34,9 @@ export default function DealCard({ deal, onRedeem }) {
             className="w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center active:scale-90 transition"
             aria-label={saved ? "Unsave" : "Save"}
           >
-            <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
+            <span key={saved ? "on" : "off"} className={cn("inline-flex", saved && "save-pop")}>
+              <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
+            </span>
           </button>
           <button onClick={onShare} className="w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center active:scale-90 transition">
             <Share2 className="w-4 h-4 text-foreground" strokeWidth={1.5} />

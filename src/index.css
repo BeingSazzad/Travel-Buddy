@@ -19,6 +19,22 @@ img { -webkit-user-drag: none; }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 .safe-x { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 
+/* Premium subtle motion */
+.card-press { transition: transform .2s cubic-bezier(.22,1,.36,1), box-shadow .2s ease; }
+.card-press:active { transform: scale(.985); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .card-press:hover { transform: translateY(-2px); box-shadow: 0 12px 36px -10px rgba(78,64,56,.14); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-press, .fade-in-up, .save-pop, .skeleton-shimmer { animation: none !important; transition: none !important; }
+}
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.fade-in-up { animation: fadeInUp .4s cubic-bezier(.22,1,.36,1) both; }
+@keyframes savePop { 0% { transform: scale(1);} 45% { transform: scale(1.22);} 100% { transform: scale(1);} }
+.save-pop { animation: savePop .34s cubic-bezier(.22,1,.36,1); }
+@keyframes shimmer { 0% { background-position: -180% 0; } 100% { background-position: 180% 0; } }
+.skeleton-shimmer { background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted) / .55) 37%, hsl(var(--muted)) 63%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; }
+
 @layer base {
   :root {
     --background: 38 36% 96%;

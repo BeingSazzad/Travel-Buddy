@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Tag } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
+import ListSkeleton from "@/components/common/ListSkeleton";
 
 export const DEAL_CATEGORIES = [
   "hotels", "restaurants", "cafes", "tours", "activities",
@@ -59,7 +60,7 @@ export default function Deals() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground mt-8">Loading deals…</p>
+        <ListSkeleton className="mt-4" count={3} />
       ) : error ? (
         <ErrorState className="mt-6" onRetry={reload} />
       ) : filtered.length === 0 ? (

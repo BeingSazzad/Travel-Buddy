@@ -7,7 +7,7 @@ export default function ContentCard({ item, onClick }) {
   return (
     <div
       onClick={onClick}
-      className="relative w-56 shrink-0 rounded-2xl overflow-hidden border border-border bg-card shadow-soft cursor-pointer active:scale-[0.98] transition-transform"
+      className="relative w-56 shrink-0 rounded-2xl overflow-hidden border border-border bg-card shadow-soft cursor-pointer card-press"
     >
       <div className="relative h-32">
         <Image src={item.image} alt={item.title} fittingType="fill" className="w-full h-full" />

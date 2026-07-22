@@ -5,6 +5,7 @@ import HotelCard from "@/components/hotels/HotelCard";
 import { cn } from "@/lib/utils";
 import { BedDouble } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
+import ListSkeleton from "@/components/common/ListSkeleton";
 
 const emptyTags = () => Object.fromEntries(HOTEL_TAG_FILTERS.map((t) => [t.key, false]));
 
@@ -37,7 +38,13 @@ export default function Hotels() {
     return list;
   }, [hotels, tags, price, stars, rating, sort]);
 
-  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
+  if (loading) return (
+    <div className="px-5 pt-12 pb-6">
+      <h1 className="font-display font-semibold text-2xl">Hotels</h1>
+      <p className="text-sm text-muted-foreground mt-0.5 mb-4">Stays curated for women who travel</p>
+      <ListSkeleton count={4} />
+    </div>
+  );
 
   return (
     <div className="px-5 pt-12 pb-6">
