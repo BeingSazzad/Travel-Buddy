@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, CalendarOff, CalendarHeart } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
 import { useEvents } from "@/hooks/useEvents";
+import { onRefresh } from "@/lib/refresh-bus";
 import EventCard from "@/components/events/EventCard";
 import EventRow from "@/components/events/EventRow";
 import ListSkeleton from "@/components/common/ListSkeleton";
 import { EVENT_CATEGORIES, capitalize } from "@/lib/event-options";
 
 export default function Events() {
-  const { loading, rsvp, joinedIds, byCategory, nearby, popular, joined, saved, atTrips } = useEvents();
+  const { loading, rsvp, reload, joinedIds, byCategory, nearby, popular, joined, saved, atTrips } = useEvents();
   const [category, setCategory] = useState("All");
   const navigate = useNavigate();
+  useEffect(() => onRefresh("/events", reload), [reload]);
 
   const filtered = category === "All" ? null : byCategory(category);
 

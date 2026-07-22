@@ -1,20 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { Loader2 } from "lucide-react";
+import { onRefresh } from "@/lib/refresh-bus";
 
 export default function HomeFeatured() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    base44.entities.FeaturedContent
-      .list("sort_order", 50)
-      .then((list) => setItems((list || []).filter((i) => i.active)))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
+  const reload = useCallback(async () => {
+    setLoading(true);
+    try {
+      const list = await base44.entities.FeaturedContent.list("sort_order", 50);
+      setItems((list || []).filter((i) => i.active));
+    } catch {
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+  useEffect(() => onRefresh("/", reload), [reload]);
 
   if (loading) return <div className="px-5 py-6"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /></div>;
   if (items.length === 0) return null;

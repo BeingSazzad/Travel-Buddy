@@ -34,5 +34,5 @@ export function useTrips() {
   const update = useCallback((id, data) => base44.entities.Trip.update(id, data), []);
   const remove = useCallback((id) => base44.entities.Trip.delete(id), []);
 
-  return { trips, loading, user, create, update, remove };
+  return { trips, loading, user, reload: load, create, update, remove };
 }

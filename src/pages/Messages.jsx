@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/AuthContext";
 import ConversationRow from "@/components/messages/ConversationRow";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
+import { onRefresh } from "@/lib/refresh-bus";
 
 function timeLabel(iso) {
   if (!iso) return "";
@@ -54,6 +55,7 @@ export default function Messages() {
     const unsub = base44.entities.Conversation.subscribe(() => load());
     return unsub;
   }, [load]);
+  useEffect(() => onRefresh("/messages", load), [load]);
 
   const rows = useMemo(() => {
     const mapped = conversations

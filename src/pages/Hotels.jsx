@@ -5,6 +5,7 @@ import HotelCard from "@/components/hotels/HotelCard";
 import { cn } from "@/lib/utils";
 import { BedDouble } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
+import FilterPicker from "@/components/common/FilterPicker";
 import ListSkeleton from "@/components/common/ListSkeleton";
 
 const emptyTags = () => Object.fromEntries(HOTEL_TAG_FILTERS.map((t) => [t.key, false]));
@@ -67,27 +68,10 @@ export default function Hotels() {
       </div>
 
       <div className="flex flex-wrap gap-2 mt-2">
-        <select value={price} onChange={(e) => setPrice(e.target.value)} className="px-3 py-1.5 rounded-full text-xs border border-border bg-background">
-          <option value="All">Price: Any</option>
-          <option value="<100">Under €100</option>
-          <option value="100-250">€100–250</option>
-          <option value="250-400">€250–400</option>
-          <option value="400+">€400+</option>
-        </select>
-        <select value={stars} onChange={(e) => setStars(e.target.value)} className="px-3 py-1.5 rounded-full text-xs border border-border bg-background">
-          <option value="All">Stars: Any</option>
-          {STAR_OPTIONS.map((s) => <option key={s} value={s}>{s} stars</option>)}
-        </select>
-        <select value={rating} onChange={(e) => setRating(e.target.value)} className="px-3 py-1.5 rounded-full text-xs border border-border bg-background">
-          <option value="All">Rating: Any</option>
-          <option value="4">4.0+</option>
-          <option value="4.5">4.5+</option>
-        </select>
-        <select value={sort} onChange={(e) => setSort(e.target.value)} className="px-3 py-1.5 rounded-full text-xs border border-border bg-background">
-          <option value="distance">Sort: Nearest</option>
-          <option value="rating">Sort: Top rated</option>
-          <option value="price">Sort: Price</option>
-        </select>
+        <FilterPicker title="Price" value={price} onChange={setPrice} options={[{ value: "All", label: "Any" }, { value: "<100", label: "Under €100" }, { value: "100-250", label: "€100–250" }, { value: "250-400", label: "€250–400" }, { value: "400+", label: "€400+" }]} />
+        <FilterPicker title="Stars" value={stars} onChange={setStars} options={[{ value: "All", label: "Any" }, ...STAR_OPTIONS.map((s) => ({ value: String(s), label: `${s} stars` }))]} />
+        <FilterPicker title="Rating" value={rating} onChange={setRating} options={[{ value: "All", label: "Any" }, { value: "4", label: "4.0+" }, { value: "4.5", label: "4.5+" }]} />
+        <FilterPicker title="Sort" value={sort} onChange={setSort} options={[{ value: "distance", label: "Nearest" }, { value: "rating", label: "Top rated" }, { value: "price", label: "Price" }]} />
       </div>
 
       <p className="text-xs text-muted-foreground mt-3 mb-3">{filtered.length} hotels</p>

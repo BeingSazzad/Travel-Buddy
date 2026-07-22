@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import { SavedProvider } from '@/lib/SavedContext';
+import { ThemeProvider } from 'next-themes';
 import Layout from '@/components/Layout';
 import Home from '@/pages/Home';
 import Trips from '@/pages/Trips';
@@ -221,6 +222,7 @@ const AuthenticatedApp = () => {
 function App() {
 
   return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
@@ -232,6 +234,7 @@ function App() {
         <Toaster />
       </QueryClientProvider>
     </AuthProvider>
+    </ThemeProvider>
   )
 }
 

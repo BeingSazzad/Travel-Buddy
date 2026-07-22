@@ -51,20 +51,32 @@ export function useEvents() {
   );
 
   const rsvp = useCallback(async (event, action) => {
+    const join = action === "join";
+    // Optimistic update — reflect the change immediately, revert on failure.
+    if (join) {
+      setAttendance((prev) => (prev.some((a) => a.event_id === event.id) ? prev : [...prev, { event_id: event.id, user_id: user?.id, id: "temp" + Date.now() }]));
+      setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, attendees_count: (e.attendees_count || 0) + 1 } : e)));
+    } else {
+      setAttendance((prev) => prev.filter((a) => a.event_id !== event.id));
+      setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, attendees_count: Math.max(0, (e.attendees_count || 0) - 1) } : e)));
+    }
     try {
       const res = await base44.functions.invoke("rsvp-event", { action, event_id: event.id });
       if (res.data?.full) {
+        setAttendance((prev) => prev.filter((a) => a.event_id !== event.id));
+        setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, attendees_count: res.data?.count ?? e.attendees_count } : e)));
         alert("This event is full.");
         return;
       }
       setEvents((prev) => prev.map((e) => (e.id === event.id ? { ...e, attendees_count: res.data?.count ?? e.attendees_count } : e)));
-      if (action === "join") {
-        setAttendance((prev) => [...prev, { event_id: event.id, user_id: user?.id, id: "temp" + Date.now() }]);
-      } else {
-        setAttendance((prev) => prev.filter((a) => a.event_id !== event.id));
-      }
     } catch (e) {
-      /* ignore */
+      if (join) {
+        setAttendance((prev) => prev.filter((a) => a.event_id !== event.id));
+        setEvents((prev) => prev.map((ev) => (ev.id === event.id ? { ...ev, attendees_count: Math.max(0, (ev.attendees_count || 0) - 1) } : ev)));
+      } else {
+        setAttendance((prev) => (prev.some((a) => a.event_id === event.id) ? prev : [...prev, { event_id: event.id, user_id: user?.id, id: "temp" + Date.now() }]));
+        setEvents((prev) => prev.map((ev) => (ev.id === event.id ? { ...ev, attendees_count: (ev.attendees_count || 0) + 1 } : ev)));
+      }
     }
   }, [user]);
 
@@ -85,5 +97,5 @@ export function useEvents() {
   const saved = useMemo(() => events.filter((e) => savedEventTitles.has(e.title)), [events, savedEventTitles]);
   const atTrips = useMemo(() => events.filter((e) => tripCities.has(e.city)), [events, tripCities]);
 
-  return { events, loading, rsvp, joinedIds, byCategory, nearby, popular, joined, saved, atTrips };
+  return { events, loading, rsvp, reload: load, joinedIds, byCategory, nearby, popular, joined, saved, atTrips };
 }

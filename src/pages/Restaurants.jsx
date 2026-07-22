@@ -5,6 +5,7 @@ import RestaurantCard from "@/components/restaurants/RestaurantCard";
 import { cn } from "@/lib/utils";
 import { UtensilsCrossed } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
+import FilterPicker from "@/components/common/FilterPicker";
 import ListSkeleton from "@/components/common/ListSkeleton";
 
 const emptyTags = () => Object.fromEntries(RESTAURANT_TAG_FILTERS.map((t) => [t.key, false]));
@@ -59,23 +60,10 @@ export default function Restaurants() {
       </div>
 
       <div className="flex flex-wrap gap-2 mt-2">
-        <select value={cuisine} onChange={(e) => setCuisine(e.target.value)} className="px-3 py-1.5 rounded-full text-xs border border-border bg-background">
-          <option value="All">Cuisine: Any</option>
-          {CUISINES.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
-        <select value={price} onChange={(e) => setPrice(e.target.value)} className="px-3 py-1.5 rounded-full text-xs border border-border bg-background">
-          <option value="All">Price: Any</option>
-          {Object.entries(PRICE_LABELS).map(([p, l]) => <option key={p} value={p}>{l}</option>)}
-        </select>
-        <select value={rating} onChange={(e) => setRating(e.target.value)} className="px-3 py-1.5 rounded-full text-xs border border-border bg-background">
-          <option value="All">Rating: Any</option>
-          <option value="4">4.0+</option>
-          <option value="4.5">4.5+</option>
-        </select>
-        <select value={sort} onChange={(e) => setSort(e.target.value)} className="px-3 py-1.5 rounded-full text-xs border border-border bg-background">
-          <option value="distance">Sort: Nearest</option>
-          <option value="rating">Sort: Top rated</option>
-        </select>
+        <FilterPicker title="Cuisine" value={cuisine} onChange={setCuisine} options={[{ value: "All", label: "Any" }, ...CUISINES.map((c) => ({ value: c, label: c }))]} />
+        <FilterPicker title="Price" value={price} onChange={setPrice} options={[{ value: "All", label: "Any" }, ...Object.entries(PRICE_LABELS).map(([p, l]) => ({ value: String(p), label: l }))]} />
+        <FilterPicker title="Rating" value={rating} onChange={setRating} options={[{ value: "All", label: "Any" }, { value: "4", label: "4.0+" }, { value: "4.5", label: "4.5+" }]} />
+        <FilterPicker title="Sort" value={sort} onChange={setSort} options={[{ value: "distance", label: "Nearest" }, { value: "rating", label: "Top rated" }]} />
       </div>
 
       <p className="text-xs text-muted-foreground mt-3 mb-3">{filtered.length} restaurants</p>

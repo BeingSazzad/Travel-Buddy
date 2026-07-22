@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, MapPinned, Compass, Sparkles } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
@@ -9,12 +9,14 @@ import { tripStatus, tripsOverlap } from "@/lib/trip-utils";
 import TripCard from "@/components/trips/TripCard";
 import TripForm from "@/components/trips/TripForm";
 import MatchSuggestions from "@/components/trips/MatchSuggestions";
+import { onRefresh } from "@/lib/refresh-bus";
 
 const STATUS_ORDER = ["active", "upcoming", "previous"];
 
 export default function Trips() {
-  const { trips, loading, user, create, update, remove } = useTrips();
+  const { trips, loading, user, reload, create, update, remove } = useTrips();
   const { matches: matchList, loading: matchesLoading, blockMember } = useMatches();
+  useEffect(() => onRefresh("/trips", reload), [reload]);
   const navigate = useNavigate();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
