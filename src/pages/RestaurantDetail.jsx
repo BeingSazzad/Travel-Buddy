@@ -4,7 +4,8 @@ import { ArrowLeft, MapPin, Star, Clock, Phone, Globe, Navigation, Share2, Bookm
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
-import { RESTAURANTS, PRICE_LABELS, FACILITY_LABELS } from "@/lib/restaurants";
+import { PRICE_LABELS, FACILITY_LABELS } from "@/lib/restaurants";
+import { useRestaurants } from "@/lib/useContent";
 import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
 import ReviewSection from "@/components/reviews/ReviewSection";
@@ -14,9 +15,11 @@ export default function RestaurantDetail() {
   const { name } = useParams();
   const navigate = useNavigate();
   const { isSaved, toggle } = useSaved();
-  const r = useMemo(() => RESTAURANTS.find((x) => x.name.toLowerCase() === name?.toLowerCase()), [name]);
+  const { items: restaurants, loading } = useRestaurants();
+  const r = useMemo(() => restaurants.find((x) => x.name.toLowerCase() === name?.toLowerCase()), [restaurants, name]);
   const [reportOpen, setReportOpen] = useState(false);
 
+  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
   if (!r)
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-3">

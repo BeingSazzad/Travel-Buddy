@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from "react";
-import { RESTAURANTS, RESTAURANT_TAG_FILTERS, PRICE_LABELS, CUISINES } from "@/lib/restaurants";
+import { RESTAURANT_TAG_FILTERS, PRICE_LABELS, CUISINES } from "@/lib/restaurants";
+import { useRestaurants } from "@/lib/useContent";
 import RestaurantCard from "@/components/restaurants/RestaurantCard";
 import { cn } from "@/lib/utils";
 
 const emptyTags = () => Object.fromEntries(RESTAURANT_TAG_FILTERS.map((t) => [t.key, false]));
 
 export default function Restaurants() {
+  const { items: restaurants, loading } = useRestaurants();
   const [tags, setTags] = useState(emptyTags());
   const [cuisine, setCuisine] = useState("All");
   const [price, setPrice] = useState("All");
@@ -15,15 +17,17 @@ export default function Restaurants() {
   const toggle = (k) => setTags((t) => ({ ...t, [k]: !t[k] }));
 
   const filtered = useMemo(() => {
-    let list = RESTAURANTS.filter((r) =>
-      Object.entries(tags).every(([k, v]) => !v || r.tags[k]) &&
+    let list = restaurants.filter((r) =>
+      Object.entries(tags).every(([k, v]) => !v || r.tags?.[k]) &&
       (cuisine === "All" || r.cuisine === cuisine) &&
       (price === "All" || r.price === Number(price)) &&
       (rating === "All" || r.rating >= Number(rating))
     );
-    list = [...list].sort((a, b) => (sort === "distance" ? a.distance - b.distance : b.rating - a.rating));
+    list = [...list].sort((a, b) => (sort === "distance" ? (a.distance || 0) - (b.distance || 0) : (b.rating || 0) - (a.rating || 0)));
     return list;
-  }, [tags, cuisine, price, rating, sort]);
+  }, [restaurants, tags, cuisine, price, rating, sort]);
+
+  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
 
   return (
     <div className="px-5 pt-12 pb-6">

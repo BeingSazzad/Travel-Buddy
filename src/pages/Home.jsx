@@ -5,6 +5,7 @@ import HomeHeader from "@/components/home/HomeHeader";
 import CategoryGrid from "@/components/home/CategoryGrid";
 import SectionRow from "@/components/home/SectionRow";
 import ContentCard from "@/components/home/ContentCard";
+import HomeFeatured from "@/components/home/HomeFeatured";
 import { SECTIONS } from "@/lib/home-data";
 
 export default function Home() {
@@ -29,6 +30,9 @@ export default function Home() {
         <h2 className="font-display font-semibold text-lg px-5 mb-3">Explore</h2>
         <CategoryGrid />
       </section>
+
+      {/* Admin-arranged featured content */}
+      <HomeFeatured />
 
       {/* Horizontal content sections */}
       {SECTIONS.map((s) => (

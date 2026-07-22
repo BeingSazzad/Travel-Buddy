@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from "react";
-import { CAFES, CAFE_TAG_FILTERS, PRICE_LABELS } from "@/lib/cafes";
+import { CAFE_TAG_FILTERS, PRICE_LABELS } from "@/lib/cafes";
+import { useCafes } from "@/lib/useContent";
 import CafeCard from "@/components/cafes/CafeCard";
 import { cn } from "@/lib/utils";
 
 const emptyTags = () => Object.fromEntries(CAFE_TAG_FILTERS.map((t) => [t.key, false]));
 
 export default function Cafes() {
+  const { items: cafes, loading } = useCafes();
   const [tags, setTags] = useState(emptyTags());
   const [price, setPrice] = useState("All");
   const [rating, setRating] = useState("All");
@@ -14,14 +16,16 @@ export default function Cafes() {
   const toggle = (k) => setTags((t) => ({ ...t, [k]: !t[k] }));
 
   const filtered = useMemo(() => {
-    let list = CAFES.filter((c) =>
-      Object.entries(tags).every(([k, v]) => !v || c.tags[k]) &&
+    let list = cafes.filter((c) =>
+      Object.entries(tags).every(([k, v]) => !v || c.tags?.[k]) &&
       (price === "All" || c.price === Number(price)) &&
       (rating === "All" || c.rating >= Number(rating))
     );
-    list = [...list].sort((a, b) => (sort === "distance" ? a.distance - b.distance : b.rating - a.rating));
+    list = [...list].sort((a, b) => (sort === "distance" ? (a.distance || 0) - (b.distance || 0) : (b.rating || 0) - (a.rating || 0)));
     return list;
-  }, [tags, price, rating, sort]);
+  }, [cafes, tags, price, rating, sort]);
+
+  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
 
   return (
     <div className="px-5 pt-12 pb-6">

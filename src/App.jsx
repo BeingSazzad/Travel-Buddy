@@ -55,6 +55,9 @@ import AdminReviews from '@/pages/admin/AdminReviews';
 import AdminDeals from '@/pages/admin/AdminDeals';
 import Partners from '@/pages/admin/Partners';
 import AdminNotifications from '@/pages/admin/AdminNotifications';
+import AdminTravelTips from '@/pages/admin/AdminTravelTips';
+import AdminSafetyTips from '@/pages/admin/AdminSafetyTips';
+import AdminFeatured from '@/pages/admin/AdminFeatured';
 import ContentManagement from '@/pages/admin/ContentManagement';
 import CommunityGuidelines from '@/pages/CommunityGuidelines';
 import { ShieldAlert } from "lucide-react";
@@ -197,6 +200,9 @@ const AuthenticatedApp = () => {
         <Route path="/admin/reviews" element={<AdminReviews />} />
         <Route path="/admin/deals" element={<AdminDeals />} />
         <Route path="/admin/partners" element={<Partners />} />
+        <Route path="/admin/featured" element={<AdminFeatured />} />
+        <Route path="/admin/travel-tips" element={<AdminTravelTips />} />
+        <Route path="/admin/safety-tips" element={<AdminSafetyTips />} />
         <Route path="/admin/notifications" element={<AdminNotifications />} />
         <Route path="/admin/content" element={<ContentManagement />} />
       </Route>

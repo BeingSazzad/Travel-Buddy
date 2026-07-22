@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { SectionHeader } from "@/components/admin/AdminUI";
-import { Loader2, ChevronRight, Star, CalendarHeart, Plane, Flag, Tag, FileText } from "lucide-react";
+import { Loader2, ChevronRight, Star, CalendarHeart, Flag, Tag, FileText, Sparkles } from "lucide-react";
 
 export default function ContentManagement() {
   const [stats, setStats] = useState(null);
@@ -26,7 +26,7 @@ export default function ContentManagement() {
   const links = [
     { to: "/admin/reviews", label: "Reviews", count: stats?.reviews, icon: Star },
     { to: "/admin/events", label: "Events", count: stats?.activeEvents, icon: CalendarHeart },
-    { to: "/admin", label: "Trips", count: stats?.activeTrips, icon: Plane },
+    { to: "/admin/featured", label: "Featured", count: null, icon: Sparkles },
     { to: "/admin/reports", label: "Reports", count: stats?.reports, icon: Flag },
     { to: "/admin/deals", label: "Deals", count: stats?.deals, icon: Tag },
     { to: "/admin/destinations", label: "Destinations", count: null, icon: FileText },

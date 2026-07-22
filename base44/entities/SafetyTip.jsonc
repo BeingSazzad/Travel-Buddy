@@ -1,0 +1,49 @@
+{
+  "name": "SafetyTip",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "icon": {
+      "type": "string",
+      "description": "Optional lucide icon name or emoji"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "published",
+        "hidden"
+      ],
+      "default": "published"
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

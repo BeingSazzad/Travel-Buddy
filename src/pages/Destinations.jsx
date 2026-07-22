@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { DESTINATIONS, CONTINENTS, WEATHERS, TAG_FILTERS } from "@/lib/destinations";
+import { CONTINENTS, WEATHERS, TAG_FILTERS } from "@/lib/destinations";
+import { useDestinations } from "@/lib/useContent";
 import DestinationCard from "@/components/destinations/DestinationCard";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +11,7 @@ export default function Destinations() {
   const [continent, setContinent] = useState("All");
   const [weather, setWeather] = useState("All");
   const [tags, setTags] = useState(emptyTags());
+  const { items: destinations, loading } = useDestinations();
   const [trips, setTrips] = useState([]);
   const [events, setEvents] = useState([]);
 
@@ -19,22 +21,24 @@ export default function Destinations() {
   }, []);
 
   const withStats = useMemo(() => {
-    return DESTINATIONS.map((d) => {
+    return destinations.map((d) => {
       const liveMembers = new Set(trips.filter((t) => t.city === d.city).map((t) => t.created_by_id)).size;
       const liveEvents = events.filter((e) => e.city === d.city).length;
       return {
         ...d,
         stats: {
-          members: Math.max(liveMembers, d.counts.members),
-          cafes: d.counts.cafes,
-          restaurants: d.counts.restaurants,
-          hotels: d.counts.hotels,
-          events: Math.max(liveEvents, d.counts.events),
-          deals: d.counts.deals,
+          members: Math.max(liveMembers, d.counts?.members || 0),
+          cafes: d.counts?.cafes || 0,
+          restaurants: d.counts?.restaurants || 0,
+          hotels: d.counts?.hotels || 0,
+          events: Math.max(liveEvents, d.counts?.events || 0),
+          deals: d.counts?.deals || 0,
         },
       };
     });
-  }, [trips, events]);
+  }, [destinations, trips, events]);
+
+  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
 
   const featured = withStats.filter((d) => d.featured);
 

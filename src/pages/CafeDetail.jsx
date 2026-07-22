@@ -4,7 +4,8 @@ import { ArrowLeft, MapPin, Star, Clock, Phone, Globe, Navigation, Share2, Bookm
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
-import { CAFES, PRICE_LABELS, FACILITY_LABELS } from "@/lib/cafes";
+import { PRICE_LABELS, FACILITY_LABELS } from "@/lib/cafes";
+import { useCafes } from "@/lib/useContent";
 import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
 import ReviewSection from "@/components/reviews/ReviewSection";
@@ -14,11 +15,13 @@ export default function CafeDetail() {
   const { name } = useParams();
   const navigate = useNavigate();
   const { isSaved, toggle } = useSaved();
-  const cafe = useMemo(() => CAFES.find((c) => c.name.toLowerCase() === name?.toLowerCase()), [name]);
+  const { items: cafes, loading } = useCafes();
+  const cafe = useMemo(() => cafes.find((c) => c.name.toLowerCase() === name?.toLowerCase()), [cafes, name]);
   const [reportOpen, setReportOpen] = useState(false);
 
   const itemKey = cafe ? `cafe:${cafe.name}` : "";
 
+  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
   if (!cafe)
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-3">

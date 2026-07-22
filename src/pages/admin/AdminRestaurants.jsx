@@ -1,36 +1,44 @@
-import React, { useState } from "react";
-import { RESTAURANTS } from "@/lib/restaurants";
-import { SectionHeader, SearchBar, ListState } from "@/components/admin/AdminUI";
-import { MapPin, Star } from "lucide-react";
+import AdminContentPage from "@/components/admin/AdminContentPage";
+
+const TAGS = [
+  { key: "vegetarian", label: "Vegetarian" }, { key: "vegan", label: "Vegan" }, { key: "glutenFree", label: "Gluten-free" },
+  { key: "solo", label: "Solo-friendly" }, { key: "outdoor", label: "Outdoor" }, { key: "romantic", label: "Romantic" },
+  { key: "local", label: "Local favourite" }, { key: "reservation", label: "Reservation" },
+];
+const STATUS = [{ value: "published", label: "Published" }, { value: "hidden", label: "Hidden" }];
+
+const fields = [
+  { key: "name", label: "Name", type: "text", required: true },
+  { key: "city", label: "City", type: "text", required: true },
+  { key: "country", label: "Country", type: "text" },
+  { key: "cuisine", label: "Cuisine", type: "text" },
+  { key: "image", label: "Image", type: "image", required: true },
+  { key: "gallery", label: "Gallery", type: "gallery" },
+  { key: "description", label: "Description", type: "textarea" },
+  { key: "rating", label: "Rating (1-5)", type: "number" },
+  { key: "reviews", label: "Review count", type: "number" },
+  { key: "price", label: "Price (1-4)", type: "number" },
+  { key: "distance", label: "Distance (km)", type: "number" },
+  { key: "address", label: "Address", type: "text" },
+  { key: "hours", label: "Opening hours", type: "text" },
+  { key: "phone", label: "Phone", type: "text" },
+  { key: "website", label: "Website", type: "text" },
+  { key: "menuUrl", label: "Menu URL", type: "text" },
+  { key: "reservationUrl", label: "Reservation URL", type: "text" },
+  { key: "tags", label: "Facilities", type: "tags", options: TAGS },
+  { key: "status", label: "Status", type: "select", options: STATUS },
+  { key: "sort_order", label: "Sort order", type: "number" },
+];
 
 export default function AdminRestaurants() {
-  const [q, setQ] = useState("");
-  const query = q.trim().toLowerCase();
-  const items = RESTAURANTS.filter((r) => !query || `${r.name} ${r.city} ${r.cuisine}`.toLowerCase().includes(query));
-
   return (
-    <div>
-      <SectionHeader title="Restaurants" subtitle={`${RESTAURANTS.length} curated restaurants (managed content)`} />
-      <SearchBar value={q} onChange={setQ} placeholder="Search restaurants…" />
-      <ListState loading={false} empty={items.length === 0} emptyText="No restaurants match.">
-        <div className="space-y-2">
-          {items.map((r) => (
-            <div key={r.name} className="flex gap-3 p-3 rounded-2xl border border-border bg-card">
-              <img src={r.image} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{r.name}</p>
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <MapPin className="w-3 h-3" strokeWidth={1.5} /> {r.city}, {r.country} · {r.cuisine}
-                </p>
-              </div>
-              <div className="text-right text-xs">
-                <p className="flex items-center gap-1 justify-end"><Star className="w-3 h-3 text-amber-500" strokeWidth={1.5} /> {r.rating}</p>
-                <p className="text-[11px] text-muted-foreground">{r.reviews} reviews</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </ListState>
-    </div>
+    <AdminContentPage
+      entity="Restaurant"
+      title="Restaurants"
+      subtitle="Curated restaurants — create, edit, publish, hide, delete"
+      fields={fields}
+      getTitle={(i) => i.name}
+      getImage={(i) => i.image}
+    />
   );
 }

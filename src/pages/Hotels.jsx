@@ -1,11 +1,13 @@
 import React, { useMemo, useState } from "react";
-import { HOTELS, HOTEL_TAG_FILTERS, STAR_OPTIONS } from "@/lib/hotels";
+import { HOTEL_TAG_FILTERS, STAR_OPTIONS } from "@/lib/hotels";
+import { useHotels } from "@/lib/useContent";
 import HotelCard from "@/components/hotels/HotelCard";
 import { cn } from "@/lib/utils";
 
 const emptyTags = () => Object.fromEntries(HOTEL_TAG_FILTERS.map((t) => [t.key, false]));
 
 export default function Hotels() {
+  const { items: hotels, loading } = useHotels();
   const [tags, setTags] = useState(emptyTags());
   const [price, setPrice] = useState("All");
   const [stars, setStars] = useState("All");
@@ -15,8 +17,8 @@ export default function Hotels() {
   const toggle = (k) => setTags((t) => ({ ...t, [k]: !t[k] }));
 
   const filtered = useMemo(() => {
-    let list = HOTELS.filter((h) =>
-      Object.entries(tags).every(([k, v]) => !v || h.tags[k]) &&
+    let list = hotels.filter((h) =>
+      Object.entries(tags).every(([k, v]) => !v || h.tags?.[k]) &&
       (price === "All" ||
         (price === "<100" && h.pricePerNight < 100) ||
         (price === "100-250" && h.pricePerNight >= 100 && h.pricePerNight < 250) ||
@@ -26,12 +28,14 @@ export default function Hotels() {
       (rating === "All" || h.memberRating >= Number(rating))
     );
     list = [...list].sort((a, b) =>
-      sort === "distance" ? a.distance - b.distance :
-      sort === "rating" ? b.memberRating - a.memberRating :
-      a.pricePerNight - b.pricePerNight
+      sort === "distance" ? (a.distance || 0) - (b.distance || 0) :
+      sort === "rating" ? (b.memberRating || 0) - (a.memberRating || 0) :
+      (a.pricePerNight || 0) - (b.pricePerNight || 0)
     );
     return list;
-  }, [tags, price, stars, rating, sort]);
+  }, [hotels, tags, price, stars, rating, sort]);
+
+  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
 
   return (
     <div className="px-5 pt-12 pb-6">

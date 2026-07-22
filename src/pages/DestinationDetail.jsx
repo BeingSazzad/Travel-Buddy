@@ -9,7 +9,7 @@ import VenueRow from "@/components/destinations/VenueRow";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import ReportSheet from "@/components/reports/ReportSheet";
 import EventCard from "@/components/events/EventCard";
-import { DESTINATIONS } from "@/lib/destinations";
+import { useDestinations } from "@/lib/useContent";
 import { contentFor } from "@/lib/destination-content";
 
 const AV = "https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&w=120&q=80";
@@ -30,13 +30,14 @@ export default function DestinationDetail() {
   const { city } = useParams();
   const navigate = useNavigate();
   const [reportOpen, setReportOpen] = useState(false);
-  const dest = useMemo(() => DESTINATIONS.find((d) => d.city.toLowerCase() === city?.toLowerCase()), [city]);
+  const { items: destinations, loading } = useDestinations();
+  const dest = useMemo(() => destinations.find((d) => d.city.toLowerCase() === city?.toLowerCase()), [destinations, city]);
   const content = useMemo(() => contentFor(dest?.city), [dest?.city]);
 
   const [trips, setTrips] = useState([]);
   const [profiles, setProfiles] = useState({});
   const [events, setEvents] = useState([]);
-  const [stats, setStats] = useState({ members: dest?.counts?.members || 0, events: dest?.counts?.events || 0 });
+  const stats = useMemo(() => ({ members: dest?.counts?.members || 0, events: dest?.counts?.events || 0 }), [dest]);
 
   useEffect(() => {
     if (!dest) return;
@@ -79,6 +80,7 @@ export default function DestinationDetail() {
     );
   };
 
+  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
   if (!dest)
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-3">

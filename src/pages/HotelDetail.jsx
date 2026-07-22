@@ -4,7 +4,8 @@ import { ArrowLeft, MapPin, Star, Globe, Navigation, Share2, Bookmark, ShieldChe
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
-import { HOTELS, FACILITY_LABELS } from "@/lib/hotels";
+import { FACILITY_LABELS } from "@/lib/hotels";
+import { useHotels } from "@/lib/useContent";
 import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
 import ReviewSection from "@/components/reviews/ReviewSection";
@@ -24,9 +25,11 @@ export default function HotelDetail() {
   const { name } = useParams();
   const navigate = useNavigate();
   const { isSaved, toggle } = useSaved();
-  const h = useMemo(() => HOTELS.find((x) => x.name.toLowerCase() === name?.toLowerCase()), [name]);
+  const { items: hotels, loading } = useHotels();
+  const h = useMemo(() => hotels.find((x) => x.name.toLowerCase() === name?.toLowerCase()), [hotels, name]);
   const [reportOpen, setReportOpen] = useState(false);
 
+  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
   if (!h)
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-3">
