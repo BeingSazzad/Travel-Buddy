@@ -110,7 +110,52 @@
     "allow_notifications": {
       "type": "boolean",
       "default": true,
-      "description": "Whether the user receives app notifications"
+      "description": "Master toggle: whether the user receives any app notifications"
+    },
+    "notif_matches": {
+      "type": "boolean",
+      "default": true,
+      "description": "Notifications for new travel matches"
+    },
+    "notif_messages": {
+      "type": "boolean",
+      "default": true,
+      "description": "Notifications for new messages"
+    },
+    "notif_events": {
+      "type": "boolean",
+      "default": true,
+      "description": "Notifications for event invitations, approvals and reminders"
+    },
+    "notif_trip_suggestions": {
+      "type": "boolean",
+      "default": true,
+      "description": "Notifications for trip reminders and suggestions"
+    },
+    "notif_destination_activity": {
+      "type": "boolean",
+      "default": true,
+      "description": "Notifications for members travelling to the same destination and destination updates"
+    },
+    "notif_deals": {
+      "type": "boolean",
+      "default": true,
+      "description": "Notifications for new exclusive deals"
+    },
+    "notif_recommendations": {
+      "type": "boolean",
+      "default": true,
+      "description": "Notifications for saved place updates and recommendations"
+    },
+    "notif_marketing": {
+      "type": "boolean",
+      "default": true,
+      "description": "Marketing and promotional messages"
+    },
+    "notif_safety": {
+      "type": "boolean",
+      "default": true,
+      "description": "Safety and account-critical notices (always on, cannot be disabled)"
     },
     "is_email_verified": {
       "type": "boolean",
@@ -158,6 +203,11 @@
       "type": "string",
       "format": "date-time",
       "description": "End of the current billing period (drives grace access for cancelled_active)"
+    },
+    "account_deletion_requested": {
+      "type": "boolean",
+      "default": false,
+      "description": "Set when the user requested account deletion"
     }
   },
   "required": [
