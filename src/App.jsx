@@ -42,6 +42,7 @@ import Conversation from '@/pages/Conversation';
 import Messages from '@/pages/Messages';
 import Notifications from '@/pages/Notifications';
 import AdminReports from '@/pages/AdminReports';
+import CommunityGuidelines from '@/pages/CommunityGuidelines';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -113,6 +114,16 @@ const AuthenticatedApp = () => {
     );
   }
 
+  // Step 4: community guidelines must be accepted before social features
+  if (!isAdmin && !user?.accepted_guidelines_at) {
+    return (
+      <Routes>
+        <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+        <Route path="*" element={<Navigate to="/community-guidelines" replace />} />
+      </Routes>
+    );
+  }
+
   // Authenticated: render the main app
   return (
     <Routes>
@@ -129,6 +140,7 @@ const AuthenticatedApp = () => {
         <Route path="/messages" element={<Messages />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/admin/reports" element={<AdminReports />} />
+        <Route path="/community-guidelines" element={<CommunityGuidelines />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/cafes" element={<Cafes />} />
