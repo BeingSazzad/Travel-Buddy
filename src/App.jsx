@@ -40,6 +40,7 @@ import SubscriptionManagement from '@/pages/SubscriptionManagement';
 import Discover from '@/pages/Discover';
 import Conversation from '@/pages/Conversation';
 import Messages from '@/pages/Messages';
+import Notifications from '@/pages/Notifications';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -125,6 +126,7 @@ const AuthenticatedApp = () => {
         <Route path="/discover" element={<Discover />} />
         <Route path="/friends" element={<Friends />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/notifications" element={<Notifications />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/cafes" element={<Cafes />} />

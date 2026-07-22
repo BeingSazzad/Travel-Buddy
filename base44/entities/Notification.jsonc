@@ -1,0 +1,70 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "The member this notification is for"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "new_match",
+        "new_message",
+        "event_invitation",
+        "event_approval",
+        "event_reminder",
+        "trip_reminder",
+        "member_travelling",
+        "new_deal",
+        "saved_place_update",
+        "admin_message"
+      ],
+      "description": "The notification category"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short headline"
+    },
+    "body": {
+      "type": "string",
+      "description": "Optional detail text"
+    },
+    "image": {
+      "type": "string",
+      "description": "Optional avatar or thumbnail URL"
+    },
+    "link": {
+      "type": "string",
+      "description": "Optional in-app route to open on tap, e.g. /conversations/:id"
+    },
+    "related_id": {
+      "type": "string",
+      "description": "Optional id of the related entity"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the member has opened this notification"
+    }
+  },
+  "required": [
+    "user_id",
+    "type",
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "data.user_id": "{{user.id}}"
+    },
+    "create": {
+      "data.user_id": "{{user.id}}"
+    },
+    "update": {
+      "data.user_id": "{{user.id}}"
+    },
+    "delete": {
+      "data.user_id": "{{user.id}}"
+    }
+  }
+}
