@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, MapPin, Sun, Sparkles, ShieldCheck, Bus, BedDouble, Users, CalendarHeart } from "lucide-react";
+import { ArrowLeft, MapPin, Sun, Sparkles, ShieldCheck, Bus, BedDouble, Users, CalendarHeart, Flag } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
 import VenueRow from "@/components/destinations/VenueRow";
 import ReviewSection from "@/components/reviews/ReviewSection";
+import ReportSheet from "@/components/reports/ReportSheet";
 import EventCard from "@/components/events/EventCard";
 import { DESTINATIONS } from "@/lib/destinations";
 import { contentFor } from "@/lib/destination-content";
@@ -28,6 +29,7 @@ function Section({ icon: Icon, title, children }) {
 export default function DestinationDetail() {
   const { city } = useParams();
   const navigate = useNavigate();
+  const [reportOpen, setReportOpen] = useState(false);
   const dest = useMemo(() => DESTINATIONS.find((d) => d.city.toLowerCase() === city?.toLowerCase()), [city]);
   const content = useMemo(() => contentFor(dest?.city), [dest?.city]);
 
@@ -89,7 +91,10 @@ export default function DestinationDetail() {
     <div className="max-w-md mx-auto min-h-screen flex flex-col bg-background">
       <header className="sticky top-0 z-20 px-4 pt-10 pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
-        <button onClick={() => navigate(`/trips/new?city=${encodeURIComponent(dest.city)}`)} className="w-9 h-9 rounded-full bg-foreground text-background flex items-center justify-center"><Sparkles className="w-5 h-5" strokeWidth={1.5} /></button>
+        <div className="flex items-center gap-1">
+          <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
+          <button onClick={() => navigate(`/trips/new?city=${encodeURIComponent(dest.city)}`)} className="w-9 h-9 rounded-full bg-foreground text-background flex items-center justify-center"><Sparkles className="w-5 h-5" strokeWidth={1.5} /></button>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto pb-28">
@@ -194,6 +199,10 @@ export default function DestinationDetail() {
           {/* Reviews */}
           <Section icon={Users} title="Member reviews">
             <ReviewSection itemKey={`destination:${dest.city}`} itemType="destination" itemTitle={dest.city} />
+            <button onClick={() => setReportOpen(true)} className="mt-3 text-xs text-muted-foreground flex items-center gap-1.5 underline underline-offset-2">
+              <Flag className="w-3.5 h-3.5" strokeWidth={1.5} /> Report incorrect information
+            </button>
+            <ReportSheet open={reportOpen} onOpenChange={setReportOpen} target={{ type: "place", id: `destination:${dest.city}`, title: dest.city }} />
           </Section>
         </div>
       </div>

@@ -3,26 +3,29 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Flag, Ban } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-
-const REPORT_REASONS = ["Spam or scam", "Inappropriate messages", "Harassment", "Fake profile", "Other"];
+import { REPORT_REASONS } from "@/components/reports/ReportSheet";
 
 export default function SafetySheet({ open, onOpenChange, otherId, otherName, onDone }) {
   const [mode, setMode] = useState(null);
-  const [reason, setReason] = useState(REPORT_REASONS[0]);
+  const [reason, setReason] = useState(REPORT_REASONS[0].value);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const reset = () => { setMode(null); setReason(REPORT_REASONS[0]); setNote(""); };
+  const reset = () => { setMode(null); setReason(REPORT_REASONS[0].value); setNote(""); };
 
   const submit = async () => {
     try {
       setBusy(true);
       if (mode === "report") {
-        await base44.entities.BlockedMember.create({
-          blocked_user_id: otherId,
-          reason: "report",
-          note: `${reason}${note ? ": " + note : ""}`,
+        await base44.entities.Report.create({
+          reported_type: "message",
+          reported_id: otherId,
+          reported_title: `Conversation with ${otherName}`,
+          reported_user_id: otherId,
+          reason,
+          explanation: note.trim(),
         });
+        await base44.entities.BlockedMember.create({ blocked_user_id: otherId, reason: "report", note });
       } else {
         await base44.entities.BlockedMember.create({ blocked_user_id: otherId, reason: "block", note });
       }
@@ -77,14 +80,14 @@ export default function SafetySheet({ open, onOpenChange, otherId, otherName, on
               <DialogTitle className="font-display">{mode === "report" ? "Report conversation" : "Block user"}</DialogTitle>
             </DialogHeader>
             {mode === "report" && (
-              <div className="space-y-2">
+              <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1 -mr-1">
                 {REPORT_REASONS.map((r) => (
                   <button
-                    key={r}
-                    onClick={() => setReason(r)}
-                    className={`w-full text-left px-3 py-2 rounded-xl border text-sm ${reason === r ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border"}`}
+                    key={r.value}
+                    onClick={() => setReason(r.value)}
+                    className={`w-full text-left px-3 py-2 rounded-xl border text-sm ${reason === r.value ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border"}`}
                   >
-                    {r}
+                    {r.label}
                   </button>
                 ))}
               </div>

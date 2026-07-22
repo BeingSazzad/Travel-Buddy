@@ -1,0 +1,86 @@
+{
+  "name": "Report",
+  "type": "object",
+  "properties": {
+    "reported_type": {
+      "type": "string",
+      "enum": [
+        "profile",
+        "message",
+        "event",
+        "review",
+        "photo",
+        "place"
+      ],
+      "description": "The kind of content being reported"
+    },
+    "reported_id": {
+      "type": "string",
+      "description": "Identifier of the reported item (entity id, item key, or photo URL)"
+    },
+    "reported_title": {
+      "type": "string",
+      "description": "Display title of the reported item (denormalized for the admin dashboard)"
+    },
+    "reported_user_id": {
+      "type": "string",
+      "description": "The owner of the reported content, when applicable (e.g. profile, review, photo author)"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "fake_profile",
+        "harassment",
+        "inappropriate_content",
+        "discrimination",
+        "spam",
+        "scam",
+        "safety_concern",
+        "underage",
+        "other"
+      ],
+      "description": "Why the content was reported"
+    },
+    "explanation": {
+      "type": "string",
+      "description": "Optional context from the reporter"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "reviewing",
+        "resolved",
+        "dismissed"
+      ],
+      "default": "pending",
+      "description": "Admin handling status"
+    }
+  },
+  "required": [
+    "reported_type",
+    "reported_id",
+    "reported_title",
+    "reason"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

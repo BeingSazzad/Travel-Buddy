@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Pencil, Plane, CalendarHeart, MessageCircle, Crown, Shield, Bell,
-  Ban, HelpCircle, FileText, ShieldCheck, Trash2, LogOut, ChevronRight,
+  Ban, HelpCircle, FileText, ShieldCheck, Trash2, LogOut, ChevronRight, ShieldAlert,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import PrivacySheet from "@/components/profile/PrivacySheet";
@@ -12,7 +12,7 @@ import LegalSheet from "@/components/profile/LegalSheet";
 import DeleteAccountSheet from "@/components/profile/DeleteAccountSheet";
 
 export default function AccountMenu() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
   const [sheet, setSheet] = useState(null);
 
@@ -33,6 +33,7 @@ export default function AccountMenu() {
         <Row icon={CalendarHeart} label="My events" onClick={() => navigate("/events")} />
         <Row icon={MessageCircle} label="Messages" onClick={() => navigate("/messages")} />
         <Row icon={Crown} label="Subscription" onClick={() => navigate("/subscription-management")} />
+        {user?.role === "admin" && <Row icon={ShieldAlert} label="Reports dashboard" onClick={() => navigate("/admin/reports")} />}
         <Row icon={Shield} label="Privacy" onClick={() => setSheet("privacy")} />
         <Row icon={Bell} label="Notifications" onClick={() => setSheet("notifications")} />
         <Row icon={Ban} label="Blocked users" onClick={() => setSheet("blocked")} />

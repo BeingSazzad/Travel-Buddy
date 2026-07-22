@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, MapPin, Star, Clock, Phone, Globe, Navigation, Share2, Bookmark, UtensilsCrossed, CalendarCheck } from "lucide-react";
+import { ArrowLeft, MapPin, Star, Clock, Phone, Globe, Navigation, Share2, Bookmark, UtensilsCrossed, CalendarCheck, Flag } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
@@ -8,12 +8,14 @@ import { RESTAURANTS, PRICE_LABELS, FACILITY_LABELS } from "@/lib/restaurants";
 import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
 import ReviewSection from "@/components/reviews/ReviewSection";
+import ReportSheet from "@/components/reports/ReportSheet";
 
 export default function RestaurantDetail() {
   const { name } = useParams();
   const navigate = useNavigate();
   const { isSaved, toggle } = useSaved();
   const r = useMemo(() => RESTAURANTS.find((x) => x.name.toLowerCase() === name?.toLowerCase()), [name]);
+  const [reportOpen, setReportOpen] = useState(false);
 
   if (!r)
     return (
@@ -40,6 +42,7 @@ export default function RestaurantDetail() {
       <header className="sticky top-0 z-20 px-4 pt-10 pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-2">
+          <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={onShare} className="w-9 h-9 rounded-full flex items-center justify-center"><Share2 className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={() => toggle({ type: "restaurant", title: r.name, location: r.city, country: r.country, image: r.image, rating: r.rating })} className="w-9 h-9 rounded-full flex items-center justify-center">
             <Bookmark className={cn("w-5 h-5", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
@@ -98,6 +101,11 @@ export default function RestaurantDetail() {
           </section>
 
           <ReviewSection itemKey={itemKey} itemType="restaurant" itemTitle={r.name} />
+
+          <button onClick={() => setReportOpen(true)} className="mt-4 text-xs text-muted-foreground flex items-center gap-1.5 underline underline-offset-2">
+            <Flag className="w-3.5 h-3.5" strokeWidth={1.5} /> Report incorrect information
+          </button>
+          <ReportSheet open={reportOpen} onOpenChange={setReportOpen} target={{ type: "place", id: itemKey, title: r.name }} />
         </div>
       </div>
 

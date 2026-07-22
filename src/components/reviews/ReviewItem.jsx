@@ -1,27 +1,18 @@
 import React, { useState } from "react";
 import { Star, ThumbsUp, Flag, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ReportSheet from "@/components/reports/ReportSheet";
 
 const fmtDate = (d) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "");
 
 export default function ReviewItem({ review, isAdmin, voted, voting, onVote, onReport, onRemove }) {
-  const [reporting, setReporting] = useState(false);
-  const [reason, setReason] = useState("spam");
-  const [note, setNote] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
-  const submitReport = async () => {
-    setSubmitting(true);
-    try {
-      await onReport(review, reason, note);
-      setReporting(false);
-      setNote("");
-      alert("Report submitted. Our team will review it.");
-    } catch (e) {
-      alert("Could not submit report.");
-    } finally {
-      setSubmitting(false);
-    }
+  const target = {
+    type: "review",
+    id: review.id,
+    title: `Review by ${review.author_name}`,
+    ownerId: review.created_by_id || "",
   };
 
   return (
@@ -70,8 +61,8 @@ export default function ReviewItem({ review, isAdmin, voted, voting, onVote, onR
           Helpful {review.helpful_count > 0 && <span className="font-medium">{review.helpful_count}</span>}
         </button>
 
-        {!reporting && !isAdmin && (
-          <button onClick={() => setReporting(true)} className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs border border-border text-muted-foreground">
+        {!isAdmin && (
+          <button onClick={() => setReportOpen(true)} className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs border border-border text-muted-foreground">
             <Flag className="w-3.5 h-3.5" strokeWidth={1.5} /> Report
           </button>
         )}
@@ -86,23 +77,7 @@ export default function ReviewItem({ review, isAdmin, voted, voting, onVote, onR
         )}
       </div>
 
-      {reporting && (
-        <div className="mt-3 rounded-xl border border-border bg-background p-3 space-y-2">
-          <p className="text-xs font-medium">Report this review</p>
-          <select value={reason} onChange={(e) => setReason(e.target.value)} className="w-full px-2 py-1.5 rounded-lg border border-border text-sm bg-background">
-            <option value="spam">Spam</option>
-            <option value="abusive">Abusive content</option>
-            <option value="false_info">False information</option>
-            <option value="inappropriate_image">Inappropriate image</option>
-            <option value="conflict_of_interest">Conflict of interest</option>
-          </select>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Add context (optional)" rows={2} className="w-full rounded-lg border border-border bg-background p-2 text-sm resize-none" />
-          <div className="flex gap-2 justify-end">
-            <button onClick={() => setReporting(false)} className="px-3 py-1.5 text-xs rounded-full border border-border">Cancel</button>
-            <button onClick={submitReport} disabled={submitting} className="px-4 py-1.5 text-xs rounded-full bg-foreground text-background disabled:opacity-50">Submit</button>
-          </div>
-        </div>
-      )}
+      <ReportSheet open={reportOpen} onOpenChange={setReportOpen} target={target} />
     </div>
   );
 }

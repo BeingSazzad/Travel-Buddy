@@ -7,6 +7,7 @@ import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
 import ManageAttendees from "@/components/events/ManageAttendees";
+import ReportSheet from "@/components/reports/ReportSheet";
 import { capitalize, fmtEventDate } from "@/lib/event-options";
 import { useSaved } from "@/lib/SavedContext";
 
@@ -23,6 +24,7 @@ export default function EventDetail() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const load = async () => {
     try {
@@ -95,11 +97,7 @@ export default function EventDetail() {
     }
   };
 
-  const report = async () => {
-    if (!window.confirm("Report this event to admins?")) return;
-    await base44.entities.BlockedMember.create({ blocked_user_id: event.host_id, reason: "report", note: `Event: ${event.title}` });
-    alert("Reported. Our team will review.");
-  };
+  const report = () => setReportOpen(true);
 
   const cancelEvent = async () => {
     if (!window.confirm("Cancel this event? This can't be undone.")) return;
@@ -252,6 +250,7 @@ export default function EventDetail() {
       )}
 
       <ManageAttendees open={manageOpen} onOpenChange={setManageOpen} event={event} onChange={load} />
+      <ReportSheet open={reportOpen} onOpenChange={setReportOpen} target={{ type: "event", id: event.id, title: event.title, ownerId: event.host_id }} />
     </div>
   );
 }
