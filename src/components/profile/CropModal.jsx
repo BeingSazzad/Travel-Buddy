@@ -39,16 +39,20 @@ export default function CropModal({ imageSrc, onClose, onCropped }) {
   const [zoom, setZoom] = useState(1);
   const [area, setArea] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
   const onCropComplete = useCallback((_, pixels) => setArea(pixels), []);
 
   const confirm = async () => {
     if (!area || busy) return;
     setBusy(true);
+    setError("");
     try {
       const blob = await getCroppedImg(imageSrc, area);
       await onCropped(blob);
       onClose();
+    } catch (e) {
+      setError(e?.message || "Could not save your photo. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -81,6 +85,7 @@ export default function CropModal({ imageSrc, onClose, onCropped }) {
             onValueChange={(v) => setZoom(v[0])}
           />
         </div>
+        {error && <p className="text-xs text-destructive px-1">{error}</p>}
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={busy}>Cancel</Button>
           <Button onClick={confirm} disabled={busy || !area}>

@@ -25,13 +25,21 @@ export default function PhotoManager({ photos = [], mainPhoto, onChange }) {
   const handleCropped = async (blob) => {
     setUploading(true);
     try {
-      const res = await base44.integrations.Core.UploadFile({ file: blob });
+      const file = new File([blob], `photo_${Date.now()}.jpg`, { type: "image/jpeg" });
+      const res = await base44.integrations.Core.UploadFile({ file });
       const url = res?.file_url;
-      if (!url) return;
+      if (!url) throw new Error("Upload failed. Please try again.");
       const next = [...photos, url];
-      onChange({ photos: next, mainPhoto: mainPhoto || url });
+      const nextMain = mainPhoto || url;
+      onChange({ photos: next, mainPhoto: nextMain });
+      try {
+        await base44.auth.updateMe({ profile_photos: next, main_photo: nextMain });
+      } catch (e) {
+        console.error("persist photos failed", e);
+      }
     } catch (err) {
       console.error("upload failed", err);
+      throw err;
     } finally {
       setUploading(false);
     }
@@ -130,7 +138,7 @@ export default function PhotoManager({ photos = [], mainPhoto, onChange }) {
       <input
         ref={fileRef}
         type="file"
-        accept="image/*"
+        accept="image/png,image/jpeg,image/webp,image/heic,image/heif,image/*"
         className="hidden"
         onChange={handleFile}
       />
