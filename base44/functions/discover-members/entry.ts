@@ -34,12 +34,10 @@ Deno.serve(async (req) => {
       const upcoming = allTrips
         .filter((t) => t.created_by_id === u.id && t.visibility !== "hidden" && new Date(t.start_date) >= today)
         .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
-      if (upcoming.length === 0) continue;
-
-      const trip = upcoming[0];
+      const trip = upcoming[0] || null;
       members.push({
         ...buildProfile(u),
-        trip: {
+        trip: trip ? {
           id: trip.id,
           city: trip.city,
           country: trip.country || "",
@@ -48,9 +46,17 @@ Deno.serve(async (req) => {
           travel_style: trip.travel_style || "",
           looking_for: arr(trip.looking_for),
           dates: formatDates(trip),
-        },
+        } : null,
       });
     }
+
+    // Prioritise members with an upcoming destination, then by name.
+    members.sort((a, b) => {
+      if (a.trip && !b.trip) return -1;
+      if (!a.trip && b.trip) return 1;
+      if (a.trip && b.trip) return new Date(a.trip.start_date) - new Date(b.trip.start_date);
+      return String(a.name).localeCompare(String(b.name));
+    });
 
     return Response.json({ members });
   } catch (error) {

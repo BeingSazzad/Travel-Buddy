@@ -87,6 +87,17 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
             </div>
           )}
 
+          {member.travel_style?.length > 0 && (
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Travel style</p>
+              <div className="flex flex-wrap gap-1.5">
+                {member.travel_style.map((s) => (
+                  <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-[#A1846B]/10 text-[#A1846B] capitalize">{s}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
           {member.trip && (
             <div className="rounded-2xl bg-[#A1846B]/5 p-3">
               <div className="flex items-center gap-1.5 text-[#A1846B]">

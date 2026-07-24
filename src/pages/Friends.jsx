@@ -1,8 +1,7 @@
 import { Search, MessageCircle, UserPlus, Sparkles } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function Friends() {
-  const navigate = useNavigate();
   const friends = [
     { name: 'Aria K.', loc: 'Berlin, DE', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80' },
     { name: 'Maya R.', loc: 'Lisbon, PT', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80' },
@@ -21,8 +20,8 @@ export default function Friends() {
       <h1 className="font-display font-semibold text-2xl mb-1">Friends</h1>
       <p className="text-sm text-muted-foreground mb-4">Women exploring like you</p>
 
-      <button
-        onClick={() => navigate('/discover')}
+      <Link
+        to="/discover"
         className="w-full flex items-center gap-3 bg-gradient-to-br from-[#A1846B] to-[#8a6a52] text-white rounded-2xl px-4 py-4 mb-5 shadow-soft active:scale-[0.99] transition text-left"
       >
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
@@ -32,7 +31,7 @@ export default function Friends() {
           <p className="font-display font-semibold">Find travel friends</p>
           <p className="text-xs text-white/80">Swipe to connect with women heading your way</p>
         </div>
-      </button>
+      </Link>
 
       <div className="flex items-center gap-2 bg-card border border-border shadow-soft rounded-2xl px-4 py-3 mb-5">
         <Search className="w-4 h-4 text-muted-foreground" />
