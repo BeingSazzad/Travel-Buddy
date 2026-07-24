@@ -2,13 +2,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import {
-  Users, MessageCircle, CalendarPlus, CalendarCheck, BellRing,
-  Plane, Tag, Bookmark, ShieldCheck, Trash2
+  Sparkles, MessageCircle, CalendarPlus, CalendarCheck, BellRing,
+  Plane, Tag, Bookmark, ShieldCheck, Trash2, Users
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const ICONS = {
-  new_match: Users,
+  new_match: Sparkles,
   new_message: MessageCircle,
   event_invitation: CalendarPlus,
   event_approval: CalendarCheck,

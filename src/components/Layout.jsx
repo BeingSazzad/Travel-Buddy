@@ -6,6 +6,7 @@ import Friends from "@/pages/Friends";
 import Messages from "@/pages/Messages";
 import Events from "@/pages/Events";
 import Profile from "@/pages/Profile";
+import Discover from "@/pages/Discover";
 import PullToRefresh from "@/components/common/PullToRefresh";
 import { emitRefresh } from "@/lib/refresh-bus";
 
@@ -15,6 +16,7 @@ const ACTIVE = "absolute inset-0 overflow-y-auto pb-28";
 // Preserved tab views stay mounted (display:none when inactive) to keep
 // scroll position and component state across tab switches.
 const PRESERVED = [
+  { path: "/discover", Component: Discover, ptr: true },
   { path: "/trips", Component: Trips, ptr: true },
   { path: "/friends", Component: Friends, ptr: false },
   { path: "/messages", Component: Messages, ptr: true },
