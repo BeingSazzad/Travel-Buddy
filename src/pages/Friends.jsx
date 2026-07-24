@@ -28,8 +28,8 @@ export default function Friends() {
           <Sparkles className="w-5 h-5" strokeWidth={1.5} />
         </div>
         <div className="flex-1">
-          <p className="font-display font-semibold">Find travel friends</p>
-          <p className="text-xs text-white/80">Swipe to connect with women heading your way</p>
+          <p className="font-display font-semibold">Match</p>
+          <p className="text-xs text-white/80">Find your next travel connection</p>
         </div>
       </Link>
 

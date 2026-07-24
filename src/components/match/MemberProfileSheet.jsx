@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { MapPin, Plane, Compass, Flag } from "lucide-react";
+import { MapPin, Plane, Compass, Flag, Ban, HeartCrack } from "lucide-react";
 import { Image } from "@/components/ui/image";
+import { base44 } from "@/api/base44Client";
 import ReportSheet from "@/components/reports/ReportSheet";
 
 function ChipRow({ label, items, tone }) {
@@ -23,16 +24,43 @@ function ChipRow({ label, items, tone }) {
   );
 }
 
-export default function MemberProfileSheet({ open, data, loading, onClose }) {
+export default function MemberProfileSheet({ open, data, loading, matchId, onClose, onChanged }) {
   const p = data?.profile;
   const memberId = p?.user_id || p?.id || "";
   const [reportTarget, setReportTarget] = useState(null);
+  const [busy, setBusy] = useState(false);
 
   const reportProfile = () =>
     setReportTarget({ type: "profile", id: memberId, title: p?.name || "Member", ownerId: memberId });
 
   const reportPhoto = (ph) =>
     setReportTarget({ type: "photo", id: ph, title: `${p?.name || "Member"} — photo`, ownerId: memberId });
+
+  const doBlock = async () => {
+    if (!memberId || !window.confirm(`Block ${p?.name || "this member"}? You won't see each other anymore.`)) return;
+    try {
+      setBusy(true);
+      await base44.entities.BlockedMember.create({ blocked_user_id: memberId, reason: "block" });
+      onClose();
+      onChanged?.();
+    } catch (e) {
+      /* already blocked */
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const doUnmatch = async () => {
+    if (!matchId || !window.confirm(`Unmatch with ${p?.name || "this member"}?`)) return;
+    try {
+      setBusy(true);
+      await base44.entities.Match.delete(matchId).catch(() => {});
+      onClose();
+      onChanged?.();
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <>
@@ -90,8 +118,8 @@ export default function MemberProfileSheet({ open, data, loading, onClose }) {
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground">{t.dates}</p>
-                          {t.travel_style && (
-                            <p className="text-xs capitalize text-[#A1846B] mt-0.5">{t.travel_style}</p>
+                          {t.looking_for?.length > 0 && (
+                            <ChipRow label="Looking for" items={t.looking_for} tone="accent" />
                           )}
                         </div>
                       ))}
@@ -105,12 +133,30 @@ export default function MemberProfileSheet({ open, data, loading, onClose }) {
                   </div>
                 )}
 
-                <button
-                  onClick={reportProfile}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full border border-border text-sm text-muted-foreground active:scale-95 transition"
-                >
-                  <Flag className="w-4 h-4" strokeWidth={1.5} /> Report profile
-                </button>
+                <div className="space-y-2 pt-1">
+                  {matchId && (
+                    <button
+                      onClick={doUnmatch}
+                      disabled={busy}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full border border-border text-sm text-muted-foreground active:scale-95 transition disabled:opacity-50"
+                    >
+                      <HeartCrack className="w-4 h-4" strokeWidth={1.5} /> Unmatch
+                    </button>
+                  )}
+                  <button
+                    onClick={doBlock}
+                    disabled={busy}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full border border-border text-sm text-muted-foreground active:scale-95 transition disabled:opacity-50"
+                  >
+                    <Ban className="w-4 h-4" strokeWidth={1.5} /> Block
+                  </button>
+                  <button
+                    onClick={reportProfile}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full border border-border text-sm text-muted-foreground active:scale-95 transition"
+                  >
+                    <Flag className="w-4 h-4" strokeWidth={1.5} /> Report profile
+                  </button>
+                </div>
               </div>
             </>
           )}

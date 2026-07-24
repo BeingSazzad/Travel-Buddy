@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Heart, MessageCircle, User, Compass } from "lucide-react";
+import { Users, MessageCircle, User, Compass } from "lucide-react";
 
 export default function MatchModal({ open, myAvatar, theirAvatar, onMessage, onProfile, onKeepExploring }) {
   return (
@@ -39,15 +39,15 @@ export default function MatchModal({ open, myAvatar, theirAvatar, onMessage, onP
           transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 14 }}
           className="w-12 h-12 rounded-full bg-[#A1846B] mx-auto -mt-6 flex items-center justify-center text-white shadow-soft relative z-20"
         >
-          <Heart className="w-6 h-6 fill-white" strokeWidth={0} />
+          <Users className="w-6 h-6" strokeWidth={2} />
         </motion.div>
 
-        <h2 className="font-display font-semibold text-2xl mt-3">You matched!</h2>
-        <p className="text-sm text-muted-foreground mt-1">Start planning, chatting or meeting safely.</p>
+        <h2 className="font-display font-semibold text-2xl mt-3">It’s a match!</h2>
+        <p className="text-sm text-muted-foreground mt-1">You can now start chatting.</p>
 
         <div className="space-y-2 mt-5">
           <Button className="w-full bg-foreground text-background" onClick={onMessage}>
-            <MessageCircle className="w-4 h-4 mr-2" strokeWidth={1.5} /> Send message
+            <MessageCircle className="w-4 h-4 mr-2" strokeWidth={1.5} /> Start chatting
           </Button>
           <Button variant="outline" className="w-full" onClick={onProfile}>
             <User className="w-4 h-4 mr-2" strokeWidth={1.5} /> View profile
