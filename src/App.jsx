@@ -66,6 +66,15 @@ import { base44 } from "@/api/base44Client";
 import PageTransition from "@/components/PageTransition";
 // Add page imports here
 
+function getAgeFromDob(dob) {
+  if (!dob) return null;
+  const t = new Date(), b = new Date(dob);
+  let age = t.getFullYear() - b.getFullYear();
+  const m = t.getMonth() - b.getMonth();
+  if (m < 0 || (m === 0 && t.getDate() < b.getDate())) age--;
+  return age;
+}
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, user, navigateToLogin } = useAuth();
 
@@ -113,6 +122,18 @@ const AuthenticatedApp = () => {
         <Route path="/account-pending" element={<AccountPending />} />
         <Route path="*" element={<Navigate to="/account-pending" replace />} />
       </Routes>
+    );
+  }
+
+  // Under-18 users cannot access any Seluna content
+  if (!isAdmin && user?.date_of_birth && getAgeFromDob(user.date_of_birth) < 18) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center px-6 text-center gap-3 bg-background">
+        <ShieldAlert className="w-9 h-9 text-muted-foreground" strokeWidth={1.5} />
+        <p className="font-display font-semibold text-xl">Access restricted</p>
+        <p className="text-sm text-muted-foreground max-w-xs">Seluna is only available to users aged 18 or older.</p>
+        <button onClick={() => base44.auth.logout()} className="mt-2 text-sm text-[#A1846B] underline">Log out</button>
+      </div>
     );
   }
 

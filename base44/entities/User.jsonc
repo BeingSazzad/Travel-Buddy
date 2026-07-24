@@ -224,6 +224,45 @@
       "default": false,
       "description": "Admin-marked verified profile badge"
     },
+    "identity_verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "True only after Veriff confirms the user's identity"
+    },
+    "age_verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "True only after Veriff confirms the user is 18 or older"
+    },
+    "verification_status": {
+      "type": "string",
+      "description": "Current Veriff identity & age verification state",
+      "enum": [
+        "none",
+        "pending",
+        "approved",
+        "declined",
+        "expired",
+        "abandoned",
+        "resubmission_requested",
+        "manual_review_requested",
+        "review"
+      ],
+      "default": "none"
+    },
+    "verification_provider": {
+      "type": "string",
+      "description": "The identity verification provider (e.g. Veriff)"
+    },
+    "verification_session_id": {
+      "type": "string",
+      "description": "The Veriff session id for the current/last verification attempt"
+    },
+    "verified_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp the user's identity and age were verified"
+    },
     "warning_count": {
       "type": "number",
       "default": 0,

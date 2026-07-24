@@ -66,6 +66,7 @@ export default function Register() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [acceptCommunity, setAcceptCommunity] = useState(false);
+  const [ageConfirm, setAgeConfirm] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
@@ -83,7 +84,11 @@ export default function Register() {
       return;
     }
     if (getAge(dateOfBirth) < 18) {
-      setError("You must be 18 or older to create a Seluna account");
+      setError("Seluna is only available to users aged 18 or older.");
+      return;
+    }
+    if (!ageConfirm) {
+      setError("Please confirm that you are at least 18 years old");
       return;
     }
     if (!country) {
@@ -289,6 +294,12 @@ export default function Register() {
         </div>
 
         <div className="space-y-3 pt-1">
+          <div className="flex items-start gap-3">
+            <Checkbox id="ageConfirm" checked={ageConfirm} onCheckedChange={setAgeConfirm} className="mt-0.5" />
+            <Label htmlFor="ageConfirm" className="text-xs font-normal text-muted-foreground leading-snug cursor-pointer">
+              I confirm that I am at least 18 years old and that the information I provide is accurate.
+            </Label>
+          </div>
           <ConsentRow id="terms" checked={acceptTerms} onCheck={setAcceptTerms} text="I agree to the" linkLabel="Terms and Conditions" />
           <ConsentRow id="privacy" checked={acceptPrivacy} onCheck={setAcceptPrivacy} text="I agree to the" linkLabel="Privacy Policy" />
           <ConsentRow id="community" checked={acceptCommunity} onCheck={setAcceptCommunity} text="I agree to the" linkLabel="Community Guidelines" />

@@ -7,6 +7,7 @@ import ProfileTrips from "@/components/profile/ProfileTrips";
 import ProfileEvents from "@/components/profile/ProfileEvents";
 import SavedGroups from "@/components/profile/SavedGroups";
 import AccountMenu from "@/components/profile/AccountMenu";
+import VerificationCard from "@/components/profile/VerificationCard";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -35,6 +36,8 @@ export default function Profile() {
         <p className="font-display font-semibold">Active member</p>
         <p className="text-xs opacity-80 mt-0.5">Exclusive deals & verified community</p>
       </div>
+
+      <VerificationCard />
 
       <ProfileAbout />
       <ProfileTrips />

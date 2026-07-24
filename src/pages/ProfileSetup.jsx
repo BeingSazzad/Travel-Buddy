@@ -16,6 +16,7 @@ import {
 } from "@/lib/profile-options";
 import InterestPicker from "@/components/profile/InterestPicker";
 import PhotoManager from "@/components/profile/PhotoManager";
+import VerificationCard from "@/components/profile/VerificationCard";
 
 function getAge(dob) {
   const today = new Date();
@@ -69,6 +70,7 @@ export default function ProfileSetup() {
   const [allowMatches, setAllowMatches] = useState(true);
   const [allowInvitations, setAllowInvitations] = useState(true);
   const [allowNotifications, setAllowNotifications] = useState(true);
+  const [ageConfirm, setAgeConfirm] = useState(false);
 
   const age = dob ? getAge(dob) : null;
 
@@ -77,7 +79,8 @@ export default function ProfileSetup() {
     if (step === 0) {
       if (!profileName.trim()) return setError("Enter your profile name");
       if (!dob) return setError("Enter your date of birth");
-      if (age < 18) return setError("You must be 18 or older");
+      if (age < 18) return setError("Seluna is only available to users aged 18 or older.");
+      if (!ageConfirm) return setError("Please confirm that you are at least 18 years old");
       if (!city.trim()) return setError("Enter your current city");
       if (!country) return setError("Select your country");
       if (!nationality) return setError("Select your nationality");
@@ -178,6 +181,11 @@ export default function ProfileSetup() {
                 <Input id="dob" type="date" value={dob} onChange={(e) => setDob(e.target.value)} className="h-11" />
               </div>
 
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" checked={ageConfirm} onChange={(e) => setAgeConfirm(e.target.checked)} className="mt-0.5 w-4 h-4 shrink-0 accent-[#A1846B]" />
+                <span className="text-xs text-muted-foreground leading-snug">I confirm that I am at least 18 years old and that the information I provide is accurate.</span>
+              </label>
+
               <div className="space-y-2">
                 <Label htmlFor="city">Current city</Label>
                 <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} className="h-11" placeholder="Where you live now" />
@@ -260,12 +268,13 @@ export default function ProfileSetup() {
           )}
 
           {step === 3 && (
-            <div className="mt-4">
+            <div className="mt-4 space-y-4">
               <PhotoManager
                 photos={photos}
                 mainPhoto={mainPhoto}
                 onChange={({ photos, mainPhoto }) => { setPhotos(photos); setMainPhoto(mainPhoto); }}
               />
+              <VerificationCard />
             </div>
           )}
 
