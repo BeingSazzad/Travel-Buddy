@@ -232,6 +232,11 @@
     "admin_notes": {
       "type": "string",
       "description": "Internal admin notes (append-only log of notes)"
+    },
+    "is_test_user": {
+      "type": "boolean",
+      "default": false,
+      "description": "Admin-approved test user \u2014 bypasses payment during testing (TestFlight)"
     }
   },
   "required": [

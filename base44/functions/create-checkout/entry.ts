@@ -2,8 +2,8 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 import Stripe from 'npm:stripe@14.25.0';
 
 const PRICES = {
-  monthly: 'price_1TvkNCGS9VdrqfmAQ3ErF9G4',
-  yearly: 'price_1TvkNCGS9VdrqfmA9MbW1Vnh',
+  monthly: 'price_1TweyEGS9VdrqfmATRx3Dfr2',
+  yearly: 'price_1TweyEGS9VdrqfmANRD5DLq8',
 };
 
 Deno.serve(async (req) => {

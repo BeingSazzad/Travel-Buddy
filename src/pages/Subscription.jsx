@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Moon, Check, Loader2, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 
 const PLANS = [
-  { id: "monthly", name: "Monthly", price: "€12", period: "/month" },
-  { id: "yearly", name: "Yearly", price: "€99", period: "/year", badge: "Save 30%" },
+  { id: "monthly", name: "Monthly", price: "€5.29", period: "/month" },
+  { id: "yearly", name: "Yearly", price: "€44.49", period: "/year", badge: "Save 30%" },
 ];
 
 export default function Subscription() {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
   const [selected, setSelected] = useState("yearly");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -140,6 +142,12 @@ export default function Subscription() {
           <p className="text-[11px] text-muted-foreground text-center mt-3">
             Secure payment via Stripe. You can cancel anytime.
           </p>
+
+          {(user?.role === "admin" || user?.is_test_user) && (
+            <Button variant="outline" className="w-full h-12 mt-3 font-medium" onClick={() => navigate("/")}>
+              Continue as test user
+            </Button>
+          )}
         </div>
 
         <button

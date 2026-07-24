@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import {
-  AlertTriangle, Ban, ShieldCheck, RotateCcw, BadgeCheck, Trash2, StickyNote, Flag, Loader2,
+  AlertTriangle, Ban, ShieldCheck, RotateCcw, BadgeCheck, Trash2, StickyNote, Flag, Loader2, FlaskConical,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -59,6 +59,17 @@ export default function AdminUserSheet({ open, user, onClose, onChanged }) {
     await base44.entities.User.update(user.id, { verified: !user.verified });
   });
 
+  const toggleTestUser = async () => {
+    setBusy("test_user");
+    try {
+      await base44.entities.User.update(user.id, { is_test_user: !user.is_test_user });
+      await log("note", `toggled test user access -> ${!user.is_test_user}`);
+      await onChanged();
+    } finally {
+      setBusy("");
+    }
+  };
+
   const removePhoto = (ph) => run("remove_photo", async () => {
     const photos = (user.profile_photos || []).filter((p) => p !== ph);
     const patch = { profile_photos: photos };
@@ -95,6 +106,11 @@ export default function AdminUserSheet({ open, user, onClose, onChanged }) {
             {user.verified && (
               <span className="px-2 py-0.5 rounded-full bg-[#A1846B]/10 text-[#7a5c44] flex items-center gap-1">
                 <BadgeCheck className="w-3 h-3" strokeWidth={1.5} /> Verified
+              </span>
+            )}
+            {user.is_test_user && (
+              <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 flex items-center gap-1">
+                <FlaskConical className="w-3 h-3" strokeWidth={1.5} /> Test user
               </span>
             )}
             <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground capitalize">
@@ -174,6 +190,9 @@ export default function AdminUserSheet({ open, user, onClose, onChanged }) {
             )}
             <Row icon={BadgeCheck} label={user.verified ? "Remove verified badge" : "Mark profile as verified"} onClick={toggleVerified} disabled={!!busy}>
               {busy === "verify" && <Loader2 className="w-4 h-4 animate-spin" />}
+            </Row>
+            <Row icon={FlaskConical} label={user.is_test_user ? "Remove test user access" : "Grant test user access"} onClick={toggleTestUser} disabled={!!busy}>
+              {busy === "test_user" && <Loader2 className="w-4 h-4 animate-spin" />}
             </Row>
           </div>
 

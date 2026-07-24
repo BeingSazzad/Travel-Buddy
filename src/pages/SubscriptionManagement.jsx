@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Crown, RotateCw, Settings2, Info, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 
-const MONTHLY_PRICE = "39 DKK";
+const MONTHLY_PRICE = "€5.29";
 
 const STATUS = {
   active: { label: "Active", tone: "success" },

@@ -104,6 +104,7 @@ const AuthenticatedApp = () => {
   const accountVerified = !!user?.is_email_verified;
   const termsAccepted = !!user?.accepted_terms_at;
   const subscriptionOk = GRANTED_SUBSCRIPTIONS.includes(user?.subscription_status);
+  const bypassPayment = isAdmin || !!user?.is_test_user;
 
   // Step 1: account must be verified and terms accepted
   if (!isAdmin && (!accountVerified || !termsAccepted)) {
@@ -116,7 +117,7 @@ const AuthenticatedApp = () => {
   }
 
   // Step 2: subscription must be active (or cancelled but still within the billing period)
-  if (!isAdmin && !subscriptionOk) {
+  if (!bypassPayment && !subscriptionOk) {
     return (
       <Routes>
         <Route path="/subscription" element={<Subscription />} />
