@@ -39,5 +39,6 @@ export function buildProfile(u) {
     bio: u.biography || "",
     interests: arr(u.interests),
     travel_style: arr(u.travel_style),
+    verified: !!u.identity_verified && !!u.age_verified,
   };
 }

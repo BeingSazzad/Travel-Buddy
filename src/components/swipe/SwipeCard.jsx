@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { MapPin, Plane, X, UserPlus, User } from "lucide-react";
+import { MapPin, Plane, X, UserPlus, User, BadgeCheck } from "lucide-react";
 import { Image } from "@/components/ui/image";
 
 export default function SwipeCard({ member, onSwipe, onProfile }) {
@@ -52,8 +52,9 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
             CONNECT
           </motion.div>
           <div className="absolute bottom-3 left-4 right-4 text-white">
-            <h2 className="font-display font-semibold text-2xl drop-shadow">
+            <h2 className="font-display font-semibold text-2xl drop-shadow flex items-center gap-1.5">
               {member.name}{member.age != null ? `, ${member.age}` : ""}
+              {member.verified && <BadgeCheck className="w-5 h-5 text-white drop-shadow" strokeWidth={2} />}
             </h2>
             <div className="flex items-center gap-1 text-sm mt-0.5">
               <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
