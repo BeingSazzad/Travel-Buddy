@@ -40,6 +40,8 @@ export default function ReportSheet({ open, onOpenChange, target }) {
 
   const reset = () => { setReason(""); setExplanation(""); setBlockToo(false); setError(""); setDone(false); };
 
+  if (!target) return null;
+
   const submit = async () => {
     if (!reason) { setError("Please select a reason."); return; }
     setBusy(true);
