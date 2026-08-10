@@ -33,7 +33,7 @@ const MOCK_EVENTS = [
     description: "Join us for an unforgettable sunset dinner with amazing women travellers. Good food, great conversations, and memories to last a lifetime.",
     attendees_count: 12,
     host_name: "Anika K.",
-    host_avatar: "",
+    host_avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80",
     image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=400&h=300&q=80"
   },
   {

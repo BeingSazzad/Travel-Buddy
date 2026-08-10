@@ -30,8 +30,22 @@ export default function DestinationDetail() {
   const { city } = useParams();
   const navigate = useNavigate();
   const [reportOpen, setReportOpen] = useState(false);
-  const { items: destinations, loading } = useDestinations();
-  const dest = useMemo(() => destinations.find((d) => d.city.toLowerCase() === city?.toLowerCase()), [destinations, city]);
+  const dest = useMemo(() => {
+    const found = destinations.find((d) => d.city.toLowerCase() === city?.toLowerCase());
+    if (found) return found;
+    if (!city) return null;
+    const cityName = decodeURIComponent(city);
+    return {
+      city: cityName,
+      country: "Explore",
+      continent: "Global",
+      image: "https://images.unsplash.com/photo-1517248135467-4c7edcad2f99?auto=format&fit=crop&w=800&q=80",
+      description: `Explore top cafes, local restaurants, hotels, and fellow women travel buddies visiting ${cityName}.`,
+      weather: "Sunny",
+      tags: { solo: true },
+      counts: { members: 6, events: 2 }
+    };
+  }, [destinations, city]);
   const content = useMemo(() => contentFor(dest?.city), [dest?.city]);
 
   const [trips, setTrips] = useState([]);

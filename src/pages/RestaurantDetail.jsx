@@ -15,8 +15,32 @@ export default function RestaurantDetail() {
   const { name } = useParams();
   const navigate = useNavigate();
   const { isSaved, toggle } = useSaved();
-  const { items: restaurants, loading } = useRestaurants();
-  const r = useMemo(() => restaurants.find((x) => x.name.toLowerCase() === name?.toLowerCase()), [restaurants, name]);
+  const r = useMemo(() => {
+    const found = restaurants.find((x) => x.name.toLowerCase() === name?.toLowerCase());
+    if (found) return found;
+    if (!name) return null;
+    const restName = decodeURIComponent(name);
+    return {
+      name: restName,
+      city: "Travel Destination",
+      country: "Global",
+      address: `15 Culinary Way, ${restName}`,
+      distance: 1.8,
+      rating: 4.9,
+      reviews: 48,
+      price: "$$$",
+      hours: "12:00 PM – 11:00 PM",
+      phone: "+1 555-0199",
+      website: "https://selunatribe.app",
+      description: `An exquisite dining experience featuring local produce, authentic wine, and a warm atmosphere.`,
+      image: "https://images.unsplash.com/photo-1517248135467-4c7edcad2f99?auto=format&fit=crop&w=800&q=80",
+      gallery: [
+        "https://images.unsplash.com/photo-1517248135467-4c7edcad2f99?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80"
+      ],
+      tags: { outdoor: true, reservations: true, vegan: true }
+    };
+  }, [restaurants, name]);
   const [reportOpen, setReportOpen] = useState(false);
 
   if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;

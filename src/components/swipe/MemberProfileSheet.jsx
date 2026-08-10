@@ -1,19 +1,28 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { MapPin, Plane, Compass, Flag } from "lucide-react";
+import { MapPin, Plane, Compass, Flag, MessageCircle, BadgeCheck, Globe, Sparkles } from "lucide-react";
 import { Image } from "@/components/ui/image";
+import { Button } from "@/components/ui/button";
 import ReportSheet from "@/components/reports/ReportSheet";
 
-function ChipRow({ label, items, tone }) {
+function ChipRow({ label, items, tone, icon: Icon }) {
   if (!items?.length) return null;
   return (
-    <div>
-      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">{label}</p>
+    <div className="space-y-1.5">
+      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+        {Icon && <Icon className="w-3.5 h-3.5 text-[#A1846B]" strokeWidth={1.75} />}
+        <span>{label}</span>
+      </p>
       <div className="flex flex-wrap gap-1.5">
         {items.map((it) => (
           <span
             key={it}
-            className={`text-xs px-2 py-0.5 rounded-full capitalize ${tone === "accent" ? "bg-[#A1846B]/10 text-[#A1846B]" : "bg-muted text-muted-foreground"}`}
+            className={`text-xs px-3 py-1 rounded-full font-medium capitalize border ${
+              tone === "accent"
+                ? "bg-[#A1846B]/12 text-[#A1846B] border-[#A1846B]/25"
+                : "bg-card border-border/80 text-foreground"
+            }`}
           >
             {it}
           </span>
@@ -24,9 +33,14 @@ function ChipRow({ label, items, tone }) {
 }
 
 export default function MemberProfileSheet({ open, data, loading, onClose }) {
-  const p = data?.profile;
-  const memberId = p?.user_id || p?.id || "";
+  const navigate = useNavigate();
   const [reportTarget, setReportTarget] = useState(null);
+
+  // Normalize data object so it works whether passed as { profile: {...} } or direct member object
+  const p = data?.profile || data;
+  const memberId = p?.user_id || p?.id || "";
+  const photos = p?.photos || p?.profile_photos || [p?.main_photo || p?.avatar].filter(Boolean);
+  const trips = data?.trips || (p?.trip ? [p.trip] : []);
 
   const reportProfile = () =>
     setReportTarget({ type: "profile", id: memberId, title: p?.name || "Member", ownerId: memberId });
@@ -34,64 +48,99 @@ export default function MemberProfileSheet({ open, data, loading, onClose }) {
   const reportPhoto = (ph) =>
     setReportTarget({ type: "photo", id: ph, title: `${p?.name || "Member"} — photo`, ownerId: memberId });
 
+  const handleMessage = () => {
+    onClose();
+    // Use simulated conversation ID for mock users
+    const mockConvMap = {
+      mock_1: "sim_conv_mock_1",
+      mock_2: "sim_conv_mock_2",
+      mock_3: "sim_conv_mock_3_sophie",
+      mock_4: "sim_conv_mock_3",
+      mock_5: "sim_conv_mock_4",
+    };
+    const convId = mockConvMap[memberId] || `sim_conv_${memberId}`;
+    navigate(`/conversations/${convId}`);
+  };
+
   return (
     <>
       <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-        <SheetContent side="bottom" className="rounded-t-3xl max-h-[90vh] overflow-y-auto">
+        <SheetContent side="bottom" className="rounded-t-[32px] max-h-[90vh] overflow-y-auto px-0">
           {loading || !p ? (
-            <div className="p-10 text-center text-muted-foreground">Loading profile…</div>
+            <div className="p-12 text-center text-muted-foreground font-medium">Loading member profile…</div>
           ) : (
-            <>
-              <SheetHeader>
-                <SheetTitle className="font-display text-xl">
-                  {p.name}{p.age != null ? `, ${p.age}` : ""}
-                </SheetTitle>
-              </SheetHeader>
+            <div className="flex flex-col min-h-full">
+              {/* Photo Carousel Header */}
+              {photos.length > 0 && (
+                <div className="flex gap-2.5 overflow-x-auto no-scrollbar px-6 pt-1 pb-3">
+                  {photos.map((ph, i) => (
+                    <div key={i} className="relative w-44 h-60 rounded-2xl overflow-hidden border border-border/80 shrink-0 shadow-soft">
+                      <Image src={ph} alt={p.name} fittingType="fill" className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => reportPhoto(ph)}
+                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white active:scale-90"
+                        aria-label="Report photo"
+                      >
+                        <Flag className="w-3.5 h-3.5" strokeWidth={1.5} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-              <div className="px-4 pb-8 space-y-4">
-                {p.photos?.length > 0 && (
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
-                    {p.photos.map((ph, i) => (
-                      <div key={i} className="relative w-40 h-52 rounded-2xl overflow-hidden border border-border shrink-0">
-                        <Image src={ph} alt={p.name} fittingType="fill" className="w-full h-full" />
-                        <button
-                          onClick={() => reportPhoto(ph)}
-                          className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-black/40 backdrop-blur flex items-center justify-center"
-                          aria-label="Report photo"
-                        >
-                          <Flag className="w-3.5 h-3.5 text-white" strokeWidth={1.5} />
-                        </button>
+              {/* Profile Details Body */}
+              <div className="px-6 py-4 space-y-5 flex-1">
+                {/* Header Name & Location */}
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-display font-bold text-2xl text-foreground">
+                      {p.name || p.full_name}{p.age != null ? `, ${p.age}` : ""}
+                    </h2>
+                    {(p.verified ?? true) && (
+                      <div className="w-5 h-5 rounded-full bg-[#A1846B] flex items-center justify-center shadow-sm">
+                        <BadgeCheck className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
                       </div>
-                    ))}
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium mt-1">
+                    <MapPin className="w-3.5 h-3.5 text-[#A1846B]" strokeWidth={1.75} />
+                    <span>{[p.current_city, p.country].filter(Boolean).join(", ")}</span>
+                  </div>
+                </div>
+
+                {/* Bio */}
+                {p.bio && (
+                  <div className="rounded-2xl bg-card border border-border/70 p-4 shadow-soft">
+                    <p className="text-xs text-foreground/90 leading-relaxed italic">
+                      "{p.bio}"
+                    </p>
                   </div>
                 )}
 
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4" strokeWidth={1.5} />
-                  {[p.current_city, p.country].filter(Boolean).join(", ")}
-                </div>
+                {/* Chips */}
+                <ChipRow label="Languages" items={p.languages} icon={Globe} />
+                <ChipRow label="Interests" items={p.interests} tone="accent" icon={Sparkles} />
+                <ChipRow label="Travel Style" items={p.travel_style} icon={Compass} />
 
-                {p.bio && <p className="text-sm leading-relaxed">{p.bio}</p>}
-
-                <ChipRow label="Languages" items={p.languages} />
-                <ChipRow label="Interests" items={p.interests} tone="accent" />
-                <ChipRow label="Travel style" items={p.travel_style} />
-
-                {data.trips?.length > 0 && (
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Upcoming trips</p>
+                {/* Upcoming Trips */}
+                {trips.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                      <Plane className="w-3.5 h-3.5 text-[#A1846B]" strokeWidth={1.75} />
+                      <span>Upcoming Trips</span>
+                    </p>
                     <div className="space-y-2">
-                      {data.trips.map((t) => (
-                        <div key={t.id} className="rounded-2xl bg-[#A1846B]/5 p-3">
-                          <div className="flex items-center gap-1.5 text-[#A1846B]">
-                            <Plane className="w-4 h-4" strokeWidth={1.5} />
-                            <span className="text-sm font-medium">
-                              {t.city}{t.country ? `, ${t.country}` : ""}
-                            </span>
-                          </div>
-                          <p className="text-xs text-muted-foreground">{t.dates}</p>
+                      {trips.map((t, idx) => (
+                        <div key={idx} className="rounded-2xl bg-gradient-to-br from-[#A1846B]/15 to-[#A1846B]/5 border border-[#A1846B]/25 p-3.5 shadow-sm">
+                          <p className="text-sm font-display font-bold text-foreground">
+                            {t.city}{t.country ? `, ${t.country}` : ""}
+                          </p>
+                          {t.dates && <p className="text-xs text-muted-foreground mt-0.5">{t.dates}</p>}
                           {t.travel_style && (
-                            <p className="text-xs capitalize text-[#A1846B] mt-0.5">{t.travel_style}</p>
+                            <span className="inline-block text-[10px] font-semibold text-[#A1846B] capitalize px-2 py-0.5 rounded-full bg-[#A1846B]/12 mt-1.5">
+                              {t.travel_style}
+                            </span>
                           )}
                         </div>
                       ))}
@@ -99,20 +148,31 @@ export default function MemberProfileSheet({ open, data, loading, onClose }) {
                   </div>
                 )}
 
-                {data.trips?.length === 0 && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Compass className="w-4 h-4" /> No upcoming trips shared yet
+                {trips.length === 0 && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
+                    <Compass className="w-4 h-4 text-[#A1846B]" /> No upcoming trips shared yet
                   </div>
                 )}
 
                 <button
                   onClick={reportProfile}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full border border-border text-sm text-muted-foreground active:scale-95 transition"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl border border-border text-xs text-muted-foreground hover:bg-card active:scale-95 transition"
                 >
-                  <Flag className="w-4 h-4" strokeWidth={1.5} /> Report profile
+                  <Flag className="w-3.5 h-3.5" strokeWidth={1.5} /> Report member profile
                 </button>
               </div>
-            </>
+
+              {/* Fixed Bottom Action Bar */}
+              <div className="sticky bottom-0 bg-background/95 backdrop-blur-md border-t border-border/60 p-4">
+                <Button
+                  onClick={handleMessage}
+                  className="w-full h-12 rounded-2xl bg-[#A1846B] hover:bg-[#8a6a52] text-white font-bold shadow-md flex items-center justify-center gap-2"
+                >
+                  <MessageCircle className="w-5 h-5" strokeWidth={2} />
+                  <span>Send Message</span>
+                </Button>
+              </div>
+            </div>
           )}
         </SheetContent>
       </Sheet>

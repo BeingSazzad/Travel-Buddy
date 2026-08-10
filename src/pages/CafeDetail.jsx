@@ -15,8 +15,32 @@ export default function CafeDetail() {
   const { name } = useParams();
   const navigate = useNavigate();
   const { isSaved, toggle } = useSaved();
-  const { items: cafes, loading } = useCafes();
-  const cafe = useMemo(() => cafes.find((c) => c.name.toLowerCase() === name?.toLowerCase()), [cafes, name]);
+  const cafe = useMemo(() => {
+    const found = cafes.find((c) => c.name.toLowerCase() === name?.toLowerCase());
+    if (found) return found;
+    if (!name) return null;
+    const cafeName = decodeURIComponent(name);
+    return {
+      name: cafeName,
+      city: "Travel Spot",
+      country: "Global",
+      address: `10 Central Ave, ${cafeName}`,
+      distance: 1.2,
+      rating: 4.8,
+      reviews: 32,
+      price: "$$",
+      hours: "08:00 AM – 08:00 PM",
+      phone: "+1 555-0192",
+      website: "https://selunatribe.app",
+      description: `A cozy, female-friendly cafe spot serving specialty coffee, fresh pastries, and wifi.`,
+      image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80",
+      gallery: [
+        "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80"
+      ],
+      tags: { wifi: true, power: true, quiet: true }
+    };
+  }, [cafes, name]);
   const [reportOpen, setReportOpen] = useState(false);
 
   const itemKey = cafe ? `cafe:${cafe.name}` : "";

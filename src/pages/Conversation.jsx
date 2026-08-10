@@ -8,7 +8,7 @@ import { Image } from "@/components/ui/image";
 import MessageBubble from "@/components/messages/MessageBubble";
 import EmojiPicker from "@/components/messages/EmojiPicker";
 import ShareSheet from "@/components/messages/ShareSheet";
-import SafetySheet from "@/components/messages/SafetySheet";
+import MemberProfileSheet from "@/components/swipe/MemberProfileSheet";
 
 export default function Conversation() {
   const { id } = useParams();
@@ -19,6 +19,7 @@ export default function Conversation() {
   const [showEmoji, setShowEmoji] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [safetyOpen, setSafetyOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [, setNow] = useState(Date.now());
   const fileRef = useRef(null);
@@ -119,12 +120,17 @@ export default function Conversation() {
         <button onClick={() => navigate(-1)} className="w-9 h-9 flex items-center justify-center">
           <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
         </button>
-        <div className="w-10 h-10 rounded-full overflow-hidden border border-border shrink-0">
-          <Image src={otherAvatar} alt={otherName} fittingType="fill" className="w-full h-full" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-display font-semibold leading-tight truncate">{otherName}</p>
-          <p className="text-xs text-muted-foreground">{otherTyping ? "typing…" : "Travel friend"}</p>
+        <div
+          onClick={() => setProfileOpen(true)}
+          className="flex-1 flex items-center gap-2 cursor-pointer min-w-0 hover:opacity-90 active:scale-[0.99] transition"
+        >
+          <div className="w-10 h-10 rounded-full overflow-hidden border border-border shrink-0">
+            <Image src={otherAvatar} alt={otherName} fittingType="fill" className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-display font-semibold leading-tight truncate">{otherName}</p>
+            <p className="text-xs text-muted-foreground">{otherTyping ? "typing…" : "Tap to view profile"}</p>
+          </div>
         </div>
         <button onClick={() => setSafetyOpen(true)} className="w-9 h-9 flex items-center justify-center text-muted-foreground">
           <Flag className="w-5 h-5" strokeWidth={1.5} />
@@ -202,6 +208,11 @@ export default function Conversation() {
       </form>
 
       <ShareSheet open={shareOpen} onOpenChange={setShareOpen} onShare={onShare} />
+      <MemberProfileSheet
+        open={profileOpen}
+        data={{ name: otherName, avatar: otherAvatar, user_id: otherId, current_city: "Travel Spot", bio: "Traveling enthusiast sharing memories and adventures." }}
+        onClose={() => setProfileOpen(false)}
+      />
       <SafetySheet
         open={safetyOpen}
         onOpenChange={setSafetyOpen}

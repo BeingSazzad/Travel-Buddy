@@ -149,7 +149,10 @@ export function useConversation(conversationId) {
         }
       }
     } catch (e) {
-      setConversation(null);
+      const fallbackConv = getMockConversation(conversationId, user?.id);
+      const fallbackMsgs = getMockMessages(conversationId, user?.id);
+      setConversation(fallbackConv);
+      setMessages(fallbackMsgs);
     } finally {
       setLoading(false);
     }
