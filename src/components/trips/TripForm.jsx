@@ -60,7 +60,7 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md rounded-2xl">
+      <DialogContent className="max-w-app rounded-2xl">
         <DialogHeader>
           <DialogTitle>{initial ? "Edit trip" : "New trip"}</DialogTitle>
         </DialogHeader>

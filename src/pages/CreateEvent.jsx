@@ -140,7 +140,7 @@ export default function CreateEvent() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen flex flex-col bg-background">
+    <div className="max-w-app mx-auto min-h-screen flex flex-col bg-background">
       <header className="px-5 safe-pt pb-3 flex items-center gap-3">
         <button onClick={back} className="w-9 h-9 rounded-full flex items-center justify-center">
           <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />

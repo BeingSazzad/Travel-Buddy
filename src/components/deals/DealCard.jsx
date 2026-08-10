@@ -22,23 +22,24 @@ export default function DealCard({ deal, onRedeem }) {
   };
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card">
+    <div className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card interactive-card group">
       <div className="relative h-36">
-        <Image src={deal.image} alt={deal.partner} fittingType="fill" className="w-full h-full" />
-        <span className="absolute top-2 left-2 px-2.5 py-1 rounded-full bg-[#A1846B] text-white text-xs font-semibold flex items-center gap-1">
+        <Image src={deal.image} alt={deal.partner} fittingType="fill" className="w-full h-full image-zoom" />
+        <div className="gradient-overlay-soft opacity-45" />
+        <span className="absolute top-2 left-2 px-2.5 py-1 rounded-full gradient-brand-accent text-white text-xs font-semibold flex items-center gap-1 shadow-sm z-20">
           <Tag className="w-3 h-3" strokeWidth={1.5} /> {deal.discount}
         </span>
         <div className="absolute top-2 right-2 flex gap-1.5">
           <button
             onClick={(e) => { e.stopPropagation(); toggle({ type: "deal", title: deal.title, location: deal.city, country: deal.country, image: deal.image, item_key: key }); }}
-            className="w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center active:scale-90 transition"
+            className="w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center tap-feedback"
             aria-label={saved ? "Unsave" : "Save"}
           >
             <span key={saved ? "on" : "off"} className={cn("inline-flex", saved && "save-pop")}>
               <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
             </span>
           </button>
-          <button onClick={onShare} className="w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center active:scale-90 transition">
+          <button onClick={onShare} className="w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center tap-feedback">
             <Share2 className="w-4 h-4 text-foreground" strokeWidth={1.5} />
           </button>
         </div>
@@ -55,7 +56,7 @@ export default function DealCard({ deal, onRedeem }) {
         <button
           onClick={() => onRedeem(deal)}
           disabled={expired}
-          className="w-full mt-3 h-10 rounded-full bg-foreground text-background text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full mt-3 h-10 rounded-full gradient-brand-accent text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed tap-feedback shadow-sm hover:shadow-md transition-shadow"
         >
           {expired ? "Expired" : "Redeem deal"}
         </button>

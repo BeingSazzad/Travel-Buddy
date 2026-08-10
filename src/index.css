@@ -86,6 +86,130 @@ img { -webkit-user-drag: none; }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .card-press:hover { transform: translateY(-2px); box-shadow: 0 12px 36px -10px rgba(78,64,56,.14); }
 }
+/* Unified brand gradients — full bleed end-to-end */
+.gradient-overlay {
+  @apply absolute inset-0 pointer-events-none z-10;
+  background: linear-gradient(
+    to top,
+    hsl(var(--brand-espresso) / 0.92) 0%,
+    hsl(var(--brand-walnut) / 0.42) 42%,
+    transparent 100%
+  );
+}
+.gradient-overlay-soft {
+  @apply absolute inset-0 pointer-events-none z-10;
+  background: linear-gradient(
+    to top,
+    hsl(var(--brand-espresso) / 0.78) 0%,
+    hsl(var(--brand-walnut) / 0.18) 55%,
+    transparent 100%
+  );
+}
+.gradient-overlay-hero {
+  @apply absolute inset-0 pointer-events-none;
+  background: linear-gradient(
+    to top,
+    hsl(0 0% 0% / 0.92) 0%,
+    hsl(0 0% 0% / 0.55) 38%,
+    hsl(0 0% 0% / 0.15) 100%
+  );
+}
+.gradient-brand {
+  background: linear-gradient(135deg, hsl(var(--brand-espresso)) 0%, hsl(var(--brand-walnut)) 48%, hsl(var(--brand-caramel)) 100%);
+}
+.gradient-brand-horizontal {
+  background: linear-gradient(90deg, hsl(var(--brand-espresso)) 0%, hsl(var(--brand-walnut)) 50%, hsl(var(--brand-caramel)) 100%);
+}
+.gradient-brand-accent {
+  background: linear-gradient(135deg, hsl(var(--brand-sand)) 0%, #8a6a52 100%);
+}
+.gradient-brand-soft {
+  background: linear-gradient(135deg, hsl(var(--brand-sand) / 0.14) 0%, hsl(var(--brand-gold) / 0.22) 100%);
+}
+.gradient-divider {
+  @apply h-px w-full;
+  background: linear-gradient(90deg, transparent 0%, hsl(var(--border)) 50%, transparent 100%);
+}
+/* App shell corner glow — soft radial highlights like reference UI */
+.gradient-app-bg {
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(ellipse 95% 75% at 100% 0%, hsl(var(--brand-caramel) / 0.5) 0%, transparent 66%),
+    radial-gradient(ellipse 80% 60% at 0% 0%, hsl(var(--brand-sand) / 0.32) 0%, transparent 60%),
+    radial-gradient(ellipse 65% 50% at 100% 100%, hsl(var(--brand-walnut) / 0.2) 0%, transparent 70%);
+}
+.dark .gradient-app-bg {
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(ellipse 95% 75% at 100% 0%, hsl(var(--brand-caramel) / 0.62) 0%, transparent 66%),
+    radial-gradient(ellipse 80% 60% at 0% 0%, hsl(var(--brand-sand) / 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 65% 50% at 100% 100%, hsl(var(--brand-walnut) / 0.28) 0%, transparent 70%);
+}
+/* Top header band — stronger corner mesh (coffee-app style) */
+.gradient-top-header {
+  background-color: hsl(var(--background) / 0.82);
+  background-image:
+    radial-gradient(ellipse 115% 90% at 100% -8%, hsl(var(--brand-caramel) / 0.55) 0%, transparent 58%),
+    radial-gradient(ellipse 100% 80% at 0% -8%, hsl(var(--brand-sand) / 0.4) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 55% at 50% -20%, hsl(var(--brand-gold) / 0.22) 0%, transparent 52%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.dark .gradient-top-header {
+  background-color: hsl(var(--background) / 0.88);
+  background-image:
+    radial-gradient(ellipse 115% 90% at 100% -8%, hsl(var(--brand-caramel) / 0.65) 0%, transparent 58%),
+    radial-gradient(ellipse 100% 80% at 0% -8%, hsl(var(--brand-sand) / 0.38) 0%, transparent 55%);
+}
+/* Top page wash — full-width gradient behind first screen section */
+.gradient-top-bg {
+  background-image:
+    radial-gradient(ellipse 120% 95% at 100% 0%, hsl(var(--brand-caramel) / 0.45) 0%, transparent 62%),
+    radial-gradient(ellipse 105% 80% at 0% 0%, hsl(var(--brand-sand) / 0.3) 0%, transparent 58%),
+    radial-gradient(ellipse 80% 60% at 50% -10%, hsl(var(--brand-gold) / 0.16) 0%, transparent 55%);
+  background-repeat: no-repeat;
+  background-size: 100% 280px;
+  background-position: top center;
+}
+/* Touch / focus interactivity */
+.interactive-card {
+  @apply cursor-pointer card-press transition-all duration-200 ease-out;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  --tw-ring-color: hsl(var(--brand-sand) / 0.35);
+}
+.interactive-card:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--brand-sand) / 0.35);
+}
+.interactive-chip {
+  @apply transition-all duration-200 ease-out active:scale-[0.96];
+  @apply focus-visible:outline-none focus-visible:ring-offset-1;
+}
+.interactive-chip:focus-visible {
+  box-shadow: 0 0 0 2px hsl(var(--brand-sand) / 0.3);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .interactive-chip:hover {
+    border-color: hsl(var(--brand-sand) / 0.35);
+    @apply shadow-soft;
+    background: linear-gradient(145deg, hsl(var(--brand-sand) / 0.08) 0%, hsl(var(--card)) 100%);
+  }
+  .interactive-chip:hover .chip-icon-wrap {
+    background-color: hsl(var(--brand-sand) / 0.22);
+    transform: scale(1.05);
+  }
+}
+.tap-feedback {
+  @apply transition-transform duration-150 ease-out active:scale-[0.97];
+}
+.nav-pill-active {
+  background: linear-gradient(135deg, hsl(var(--brand-sand) / 0.28) 0%, hsl(var(--brand-sand) / 0.08) 100%);
+}
+.image-zoom {
+  @apply transition-transform duration-500 ease-out;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .group:hover .image-zoom { transform: scale(1.05); }
+}
 @media (prefers-reduced-motion: reduce) {
   .card-press, .fade-in-up, .save-pop, .skeleton-shimmer { animation: none !important; transition: none !important; }
 }
@@ -139,6 +263,12 @@ img { -webkit-user-drag: none; }
     --sidebar-accent-foreground: 20 12% 20%;
     --sidebar-border: 28 15% 84%;
     --sidebar-ring: 25 28% 48%;
+    /* Brand gradient stops */
+    --brand-espresso: 28 45% 12%;
+    --brand-walnut: 25 35% 18%;
+    --brand-caramel: 22 42% 28%;
+    --brand-sand: 25 28% 48%;
+    --brand-gold: 35 55% 72%;
   }
 
   .dark {
@@ -231,6 +361,19 @@ img { -webkit-user-drag: none; }
     font-size: 0.75rem;    /* 12px */
     font-weight: 400;
     line-height: 1.5;
+  }
+}
+
+/* ─── App shell: 430px column, 20px gutters → 390px content ─ */
+@layer components {
+  .app-shell {
+    @apply w-full max-w-app mx-auto;
+  }
+  .app-px {
+    @apply px-app;
+  }
+  .app-gutter-x {
+    @apply -mx-app px-app;
   }
 }
 

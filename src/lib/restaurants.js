@@ -4,12 +4,12 @@ export const CUISINES = ["Italian", "Japanese", "Portuguese", "French", "Mexican
 
 export const RESTAURANTS = [
   {
-    name: "Cervejaria Ramiro", city: "Lisbon", country: "Portugal", cuisine: "Portuguese", image: img("1517248135467-4c7edcad2f99"),
+    name: "Cervejaria Ramiro", city: "Lisbon", country: "Portugal", cuisine: "Portuguese", image: img("1414235077428-338989a2e8c0"),
     rating: 4.7, reviews: 528, price: 3, distance: 1.0,
     tags: { vegetarian: false, vegan: false, glutenFree: false, solo: true, outdoor: false, romantic: false, local: true, reservation: true },
     address: "Av. Almirante Reis 1H, 1150 Lisboa", hours: "Tue–Sun 12:00–00:30", phone: "+351 21 885 1024", website: "https://cervejariaramiro.pt",
     menuUrl: "https://cervejariaramiro.pt/menu", reservationUrl: "https://cervejariaramiro.pt/reserve",
-    gallery: [img("1517248135467-4c7edcad2f99"), img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de")],
+    gallery: [img("1414235077428-338989a2e8c0"), img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de")],
     description: "Legendary seafood institution serving tiger prawns, garlic clams and fresh crab. Loud, bustling and unmistakably local.",
   },
   {
@@ -18,7 +18,7 @@ export const RESTAURANTS = [
     tags: { vegetarian: true, vegan: false, glutenFree: true, solo: true, outdoor: true, romantic: true, local: false, reservation: true },
     address: "Sankt Hans Torv 10, 2200 København", hours: "Mon–Sat 17:00–23:00", phone: "+45 35 39 00 11", website: "https://osteriadellapiazza.dk",
     menuUrl: "https://osteriadellapiazza.dk/menu", reservationUrl: "https://osteriadellapiazza.dk/book",
-    gallery: [img("1414235077428-338989a2e8c0"), img("1517248135467-4c7edcad2f99"), img("1559339352-11d035aa65de")],
+    gallery: [img("1414235077428-338989a2e8c0"), img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de")],
     description: "Hand-rolled pasta and a curated Italian wine list on a cozy square. Candle-lit and perfect for a slow, romantic dinner.",
   },
   {
@@ -27,7 +27,7 @@ export const RESTAURANTS = [
     tags: { vegetarian: false, vegan: false, glutenFree: false, solo: true, outdoor: false, romantic: false, local: false, reservation: true },
     address: "23 Rue de la Tombe Issoire, 75014 Paris", hours: "Mon–Sat 19:00–22:30", phone: "+33 1 45 22 88 12", website: "https://sushisaito.fr",
     menuUrl: "https://sushisaito.fr/omakase", reservationUrl: "https://sushisaito.fr/reserve",
-    gallery: [img("1559339352-11d035aa65de"), img("1414235077428-338989a2e8c0"), img("1517248135467-4c7edcad2f99")],
+    gallery: [img("1559339352-11d035aa65de"), img("1414235077428-338989a2e8c0"), img("1414235077428-338989a2e8c0")],
     description: "An intimate omakase counter with Edomae-style nigiri. Reservation-only; a serene solo or duo experience.",
   },
   {
@@ -36,7 +36,7 @@ export const RESTAURANTS = [
     tags: { vegetarian: true, vegan: true, glutenFree: true, solo: true, outdoor: true, romantic: true, local: false, reservation: true },
     address: "Centauro Sur 7, 77780 Tulum", hours: "Mon–Sun 18:00–23:30", phone: "+52 984 137 2233", website: "https://casajaguar.mx",
     menuUrl: "https://casajaguar.mx/menu", reservationUrl: "https://casajaguar.mx/reserve",
-    gallery: [img("1559339352-11d035aa65de"), img("1517248135467-4c7edcad2f99"), img("1414235077428-338989a2e8c0")],
+    gallery: [img("1559339352-11d035aa65de"), img("1414235077428-338989a2e8c0"), img("1414235077428-338989a2e8c0")],
     description: "Jungle-set kitchen blending Mayan and contemporary Mexican flavours. Candle-lit terrace, mezcal flights and a standout vegan mole.",
   },
   {
@@ -45,7 +45,7 @@ export const RESTAURANTS = [
     tags: { vegetarian: true, vegan: true, glutenFree: false, solo: true, outdoor: true, romantic: false, local: true, reservation: false },
     address: "Long Street 88, Cape Town", hours: "Mon–Sat 11:00–22:00", phone: "+27 21 424 1199", website: "https://somtum.co.za",
     menuUrl: "https://somtum.co.za/menu", reservationUrl: "https://somtum.co.za/reserve",
-    gallery: [img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de"), img("1517248135467-4c7edcad2f99")],
+    gallery: [img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de"), img("1414235077428-338989a2e8c0")],
     description: "Bustling Thai street-food spot with fragrant curries and a legendary som tum. Outdoor seating and a local favourite for lunch.",
   },
   {
@@ -54,7 +54,7 @@ export const RESTAURANTS = [
     tags: { vegetarian: true, vegan: true, glutenFree: true, solo: true, outdoor: true, romantic: false, local: false, reservation: true },
     address: "20 Rue du Caire, 75002 Paris", hours: "Tue–Sun 12:00–22:30", phone: "+33 1 40 26 99 88", website: "https://oliveandvine.fr",
     menuUrl: "https://oliveandvine.fr/menu", reservationUrl: "https://oliveandvine.fr/book",
-    gallery: [img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de"), img("1517248135467-4c7edcad2f99")],
+    gallery: [img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de"), img("1414235077428-338989a2e8c0")],
     description: "Mediterranean mezze, grilled fish and natural wine. Generous vegan options and a sunny terrace for a solo lunch.",
   },
   {
@@ -63,7 +63,7 @@ export const RESTAURANTS = [
     tags: { vegetarian: false, vegan: false, glutenFree: false, solo: true, outdoor: true, romantic: true, local: true, reservation: true },
     address: "7 Beach Road, Bo-Kaap, Cape Town", hours: "Mon–Sat 18:00–23:00", phone: "+27 21 447 2298", website: "https://mzansi.co.za",
     menuUrl: "https://mzansi.co.za/menu", reservationUrl: "https://mzansi.co.za/reserve",
-    gallery: [img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de"), img("1517248135467-4c7edcad2f99")],
+    gallery: [img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de"), img("1414235077428-338989a2e8c0")],
     description: "Rainbow cuisine in a Bo-Kaap heritage home — bobotie, malva pudding and a township soundtrack. Reservation recommended.",
   },
   {
@@ -72,7 +72,7 @@ export const RESTAURANTS = [
     tags: { vegetarian: false, vegan: false, glutenFree: false, solo: true, outdoor: true, romantic: false, local: true, reservation: false },
     address: "Rua das Flores 52, 1200 Lisboa", hours: "Mon–Sat 19:00–00:00", phone: "+351 21 346 7110", website: "https://tabernaruadasflores.pt",
     menuUrl: "https://tabernaruadasflores.pt/menu", reservationUrl: "",
-    gallery: [img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de"), img("1517248135467-4c7edcad2f99")],
+    gallery: [img("1414235077428-338989a2e8c0"), img("1559339352-11d035aa65de"), img("1414235077428-338989a2e8c0")],
     description: "Tiny no-reservation tasca pouring natural wine and seasonal petiscos. Queue early; it's a beloved local gem.",
   },
   {

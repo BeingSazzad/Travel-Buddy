@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Crown, Sparkles, MapPin, Settings, UserCheck } from "lucide-react";
+import { Crown } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileAbout from "@/components/profile/ProfileAbout";
@@ -16,7 +16,7 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState("activity");
 
   return (
-    <div className="px-5 safe-pt pb-24">
+    <div className="app-px safe-pt pb-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h1 className="font-display font-bold text-lg">Profile</h1>
@@ -27,7 +27,7 @@ export default function Profile() {
 
       {/* Photos Strip */}
       {photos.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 mt-4">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar app-gutter-x mt-4">
           {photos.map((p, i) => (
             <img
               key={i}
@@ -40,7 +40,7 @@ export default function Profile() {
       )}
 
       {/* Compact Membership Banner */}
-      <div className="mt-4 rounded-2xl bg-gradient-to-r from-[#2C1A0E] via-[#4A2C1A] to-[#6B3D20] text-white p-3.5 flex items-center justify-between shadow-soft">
+      <div className="mt-4 rounded-2xl gradient-brand-horizontal text-white p-3.5 flex items-center justify-between shadow-soft">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center shrink-0">
             <Crown className="w-4 h-4 text-[#F5C99A]" strokeWidth={1.5} />
@@ -58,10 +58,10 @@ export default function Profile() {
       {/* Segmented Tabs: Activity vs Settings */}
       <Tabs defaultValue="activity" value={activeTab} onValueChange={setActiveTab} className="mt-5">
         <TabsList className="grid grid-cols-2 w-full bg-muted/60 p-1 rounded-2xl">
-          <TabsTrigger value="activity" className="rounded-xl text-xs font-semibold">
+          <TabsTrigger value="activity" className="rounded-xl text-xs font-semibold data-[state=active]:gradient-brand-accent data-[state=active]:text-white transition-all">
             My Activity
           </TabsTrigger>
-          <TabsTrigger value="settings" className="rounded-xl text-xs font-semibold">
+          <TabsTrigger value="settings" className="rounded-xl text-xs font-semibold data-[state=active]:gradient-brand-accent data-[state=active]:text-white transition-all">
             Settings & Support
           </TabsTrigger>
         </TabsList>

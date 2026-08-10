@@ -52,7 +52,7 @@ export default function Hotels() {
       <h1 className="font-display font-bold text-lg">Hotels</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Stays curated for women who travel</p>
 
-      <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-2">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar app-gutter-x pb-2">
         {HOTEL_TAG_FILTERS.map((t) => (
           <button
             key={t.key}

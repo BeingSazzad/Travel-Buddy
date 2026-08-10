@@ -18,10 +18,10 @@ export default function DestinationCard({ destination, large = false }) {
   return (
     <div
       onClick={() => navigate(`/destinations/${encodeURIComponent(city)}`)}
-      className={`relative rounded-3xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer card-press ${large ? "h-72" : "h-64"}`}
+      className={`relative rounded-3xl overflow-hidden border border-border shadow-soft bg-card interactive-card group ${large ? "h-72" : "h-64"}`}
     >
-      <Image src={image} alt={city} fittingType="fill" className="w-full h-full" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+      <Image src={image} alt={city} fittingType="fill" className="w-full h-full image-zoom" />
+      <div className="gradient-overlay-soft" />
       <div className="absolute bottom-0 left-0 right-0 p-5">
         <div className="flex items-center gap-1 text-white/80 text-xs mb-1">
           <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />

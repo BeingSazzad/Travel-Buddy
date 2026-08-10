@@ -24,7 +24,7 @@ export default function HomeHeader() {
   }, [user?.id]);
 
   return (
-    <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-md px-5 py-3 flex items-center justify-between">
+    <header className="sticky top-0 z-30 gradient-top-header app-px py-3 flex items-center justify-between border-b border-border/30">
       <button onClick={() => navigate("/")} className="flex items-center gap-2 active:scale-95 transition">
         <Moon className="w-5 h-5 text-[#A1846B]" strokeWidth={1.5} />
         <h1 className="font-display font-bold text-lg tracking-[0.08em] text-[#A1846B]">SELUNA</h1>

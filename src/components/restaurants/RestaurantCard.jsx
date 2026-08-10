@@ -14,13 +14,14 @@ export default function RestaurantCard({ restaurant }) {
   const saved = isSaved(key);
 
   return (
-    <div onClick={() => navigate(`/restaurants/${encodeURIComponent(r.name)}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer card-press">
+    <div onClick={() => navigate(`/restaurants/${encodeURIComponent(r.name)}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card interactive-card group">
       <div className="relative h-40">
-        <Image src={r.image} alt={r.name} fittingType="fill" className="w-full h-full" />
+        <Image src={r.image} alt={r.name} fittingType="fill" className="w-full h-full image-zoom" />
+        <div className="gradient-overlay-soft opacity-60" />
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); e.preventDefault(); toggle({ type: "restaurant", title: r.name, location: r.city, country: r.country, image: r.image, rating: r.rating }); }}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center active:scale-90 transition"
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center tap-feedback"
           aria-label={saved ? "Unsave" : "Save"}
         >
           <span key={saved ? "on" : "off"} className={cn("inline-flex", saved && "save-pop")}>

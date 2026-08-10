@@ -62,7 +62,7 @@ export default function AccountPending() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-app">
         <div className="flex flex-col items-center mb-6">
           <Moon className="w-6 h-6 text-[#A1846B] mb-1" strokeWidth={1.5} />
           <h1 className="font-display font-semibold text-3xl tracking-[0.08em] text-[#A1846B]">SELUNA</h1>

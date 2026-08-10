@@ -9,10 +9,11 @@ import VenueRow from "@/components/destinations/VenueRow";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import ReportSheet from "@/components/reports/ReportSheet";
 import EventCard from "@/components/events/EventCard";
-import { useDestinations } from "@/lib/useContent";
 import { contentFor } from "@/lib/destination-content";
+import { useDestinations } from "@/lib/useContent";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 
-const AV = "https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&w=120&q=80";
+const AV = FALLBACK_AVATAR_URL;
 const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 
 function Section({ icon: Icon, title, children }) {
@@ -30,8 +31,10 @@ export default function DestinationDetail() {
   const { city } = useParams();
   const navigate = useNavigate();
   const [reportOpen, setReportOpen] = useState(false);
+  const { items: destinations, loading } = useDestinations();
   const dest = useMemo(() => {
-    const found = destinations.find((d) => d.city.toLowerCase() === city?.toLowerCase());
+    const cityKey = decodeURIComponent(city || "").toLowerCase();
+    const found = destinations.find((d) => d.city.toLowerCase() === cityKey);
     if (found) return found;
     if (!city) return null;
     const cityName = decodeURIComponent(city);
@@ -39,7 +42,7 @@ export default function DestinationDetail() {
       city: cityName,
       country: "Explore",
       continent: "Global",
-      image: "https://images.unsplash.com/photo-1517248135467-4c7edcad2f99?auto=format&fit=crop&w=800&q=80",
+      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80",
       description: `Explore top cafes, local restaurants, hotels, and fellow women travel buddies visiting ${cityName}.`,
       weather: "Sunny",
       tags: { solo: true },
@@ -104,12 +107,12 @@ export default function DestinationDetail() {
     );
 
   return (
-    <div className="max-w-md mx-auto min-h-dvh flex flex-col bg-background">
-      <header className="sticky top-0 z-20 px-4 safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
-        <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
+    <div className="max-w-app mx-auto min-h-dvh flex flex-col bg-background">
+      <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
+        <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center tap-feedback"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-1">
-          <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
-          <button onClick={() => navigate(`/trips/new?city=${encodeURIComponent(dest.city)}`)} className="w-9 h-9 rounded-full bg-foreground text-background flex items-center justify-center"><Sparkles className="w-5 h-5" strokeWidth={1.5} /></button>
+          <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground tap-feedback"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
+          <button onClick={() => navigate(`/trips/new?city=${encodeURIComponent(dest.city)}`)} className="w-9 h-9 rounded-full gradient-brand-accent text-white flex items-center justify-center tap-feedback shadow-sm"><Sparkles className="w-5 h-5" strokeWidth={1.5} /></button>
         </div>
       </header>
 
@@ -117,7 +120,7 @@ export default function DestinationDetail() {
         {/* Hero */}
         <div className="relative h-72">
           <Image src={dest.image} alt={dest.city} fittingType="fill" className="w-full h-full" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+          <div className="gradient-overlay-soft" />
           <div className="absolute bottom-4 left-5 right-5">
             <div className="flex items-center gap-1 text-white/80 text-xs mb-1"><MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {dest.city}, {dest.country}</div>
             <h1 className="font-display font-semibold text-3xl text-white">{dest.city}</h1>

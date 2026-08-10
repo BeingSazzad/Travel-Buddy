@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { MapPin, Plane, Compass, Flag, MessageCircle, BadgeCheck, Globe, Sparkles } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
@@ -132,7 +132,7 @@ export default function MemberProfileSheet({ open, data, loading, onClose }) {
                     </p>
                     <div className="space-y-2">
                       {trips.map((t, idx) => (
-                        <div key={idx} className="rounded-2xl bg-gradient-to-br from-[#A1846B]/15 to-[#A1846B]/5 border border-[#A1846B]/25 p-3.5 shadow-sm">
+                        <div key={idx} className="rounded-2xl gradient-brand-soft border border-[#A1846B]/25 p-3.5 shadow-sm">
                           <p className="text-sm font-display font-bold text-foreground">
                             {t.city}{t.country ? `, ${t.country}` : ""}
                           </p>

@@ -8,7 +8,9 @@ import { Image } from "@/components/ui/image";
 import MessageBubble from "@/components/messages/MessageBubble";
 import EmojiPicker from "@/components/messages/EmojiPicker";
 import ShareSheet from "@/components/messages/ShareSheet";
+import SafetySheet from "@/components/messages/SafetySheet";
 import MemberProfileSheet from "@/components/swipe/MemberProfileSheet";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 
 export default function Conversation() {
   const { id } = useParams();

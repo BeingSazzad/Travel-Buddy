@@ -57,7 +57,7 @@ export default function MatchCard({ member, onDecide, onProfile }) {
       >
         <div className="relative h-60 shrink-0">
           <Image src={member.avatar} alt={member.name} fittingType="fill" className="w-full h-full" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+          <div className="gradient-overlay-soft" />
           <motion.div
             style={{ opacity: skipOpacity }}
             className="absolute top-4 left-4 border-4 border-[#B0897A] text-[#B0897A] font-display text-2xl font-bold rounded-xl px-3 py-1 -rotate-12"

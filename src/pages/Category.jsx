@@ -9,7 +9,7 @@ const samples = {
     { name: 'Brew & Bloom', loc: 'Bali', img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=500&q=80' },
   ],
   Restaurants: [
-    { name: 'Olive & Vine', loc: 'Paris', img: 'https://images.unsplash.com/photo-1517248135467-4c7edcad2f99?auto=format&fit=crop&w=500&q=80' },
+    { name: 'Olive & Vine', loc: 'Paris', img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=500&q=80' },
     { name: 'Saffron Table', loc: 'Marrakech', img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=500&q=80' },
     { name: 'Harbor Light', loc: 'Copenhagen', img: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=500&q=80' },
   ],
@@ -41,7 +41,7 @@ const samples = {
   Deals: [
     { name: 'Lisbon Stay 20% off', loc: 'Lisbon', img: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=500&q=80' },
     { name: 'Bali Retreat Deal', loc: 'Ubud', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Paris Dinner 2-for-1', loc: 'Paris', img: 'https://images.unsplash.com/photo-1517248135467-4c7edcad2f99?auto=format&fit=crop&w=500&q=80' },
+    { name: 'Paris Dinner 2-for-1', loc: 'Paris', img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=500&q=80' },
   ],
   Destinations: [
     { name: 'Lisbon', loc: 'Portugal', img: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=500&q=80' },

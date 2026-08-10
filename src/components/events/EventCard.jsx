@@ -19,9 +19,10 @@ export default function EventCard({ event, joined, onRsvp }) {
   };
 
   return (
-    <div onClick={() => navigate(`/events/${event.id}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card cursor-pointer card-press">
+    <div onClick={() => navigate(`/events/${event.id}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card interactive-card group">
       <div className="relative h-40">
-        <Image src={event.image} alt={event.title} fittingType="fill" className="w-full h-full" />
+        <Image src={event.image} alt={event.title} fittingType="fill" className="w-full h-full image-zoom" />
+        <div className="gradient-overlay-soft opacity-50" />
         <div className="absolute top-3 left-3">
           <span className="bg-white/90 backdrop-blur text-[10px] uppercase tracking-wide font-medium text-[#7a5c44] px-2 py-1 rounded-full">
             {capitalize(event.category)}

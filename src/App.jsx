@@ -269,7 +269,7 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         {showSplash && <SplashScreen />}
         <div className="min-h-screen bg-[#F5F3F0] dark:bg-[#121111] flex justify-center">
-          <div className="w-full max-w-md bg-background flex flex-col min-h-screen shadow-2xl relative border-x border-border/5 overflow-hidden">
+          <div className="app-shell gradient-app-bg flex flex-col min-h-screen shadow-2xl relative border-x border-border/5 overflow-hidden">
             <Router>
               <ScrollToTop />
               <SavedProvider>

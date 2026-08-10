@@ -11,7 +11,9 @@ import ReportSheet from "@/components/reports/ReportSheet";
 import { capitalize, fmtEventDate } from "@/lib/event-options";
 import { useSaved } from "@/lib/SavedContext";
 
-const FALLBACK_AVATAR = "https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&w=120&q=80";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
+
+const FALLBACK_AVATAR = FALLBACK_AVATAR_URL;
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -125,8 +127,8 @@ export default function EventDetail() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-dvh flex flex-col bg-background">
-      <header className="sticky top-0 z-20 px-4 safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
+    <div className="max-w-app mx-auto min-h-dvh flex flex-col bg-background">
+      <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-1">
           <button onClick={share} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground"><Share2 className="w-5 h-5" strokeWidth={1.5} /></button>

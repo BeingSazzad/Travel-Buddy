@@ -43,11 +43,11 @@ export default function Home() {
   };
 
   return (
-    <div className="pb-6">
+    <div className="pb-6 gradient-top-bg">
       <HomeHeader />
 
       {/* Welcome Greeting */}
-      <section className="px-5 mt-3 mb-2">
+      <section className="app-px mt-3 mb-2">
         <p className="text-xs text-muted-foreground font-medium">
           {getGreeting()}, {user?.first_name || "traveler"} 👋
         </p>
@@ -57,10 +57,10 @@ export default function Home() {
       </section>
 
       {/* Search */}
-      <section className="px-5 mt-4">
-        <button
+      <section className="app-px mt-4">
+          <button
           onClick={() => navigate("/search")}
-          className="w-full flex items-center gap-2 bg-card border border-border/80 rounded-2xl px-4 py-3 shadow-soft text-left active:scale-[0.99] transition-transform"
+          className="w-full flex items-center gap-2 bg-card border border-border/80 rounded-2xl px-4 py-3 shadow-soft text-left interactive-card tap-feedback focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A1846B]/30"
         >
           <Search className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
           <span className="flex-1 text-sm text-muted-foreground">Search destinations, events, members…</span>
@@ -69,7 +69,7 @@ export default function Home() {
 
       {/* Categories */}
       <section className="mt-6">
-        <h2 className="font-display font-semibold text-base px-5 mb-3">Explore</h2>
+        <h2 className="font-display font-semibold text-base app-px mb-3">Explore</h2>
         <CategoryGrid />
       </section>
 

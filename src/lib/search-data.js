@@ -40,7 +40,7 @@ export const SEARCH_CORPUS = [
   { type: "cafe", title: "Olive & Bean", location: "Paris", country: "France", rating: 4.5, price: "$$", distance: 2.0, interests: ["cafes", "food"], image: img("1554118811-1e0d58224f24"), info: "French roastery" },
 
   // Restaurants
-  { type: "restaurant", title: "Olive & Vine", location: "Paris", country: "France", rating: 4.7, price: "$$$", distance: 1.8, interests: ["food", "wine"], image: img("1517248135467-4c7edcad2f99"), info: "Fine dining" },
+  { type: "restaurant", title: "Olive & Vine", location: "Paris", country: "France", rating: 4.7, price: "$$$", distance: 1.8, interests: ["food", "wine"], image: img("1414235077428-338989a2e8c0"), info: "Fine dining" },
   { type: "restaurant", title: "Saffron Table", location: "Marrakech", country: "Morocco", rating: 4.6, price: "$$", distance: 5.2, interests: ["food", "culture"], image: img("1414235077428-338989a2e8c0"), info: "Moroccan cuisine" },
   { type: "restaurant", title: "Harbor Light", location: "Copenhagen", country: "Denmark", rating: 4.8, price: "$$$", distance: 2.5, interests: ["food"], image: img("1559339352-11d035aa65de"), info: "Seaside dining" },
   { type: "restaurant", title: "Bali Spice", location: "Ubud", country: "Indonesia", rating: 4.5, price: "$$", distance: 7.0, interests: ["food"], image: img("1414235077428-338989a2e8c0"), info: "Local flavors" },
@@ -60,7 +60,7 @@ export const SEARCH_CORPUS = [
   // Deals
   { type: "deal", title: "Lisbon Stay 20% off", location: "Lisbon", country: "Portugal", date: "2026-08-01", distance: 1.0, interests: ["relaxation"], image: img("1555881400-74d7acaacd8b"), info: "Save 20%" },
   { type: "deal", title: "Bali Retreat Deal", location: "Ubud", country: "Indonesia", date: "2026-08-05", distance: 9.0, interests: ["wellness"], image: img("1537996194471-e657df975ab4"), info: "Save 15%" },
-  { type: "deal", title: "Paris Dinner 2-for-1", location: "Paris", country: "France", date: "2026-08-10", distance: 2.0, interests: ["food", "wine"], image: img("1517248135467-4c7edcad2f99"), info: "2-for-1" },
+  { type: "deal", title: "Paris Dinner 2-for-1", location: "Paris", country: "France", date: "2026-08-10", distance: 2.0, interests: ["food", "wine"], image: img("1414235077428-338989a2e8c0"), info: "2-for-1" },
   { type: "deal", title: "Marrakech Spa 30% off", location: "Marrakech", country: "Morocco", date: "2026-08-15", distance: 5.0, interests: ["wellness", "relaxation"], image: img("1414235077428-338989a2e8c0"), info: "Save 30%" },
 
   // Members

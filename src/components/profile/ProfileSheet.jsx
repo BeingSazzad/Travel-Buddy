@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 
 export default function ProfileSheet({ title, onClose, children, footer }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs left-1/2 -translate-x-1/2 w-full max-w-md" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs left-1/2 -translate-x-1/2 w-full max-w-app" onClick={onClose}>
       <div className="w-full bg-background rounded-t-3xl max-h-[90vh] flex flex-col border-t border-border" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-border">
           <h3 className="font-display font-semibold text-lg">{title}</h3>

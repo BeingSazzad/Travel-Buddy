@@ -14,7 +14,7 @@ export default function Welcome() {
           alt="Travel Background"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30 z-10" />
+        <div className="absolute inset-0 gradient-overlay-hero z-10" />
       </div>
 
       {/* Middle Brand Section */}
@@ -39,13 +39,13 @@ export default function Welcome() {
         <div className="w-full mt-8 flex flex-col gap-3">
           <button
             onClick={() => navigate("/onboarding")}
-            className="w-full py-4 rounded-full bg-[#B58E72] hover:bg-[#a37c61] text-white font-semibold text-sm shadow-lg active:scale-[0.98] transition-all duration-200"
+            className="w-full py-4 rounded-full gradient-brand-accent text-white font-semibold text-sm shadow-lg tap-feedback transition-shadow hover:shadow-xl"
           >
             Create Account
           </button>
           <button
             onClick={() => navigate("/login")}
-            className="w-full py-4 rounded-full border border-white/25 hover:bg-white/10 text-white font-semibold text-sm active:scale-[0.98] transition-all duration-200"
+            className="w-full py-4 rounded-full border border-white/25 hover:bg-white/10 text-white font-semibold text-sm tap-feedback transition-colors"
           >
             Sign In
           </button>

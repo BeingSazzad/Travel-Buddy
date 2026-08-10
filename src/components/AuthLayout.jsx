@@ -17,7 +17,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
     <div className="min-h-screen flex flex-col bg-background font-body overflow-hidden">
 
       {/* ── HERO TOP ── */}
-      <div className="relative flex-shrink-0 h-56 bg-gradient-to-br from-[#2C1A0E] via-[#4A2C1A] to-[#6B3D20] overflow-hidden">
+      <div className="relative flex-shrink-0 h-56 gradient-brand overflow-hidden">
         {/* Ambient light blobs */}
         <HeroOrb className="w-64 h-64 bg-[#A1846B]/30 -top-16 -left-16" />
         <HeroOrb className="w-48 h-48 bg-[#D4A574]/20 -bottom-8 -right-12" />
@@ -47,7 +47,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
         {/* Back button slot — only shown on non-welcome pages */}
         <Link
           to="/welcome"
-          className="absolute top-12 left-5 w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center active:scale-95 transition"
+          className="absolute top-12 left-5 w-9 h-9 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center tap-feedback transition"
         >
           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -73,7 +73,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
 
           {/* Screen heading */}
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#A1846B] to-[#7D6050] flex items-center justify-center shadow-sm shrink-0">
+            <div className="w-10 h-10 rounded-2xl gradient-brand-accent flex items-center justify-center shadow-sm shrink-0">
               <Icon className="w-5 h-5 text-white" strokeWidth={1.75} />
             </div>
             <div>
@@ -85,7 +85,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent mb-5" />
+          <div className="gradient-divider mb-5" />
 
           {children}
         </div>

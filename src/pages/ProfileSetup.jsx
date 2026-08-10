@@ -190,7 +190,7 @@ export default function ProfileSetup() {
   if (isEditMode) {
     return (
       <div className="min-h-screen bg-background pb-12">
-        <header className="sticky top-0 z-20 px-4 pt-10 pb-3 flex items-center justify-between bg-background/90 backdrop-blur border-b border-border">
+        <header className="sticky top-0 z-20 px-app pt-10 pb-3 flex items-center justify-between bg-background/90 backdrop-blur border-b border-border">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
@@ -212,7 +212,7 @@ export default function ProfileSetup() {
           </Button>
         </header>
 
-        <div className="max-w-md mx-auto px-5 py-6 space-y-6">
+        <div className="max-w-app mx-auto px-5 py-6 space-y-6">
           {error && (
             <div className="p-3 rounded-2xl bg-destructive/10 text-destructive text-xs font-medium leading-relaxed">
               {error}
@@ -368,7 +368,7 @@ export default function ProfileSetup() {
    ───────────────────────────────────────────────────────────── */
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-md mx-auto px-5 py-8">
+      <div className="max-w-app mx-auto px-5 py-8">
         {/* Brand Header */}
         <div className="flex flex-col items-center mb-6">
           <Moon className="w-6 h-6 text-[#A1846B] mb-1" strokeWidth={1.5} />

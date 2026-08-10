@@ -44,7 +44,7 @@ export default function Deals() {
       <h1 className="font-display font-bold text-lg">Deals</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Exclusive perks from partners who welcome women who travel.</p>
 
-      <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-2">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar app-gutter-x pb-2">
         {["All", ...DEAL_CATEGORIES].map((c) => (
           <button
             key={c}

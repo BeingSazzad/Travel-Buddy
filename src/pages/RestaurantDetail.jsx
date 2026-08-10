@@ -5,7 +5,6 @@ import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
 import { PRICE_LABELS, FACILITY_LABELS } from "@/lib/restaurants";
-import { useRestaurants } from "@/lib/useContent";
 import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
 import ReviewSection from "@/components/reviews/ReviewSection";
@@ -33,9 +32,9 @@ export default function RestaurantDetail() {
       phone: "+1 555-0199",
       website: "https://selunatribe.app",
       description: `An exquisite dining experience featuring local produce, authentic wine, and a warm atmosphere.`,
-      image: "https://images.unsplash.com/photo-1517248135467-4c7edcad2f99?auto=format&fit=crop&w=800&q=80",
+      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80",
       gallery: [
-        "https://images.unsplash.com/photo-1517248135467-4c7edcad2f99?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80",
         "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80"
       ],
       tags: { outdoor: true, reservations: true, vegan: true }
@@ -65,8 +64,8 @@ export default function RestaurantDetail() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-dvh flex flex-col bg-background">
-      <header className="sticky top-0 z-20 px-4 safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
+    <div className="max-w-app mx-auto min-h-dvh flex flex-col bg-background">
+      <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-2">
           <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>

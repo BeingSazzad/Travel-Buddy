@@ -67,7 +67,7 @@ export default function Destinations() {
 
       {/* Filters */}
       <h2 className="font-display font-semibold text-base mb-2">Explore</h2>
-      <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-2">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar app-gutter-x pb-2">
         {CONTINENTS.map((c) => (
           <button
             key={c}

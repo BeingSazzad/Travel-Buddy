@@ -39,7 +39,7 @@ export default function Events() {
         </button>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-2">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar app-gutter-x pb-2">
         {["All", ...EVENT_CATEGORIES].map((c) => (
           <button
             key={c}

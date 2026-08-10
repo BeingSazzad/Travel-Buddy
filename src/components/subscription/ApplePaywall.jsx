@@ -80,7 +80,7 @@ export default function ApplePaywall({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10 safe-pt safe-pb">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-app">
         {/* Brand */}
         <div className="flex flex-col items-center mb-8">
           <Moon className="w-6 h-6 text-[#A1846B] mb-1" strokeWidth={1.5} />

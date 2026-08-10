@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, HelpCircle, Mail, MessageCircle, ShieldAlert, ChevronRight } from "lucide-react";
+import { ArrowLeft, HelpCircle, Mail, ShieldAlert } from "lucide-react";
 
 const FAQ = [
   {
@@ -29,8 +29,8 @@ export default function HelpSupport() {
   const navigate = useNavigate();
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-background flex flex-col">
-      <header className="sticky top-0 z-20 px-4 pt-10 pb-3 flex items-center gap-3 bg-background/90 backdrop-blur border-b border-border">
+    <div className="max-w-app mx-auto min-h-screen bg-background flex flex-col">
+      <header className="sticky top-0 z-20 px-app pt-10 pb-3 flex items-center gap-3 bg-background/90 backdrop-blur border-b border-border">
         <button
           onClick={() => navigate(-1)}
           className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition"

@@ -22,7 +22,7 @@ export default function PageNotFound({}) {
 
     return (
         <div className="min-h-dvh flex items-center justify-center p-6 bg-background">
-            <div className="max-w-md w-full text-center">
+            <div className="max-w-app w-full text-center">
                 <div className="w-16 h-16 rounded-full bg-[#A1846B]/10 flex items-center justify-center mx-auto mb-5">
                     <Compass className="w-7 h-7 text-[#A1846B]" strokeWidth={1.5} />
                 </div>

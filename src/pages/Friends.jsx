@@ -18,13 +18,13 @@ export default function Friends() {
   ];
 
   return (
-    <div className="px-5 safe-pt pb-24">
+    <div className="app-px safe-pt pb-24">
       <h1 className="font-display font-bold text-lg mb-1">Friends</h1>
       <p className="text-sm text-muted-foreground mb-4">Women exploring like you</p>
 
       <Link
         to="/discover"
-        className="w-full flex items-center gap-3 bg-gradient-to-br from-[#A1846B] to-[#8a6a52] text-white rounded-2xl px-4 py-4 mb-5 shadow-soft active:scale-[0.99] transition text-left"
+        className="w-full flex items-center gap-3 gradient-brand-accent text-white rounded-2xl px-4 py-4 mb-5 shadow-soft tap-feedback transition-shadow hover:shadow-md text-left"
       >
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
           <Sparkles className="w-5 h-5" strokeWidth={1.5} />
@@ -75,4 +75,4 @@ export default function Friends() {
       </div>
     </div>
   );
-}
+}

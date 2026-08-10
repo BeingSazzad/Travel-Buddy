@@ -1,9 +1,7 @@
 import * as React from "react"
 import { useSize } from "@/hooks/use-size"
+import { FALLBACK_IMAGE_URL } from "@/lib/images"
 import { cn } from "@/lib/utils"
-
-const FALLBACK_IMAGE_URL =
-  "https://images.unsplash.com/photo-1517248135467-4c7edcad2f99?auto=format&fit=crop&w=800&q=80"
 
 // Wix Media Platform hosts whose images support /v1/ transform URLs
 // (resize, focal-point crop, and format conversion via the OUTPUT FILENAME

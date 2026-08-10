@@ -4,7 +4,7 @@ import { ShieldAlert } from 'lucide-react';
 const UserNotRegisteredError = () => {
   return (
     <div className="min-h-dvh flex items-center justify-center bg-background px-6">
-      <div className="w-full max-w-md bg-card rounded-2xl shadow-soft border border-border p-8 text-center">
+      <div className="w-full max-w-app bg-card rounded-2xl shadow-soft border border-border p-8 text-center">
         <div className="w-16 h-16 rounded-full bg-[#A1846B]/10 flex items-center justify-center mx-auto mb-5">
           <ShieldAlert className="w-7 h-7 text-[#A1846B]" strokeWidth={1.5} />
         </div>

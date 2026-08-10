@@ -1,4 +1,5 @@
 import { Moon } from 'lucide-react';
+import { Image } from '@/components/ui/image';
 
 export default function BrandHero() {
   return (
@@ -11,9 +12,10 @@ export default function BrandHero() {
       </div>
 
       <div className="relative w-36 h-36 rounded-full overflow-hidden shadow-premium ring-1 ring-[#A1846B]/20 mt-5">
-        <img
+        <Image
           src="https://media.base44.com/images/public/6a5f78595b9383901d7402b6/25ed0c0d0_IMG_0471.jpg"
           alt="Seluna"
+          fittingType="fill"
           className="w-full h-full object-cover"
           style={{ objectPosition: 'center 26%' }}
         />

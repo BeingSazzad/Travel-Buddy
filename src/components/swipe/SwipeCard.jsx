@@ -44,7 +44,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
             fittingType="fill"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
+          <div className="gradient-overlay" />
 
           {/* Swipe Action Overlay Stamps */}
           <motion.div
@@ -133,7 +133,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
         <button
           onClick={() => trigger("left")}
           aria-label="Skip"
-          className="w-14 h-14 rounded-full bg-card border border-rose-500/30 text-rose-500 shadow-md flex items-center justify-center hover:scale-105 active:scale-95 hover:bg-rose-500/10 transition-all"
+          className="w-14 h-14 rounded-full bg-card border border-rose-500/30 text-rose-500 shadow-md flex items-center justify-center hover:scale-105 tap-feedback hover:bg-rose-500/10 transition-all"
         >
           <X className="w-6 h-6" strokeWidth={2.25} />
         </button>
@@ -141,7 +141,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
         <button
           onClick={() => onProfile(member)}
           aria-label="View profile details"
-          className="w-12 h-12 rounded-full bg-card border border-[#A1846B]/40 text-[#A1846B] shadow-md flex items-center justify-center hover:scale-105 active:scale-95 hover:bg-[#A1846B]/10 transition-all"
+          className="w-12 h-12 rounded-full bg-card border border-[#A1846B]/40 text-[#A1846B] shadow-md flex items-center justify-center hover:scale-105 tap-feedback hover:bg-[#A1846B]/10 transition-all"
         >
           <Info className="w-5 h-5" strokeWidth={2} />
         </button>
@@ -149,7 +149,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
         <button
           onClick={() => trigger("right")}
           aria-label="Connect"
-          className="w-14 h-14 rounded-full bg-gradient-to-br from-[#A1846B] to-[#7a5c44] text-white shadow-lg shadow-[#A1846B]/25 flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+          className="w-14 h-14 rounded-full gradient-brand-accent text-white shadow-lg shadow-[#A1846B]/25 flex items-center justify-center hover:scale-105 tap-feedback transition-all"
         >
           <UserPlus className="w-6 h-6" strokeWidth={2.25} />
         </button>

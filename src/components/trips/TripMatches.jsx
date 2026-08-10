@@ -21,7 +21,7 @@ export default function TripMatches({ trip, allTrips, userId, onDone }) {
   const women = Object.values(byWoman);
 
   return (
-    <div className="max-w-md mx-auto min-h-screen px-5 pt-12 pb-6">
+    <div className="max-w-app mx-auto min-h-screen px-5 pt-12 pb-6">
       <h1 className="font-display font-bold text-lg">Trip created!</h1>
       <p className="text-sm text-muted-foreground mt-1">
         Women travelling to {trip.city} during your dates:

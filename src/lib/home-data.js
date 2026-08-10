@@ -19,9 +19,9 @@ export const SECTIONS = [
   {
     title: "Recommended for you",
     items: [
-      { type: "trip", image: img("1529636798458-92182e6526e8"), title: "Girls' weekend in Copenhagen", location: "Copenhagen", info: "18 attending", badge: "Featured" },
+      { type: "trip", image: img("1530103862676-de8c9debad1d"), title: "Girls' weekend in Copenhagen", location: "Copenhagen", info: "18 attending", badge: "Featured" },
       { type: "destination", image: img("1537996194471-e657df975ab4"), title: "Bali wellness retreat", location: "Ubud", info: "★ 4.9" },
-      { type: "destination", image: img("1517248135467-4c7edcad2f99"), title: "Paris art & cafés", location: "Paris", info: "★ 4.8" },
+      { type: "destination", image: img("1414235077428-338989a2e8c0"), title: "Paris art & cafés", location: "Paris", info: "★ 4.8" },
       { type: "destination", image: img("1555881400-74d7acaacd8b"), title: "Lisbon coastal escape", location: "Lisbon", info: "★ 4.7" },
     ],
   },
@@ -57,7 +57,7 @@ export const SECTIONS = [
     items: [
       { type: "deal", image: img("1555881400-74d7acaacd8b"), title: "Lisbon Stay 20% off", location: "Lisbon", info: "Save 20%", badge: "Deal" },
       { type: "deal", image: img("1537996194471-e657df975ab4"), title: "Bali Retreat Deal", location: "Ubud", info: "Save 15%", badge: "Deal" },
-      { type: "deal", image: img("1517248135467-4c7edcad2f99"), title: "Paris Dinner 2-for-1", location: "Paris", info: "2-for-1", badge: "Deal" },
+      { type: "deal", image: img("1414235077428-338989a2e8c0"), title: "Paris Dinner 2-for-1", location: "Paris", info: "2-for-1", badge: "Deal" },
       { type: "deal", image: img("1414235077428-338989a2e8c0"), title: "Marrakech Spa 30% off", location: "Marrakech", info: "Save 30%", badge: "Deal" },
     ],
   },
@@ -67,7 +67,7 @@ export const SECTIONS = [
       { type: "cafe", image: img("1554118811-1e0d58224f24"), title: "Café Norden", location: "Copenhagen", info: "★ 4.9" },
       { type: "hotel", image: img("1551882547-ff40c63fe595"), title: "Maison du Parc", location: "Paris", info: "★ 4.8" },
       { type: "hotel", image: img("1537996194471-e657df975ab4"), title: "Bali Retreat", location: "Ubud", info: "★ 5.0" },
-      { type: "restaurant", image: img("1517248135467-4c7edcad2f99"), title: "Olive & Vine", location: "Paris", info: "★ 4.7" },
+      { type: "restaurant", image: img("1414235077428-338989a2e8c0"), title: "Olive & Vine", location: "Paris", info: "★ 4.7" },
     ],
   },
 ];

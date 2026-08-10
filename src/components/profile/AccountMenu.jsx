@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Pencil, Shield, Bell, Ban, HelpCircle, FileText, ShieldCheck, Heart, Trash2, LogOut, ChevronRight,
+import { Shield, Bell, Ban, HelpCircle, FileText, ShieldCheck, Heart, Trash2, LogOut, ChevronRight,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import PrivacySheet from "@/components/profile/PrivacySheet";

@@ -28,7 +28,7 @@ export default function RedeemSheet({ deal, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-md bg-background rounded-t-3xl sm:rounded-3xl p-5 pb-8" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-app bg-background rounded-t-3xl sm:rounded-3xl p-5 pb-8" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-1.5 text-[#A1846B]"><Sparkles className="w-4 h-4" strokeWidth={1.5} /><span className="text-sm font-medium">Seluna member deal</span></div>
           <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center"><X className="w-4 h-4" /></button>

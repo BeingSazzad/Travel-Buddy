@@ -35,16 +35,16 @@ export default function TripCard({
   const imageUrl = hasValidCover ? trip.cover_image : imageForCity(trip.city);
 
   return (
-    <div className="rounded-[24px] overflow-hidden border border-border/80 shadow-soft bg-card group hover:border-[#A1846B]/40 transition-all duration-300">
+    <div className="rounded-[24px] overflow-hidden border border-border/80 shadow-soft bg-card interactive-card group hover:border-[#A1846B]/40 transition-all duration-300">
       {/* Cover Image Container */}
       <div className="h-44 relative overflow-hidden">
         <Image
           src={imageUrl}
           alt={trip.name}
           fittingType="fill"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover image-zoom"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-card via-black/20 to-transparent" />
+        <div className="gradient-overlay-soft opacity-70" />
 
         {/* Status Pill */}
         <span
@@ -62,14 +62,14 @@ export default function TripCard({
           <div className="absolute top-3 left-3 flex gap-2">
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(trip); }}
-              className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white active:scale-90 hover:bg-black/70 transition"
+              className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white tap-feedback hover:bg-black/70 transition"
               aria-label="Edit trip"
             >
               <Pencil className="w-3.5 h-3.5" strokeWidth={1.75} />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(trip); }}
-              className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-rose-400 active:scale-90 hover:bg-black/70 transition"
+              className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-rose-400 tap-feedback hover:bg-black/70 transition"
               aria-label="Delete trip"
             >
               <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Globe, Camera, BadgeCheck, Pencil, Crown } from "lucide-react";
+import { MapPin, Globe, Camera, BadgeCheck, Pencil } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, MessageCircle, Sparkles } from "lucide-react";
+import { Search, MessageCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import ConversationRow from "@/components/messages/ConversationRow";
@@ -152,7 +152,7 @@ export default function Messages() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 px-0.5">
             Your Matches
           </p>
-          <div className="flex gap-3.5 overflow-x-auto no-scrollbar -mx-5 px-5 py-1">
+          <div className="flex gap-3.5 overflow-x-auto no-scrollbar app-gutter-x py-1">
             {rows.map((r) => (
               <button
                 key={r.id}

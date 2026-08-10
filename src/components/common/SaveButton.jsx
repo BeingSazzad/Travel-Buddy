@@ -17,7 +17,7 @@ export default function SaveButton({ item, className }) {
         toggle(item);
       }}
       className={cn(
-        "w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center active:scale-90 transition",
+        "w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center tap-feedback",
         className
       )}
       aria-label={saved ? "Unsave" : "Save"}

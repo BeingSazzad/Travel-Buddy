@@ -122,7 +122,7 @@ export default function Subscription() {
   if (status === "success") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
-        <div className="w-full max-w-md text-center">
+        <div className="w-full max-w-app text-center">
           <div className="flex justify-center mb-5">
             <Moon className="w-6 h-6 text-[#A1846B]" strokeWidth={1.5} />
           </div>
@@ -161,7 +161,7 @@ export default function Subscription() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-app">
         <div className="flex flex-col items-center mb-8">
           <Moon className="w-6 h-6 text-[#A1846B] mb-1" strokeWidth={1.5} />
           <h1 className="font-display font-semibold text-3xl tracking-[0.08em] text-[#A1846B]">SELUNA</h1>

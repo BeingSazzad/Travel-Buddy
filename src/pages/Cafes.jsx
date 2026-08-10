@@ -43,7 +43,7 @@ export default function Cafes() {
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Curated coffee spots for women who travel</p>
 
       {/* Tag filters */}
-      <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-2">
+      <div className="flex gap-2 overflow-x-auto no-scrollbar app-gutter-x pb-2">
         {CAFE_TAG_FILTERS.map((t) => (
           <button
             key={t.key}
