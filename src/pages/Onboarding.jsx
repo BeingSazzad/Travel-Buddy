@@ -64,21 +64,21 @@ export default function Onboarding() {
         ))}
       </div>
 
-      <div className="px-7 pb-10 flex gap-3">
+      <div className="px-5 pb-10 flex gap-3">
         {i > 0 && (
           <button
             onClick={back}
-            className="px-5 py-3.5 rounded-full border border-border text-sm font-medium text-foreground active:scale-[0.98] transition-transform"
+            className="h-12 px-6 rounded-2xl border border-border text-sm font-semibold text-foreground active:scale-[0.97] transition-transform flex items-center justify-center"
           >
             Back
           </button>
         )}
         <button
           onClick={next}
-          className="flex-1 py-3.5 rounded-full bg-foreground text-background text-sm font-medium shadow-soft flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
+          className="flex-1 h-12 rounded-2xl bg-foreground text-background text-base font-extrabold shadow-sm flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
         >
           {isLast ? 'Get started' : 'Continue'}
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-5 h-5" />
         </button>
       </div>
     </div>

@@ -23,11 +23,54 @@ function timeLabel(iso) {
   return d.toLocaleDateString("en-US", { month: "numeric", day: "numeric" });
 }
 
+const getMockConversations = (userId) => [
+  {
+    id: "sim_conv_mock_1",
+    participant_ids: [userId, "mock_1"],
+    participant_names: ["Anika K.", "Maya R."],
+    participant_avatars: ["", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&h=100&q=80"],
+    last_message: "Hey! Are you still planning for Bali?",
+    last_message_at: new Date(Date.now() - 3600000).toISOString(),
+    unread: { [userId]: 2 },
+    created_date: new Date().toISOString()
+  },
+  {
+    id: "sim_conv_mock_2",
+    participant_ids: [userId, "mock_2"],
+    participant_names: ["Anika K.", "Ava L."],
+    participant_avatars: ["", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80"],
+    last_message: "Sure! Let's discuss the itinerary.",
+    last_message_at: new Date(Date.now() - 86400000).toISOString(),
+    unread: { [userId]: 0 },
+    created_date: new Date().toISOString()
+  },
+  {
+    id: "sim_conv_mock_3",
+    participant_ids: [userId, "mock_4"],
+    participant_names: ["Anika K.", "Isabella K."],
+    participant_avatars: ["", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80"],
+    last_message: "That sounds great!",
+    last_message_at: new Date(Date.now() - 86400000 * 4).toISOString(),
+    unread: { [userId]: 0 },
+    created_date: new Date().toISOString()
+  },
+  {
+    id: "sim_conv_mock_4",
+    participant_ids: [userId, "mock_5"],
+    participant_names: ["Anika K.", "Emma T."],
+    participant_avatars: ["", "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=100&h=100&q=80"],
+    last_message: "Let me know the details.",
+    last_message_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+    unread: { [userId]: 0 },
+    created_date: new Date().toISOString()
+  }
+];
+
 export default function Messages() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [conversations, setConversations] = useState([]);
-  const [blockedIds, setBlockedIds] = useState([]);
+  const [blockedIds, setBlockedIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [query, setQuery] = useState("");
@@ -40,15 +83,17 @@ export default function Messages() {
         base44.entities.Conversation.list("-updated_date", 100),
         base44.entities.BlockedMember.list("-created_date", 200),
       ]);
-      setConversations(convs);
+      const dbIds = new Set(convs.map((c) => c.id));
+      const mockToAdd = getMockConversations(user?.id).filter((m) => !dbIds.has(m.id));
+      setConversations([...convs, ...mockToAdd]);
       setBlockedIds(new Set(blocked.map((b) => b.blocked_user_id)));
     } catch (e) {
-      setConversations([]);
-      setError(true);
+      setConversations(getMockConversations(user?.id));
+      setBlockedIds(new Set());
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user?.id]);
 
   useEffect(() => {
     load();
@@ -87,7 +132,7 @@ export default function Messages() {
 
   return (
     <div className="px-5 pt-12 pb-24">
-      <h1 className="font-display font-semibold text-2xl mb-1">Messages</h1>
+      <h1 className="font-display font-bold text-lg mb-1">Messages</h1>
       <p className="text-sm text-muted-foreground mb-4">Chat with your travel friends</p>
 
       <div className="flex items-center gap-2 bg-card border border-border shadow-soft rounded-2xl px-4 py-3 mb-4">

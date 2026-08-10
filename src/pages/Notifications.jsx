@@ -56,7 +56,7 @@ export default function Notifications() {
             <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
           </button>
           <div>
-            <h1 className="font-display font-semibold text-xl">Notifications</h1>
+            <h1 className="font-display font-bold text-lg">Notifications</h1>
             {unreadCount > 0 && <p className="text-xs text-muted-foreground">{unreadCount} unread</p>}
           </div>
         </div>

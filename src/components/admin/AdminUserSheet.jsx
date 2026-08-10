@@ -134,7 +134,7 @@ export default function AdminUserSheet({ open, user, onClose, onChanged }) {
           {/* Photos */}
           {(user.profile_photos || []).length > 0 && (
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">Profile photos</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Profile photos</p>
               <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
                 {user.profile_photos.map((ph, i) => (
                   <div key={i} className="relative w-24 h-32 rounded-xl overflow-hidden border border-border shrink-0">
@@ -154,7 +154,7 @@ export default function AdminUserSheet({ open, user, onClose, onChanged }) {
 
           {/* Admin note input */}
           <div>
-            <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1">
               <StickyNote className="w-3.5 h-3.5" strokeWidth={1.5} /> Internal admin note
             </p>
             <textarea
@@ -168,7 +168,7 @@ export default function AdminUserSheet({ open, user, onClose, onChanged }) {
               {busy === "note" ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save note"}
             </Button>
             {user.admin_notes && (
-              <pre className="mt-2 text-[11px] text-muted-foreground whitespace-pre-wrap bg-muted/40 rounded-xl p-2 max-h-32 overflow-y-auto">{user.admin_notes}</pre>
+              <pre className="mt-2 text-xs text-muted-foreground whitespace-pre-wrap bg-muted/40 rounded-xl p-2 max-h-32 overflow-y-auto">{user.admin_notes}</pre>
             )}
           </div>
 
@@ -226,7 +226,7 @@ function ReportsBlock({ userId }) {
   }, [userId]);
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1">
+      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1">
         <Flag className="w-3.5 h-3.5" strokeWidth={1.5} /> Reports against this user
       </p>
       {!items ? <p className="text-xs text-muted-foreground">Loading…</p> :
@@ -259,7 +259,7 @@ function ReviewsBlock({ userId, onRemove, busy }) {
   }, [userId]);
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1">
+      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2 flex items-center gap-1">
         <ShieldCheck className="w-3.5 h-3.5" strokeWidth={1.5} /> Member reviews (removable content)
       </p>
       {!items ? <p className="text-xs text-muted-foreground">Loading…</p> :
@@ -269,7 +269,7 @@ function ReviewsBlock({ userId, onRemove, busy }) {
             <div key={r.id} className="text-xs rounded-xl border border-border p-2">
               <p className="font-medium">{r.item_title} · ★{r.rating}</p>
               <p className="text-muted-foreground line-clamp-2">{r.text}</p>
-              <button onClick={() => onRemove(r)} disabled={!!busy} className="text-[11px] text-destructive mt-1 flex items-center gap-1">
+              <button onClick={() => onRemove(r)} disabled={!!busy} className="text-xs text-destructive mt-1 flex items-center gap-1">
                 <Trash2 className="w-3 h-3" strokeWidth={1.5} /> Remove review
               </button>
             </div>

@@ -10,14 +10,21 @@ const STATUS_STYLES = {
   previous: "bg-white/70 text-muted-foreground",
 };
 
-export default function TripCard({ trip, overlapCount, canEdit, onEdit, onDelete, note }) {
+export default function TripCard({
+  trip,
+  overlapCount = null,
+  canEdit = false,
+  onEdit = () => {},
+  onDelete = () => {},
+  note = "",
+}) {
   const status = tripStatus(trip);
 
   return (
     <div className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card">
       <div className="h-40 relative">
         <Image src={trip.cover_image || imageForCity(trip.city)} alt={trip.name} fittingType="fill" className="w-full h-full" />
-        <span className={cn("absolute top-3 right-3 text-[11px] font-semibold px-2.5 py-1 rounded-full capitalize", STATUS_STYLES[status])}>
+        <span className={cn("absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full capitalize", STATUS_STYLES[status])}>
           {status}
         </span>
         {canEdit && (
@@ -42,7 +49,7 @@ export default function TripCard({ trip, overlapCount, canEdit, onEdit, onDelete
         <div className="flex items-center justify-between mt-3">
           <span className="text-xs text-muted-foreground">{formatDates(trip)}</span>
           {trip.travel_style && (
-            <span className="text-[11px] font-medium text-[#A1846B] capitalize px-2 py-0.5 rounded-full bg-[#A1846B]/10">
+            <span className="text-xs font-medium text-[#A1846B] capitalize px-2 py-0.5 rounded-full bg-[#A1846B]/10">
               {trip.travel_style}
             </span>
           )}
@@ -59,7 +66,7 @@ export default function TripCard({ trip, overlapCount, canEdit, onEdit, onDelete
           </div>
         )}
 
-        {note && <p className="text-[11px] text-[#A1846B] font-medium mt-2">{note}</p>}
+        {note && <p className="text-xs text-[#A1846B] font-medium mt-2">{note}</p>}
       </div>
     </div>
   );

@@ -88,7 +88,7 @@ export default function ApplePaywall({
         <div className="bg-card rounded-3xl shadow-premium border border-border p-7">
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-5 h-5 text-[#A1846B]" strokeWidth={1.5} />
-            <h2 className="font-display font-semibold text-xl text-foreground">Seluna Plus</h2>
+            <h2 className="font-display font-bold text-lg text-foreground">Seluna Plus</h2>
           </div>
           <p className="text-sm text-muted-foreground">
             Join the members-only travel community for women. Unlock matching, events, chats, deals and more.
@@ -175,7 +175,7 @@ export default function ApplePaywall({
           </button>
 
           {/* Automatic renewal info */}
-          <p className="text-[11px] leading-relaxed text-muted-foreground text-center mt-4">
+          <p className="text-xs leading-relaxed text-muted-foreground text-center mt-4">
             Payment is charged to your Apple ID at confirmation of purchase. Your subscription
             automatically renews unless auto-renew is turned off at least 24 hours before the end of
             the current period. Your account will be charged for renewal within 24 hours prior to

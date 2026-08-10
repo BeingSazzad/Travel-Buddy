@@ -8,7 +8,7 @@ const UserNotRegisteredError = () => {
         <div className="w-16 h-16 rounded-full bg-[#A1846B]/10 flex items-center justify-center mx-auto mb-5">
           <ShieldAlert className="w-7 h-7 text-[#A1846B]" strokeWidth={1.5} />
         </div>
-        <h1 className="font-display font-semibold text-2xl text-foreground">Access restricted</h1>
+        <h1 className="font-display font-bold text-lg text-foreground">Access restricted</h1>
         <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
           You are not registered to use this application. Please contact the app administrator to request access.
         </p>

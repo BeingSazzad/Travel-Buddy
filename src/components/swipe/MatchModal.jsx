@@ -42,7 +42,7 @@ export default function MatchModal({ open, myAvatar, theirAvatar, onMessage, onP
           <Sparkles className="w-6 h-6 text-white" strokeWidth={1.5} />
         </motion.div>
 
-        <h2 className="font-display font-semibold text-2xl mt-3">It's a match!</h2>
+        <h2 className="font-display font-bold text-lg mt-3">It's a match!</h2>
         <p className="text-sm text-muted-foreground mt-1">You can now start chatting.</p>
 
         <div className="space-y-2 mt-5">

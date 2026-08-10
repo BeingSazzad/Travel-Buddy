@@ -22,7 +22,7 @@ export default function TripMatches({ trip, allTrips, userId, onDone }) {
 
   return (
     <div className="max-w-md mx-auto min-h-screen px-5 pt-12 pb-6">
-      <h1 className="font-display font-semibold text-2xl">Trip created!</h1>
+      <h1 className="font-display font-bold text-lg">Trip created!</h1>
       <p className="text-sm text-muted-foreground mt-1">
         Women travelling to {trip.city} during your dates:
       </p>
@@ -55,7 +55,7 @@ export default function TripMatches({ trip, allTrips, userId, onDone }) {
                       <p className="text-sm font-medium truncate">{t.name}</p>
                       <p className="text-xs text-muted-foreground">{formatDates(t)}</p>
                       {t.travel_style && (
-                        <span className="text-[11px] text-[#A1846B] capitalize">{t.travel_style}</span>
+                        <span className="text-xs text-[#A1846B] capitalize">{t.travel_style}</span>
                       )}
                     </div>
                   </div>

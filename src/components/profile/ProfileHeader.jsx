@@ -28,7 +28,7 @@ export default function ProfileHeader() {
           <Camera className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
         </div>
       </div>
-      <h2 className="font-display font-semibold text-xl mt-3 flex items-center justify-center gap-1.5">
+      <h2 className="font-display font-bold text-lg mt-3 flex items-center justify-center gap-1.5">
         {name}{age !== null && <span className="text-muted-foreground font-normal"> · {age}</span>}
         {user?.identity_verified && user?.age_verified && (
           <BadgeCheck className="w-4 h-4 text-[#A1846B]" strokeWidth={2} />

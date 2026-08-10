@@ -34,7 +34,7 @@ export default function RedeemSheet({ deal, onClose }) {
           <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center"><X className="w-4 h-4" /></button>
         </div>
 
-        <h2 className="font-display font-semibold text-xl">{deal.title}</h2>
+        <h2 className="font-display font-bold text-lg">{deal.title}</h2>
         <p className="text-sm text-muted-foreground mt-0.5">{deal.partner} · {deal.city}</p>
         <p className="text-sm mt-2"><span className="px-2.5 py-1 rounded-full bg-[#A1846B]/10 text-[#7a5c44] font-semibold">{deal.discount}</span></p>
 
@@ -50,7 +50,7 @@ export default function RedeemSheet({ deal, onClose }) {
           <div className="mt-4 space-y-3">
             <SuccessCheck />
             <div className="rounded-2xl border-2 border-dashed border-[#A1846B] p-4 text-center">
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Your redeem code</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Your redeem code</p>
               <p className="font-mono text-2xl font-semibold tracking-wider text-foreground">{result.code}</p>
               <button onClick={copy} className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-foreground text-background text-xs">
                 {copied ? <Check className="w-3.5 h-3.5" strokeWidth={1.5} /> : <Copy className="w-3.5 h-3.5" strokeWidth={1.5} />} {copied ? "Copied" : "Copy code"}

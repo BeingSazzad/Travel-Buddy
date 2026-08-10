@@ -98,7 +98,7 @@ export default function ReviewForm({ itemKey, itemType, itemTitle, onPosted }) {
             ))}
           </div>
         )}
-        {uploading && <p className="text-[11px] text-muted-foreground mt-1">Uploading…</p>}
+        {uploading && <p className="text-xs text-muted-foreground mt-1">Uploading…</p>}
       </div>
 
       {error && <p className="text-xs text-destructive">{error}</p>}

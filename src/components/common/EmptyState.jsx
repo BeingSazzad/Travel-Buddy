@@ -6,12 +6,12 @@ import { cn } from "@/lib/utils";
  * icon: a lucide-react icon component
  */
 export default function EmptyState({
-  icon: Icon,
-  title,
-  description,
-  actionLabel,
-  onAction,
-  className,
+  icon: Icon = null,
+  title = "",
+  description = "",
+  actionLabel = "",
+  onAction = null,
+  className = "",
 }) {
   return (
     <div className={cn("rounded-2xl border border-dashed border-border p-8 text-center", className)}>

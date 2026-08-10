@@ -27,7 +27,7 @@ export default function HomeHeader() {
     <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-md px-5 py-3 flex items-center justify-between">
       <button onClick={() => navigate("/")} className="flex items-center gap-2 active:scale-95 transition">
         <Moon className="w-5 h-5 text-[#A1846B]" strokeWidth={1.5} />
-        <h1 className="font-display font-semibold text-xl tracking-[0.08em] text-[#A1846B]">SELUNA</h1>
+        <h1 className="font-display font-bold text-lg tracking-[0.08em] text-[#A1846B]">SELUNA</h1>
       </button>
 
       <div className="flex items-center gap-3">
@@ -37,7 +37,7 @@ export default function HomeHeader() {
         >
           <Bell className="w-4 h-4 text-foreground" strokeWidth={1.5} />
           {unread > 0 && (
-            <span className="absolute top-1.5 right-1.5 min-w-4 h-4 px-1 rounded-full bg-[#A1846B] ring-2 ring-card text-[9px] font-semibold text-white flex items-center justify-center">
+            <span className="absolute top-1.5 right-1.5 min-w-4 h-4 px-1 rounded-full bg-[#A1846B] ring-2 ring-card text-[10px] font-semibold text-white flex items-center justify-center">
               {unread > 9 ? "9+" : unread}
             </span>
           )}

@@ -22,7 +22,7 @@ function ChipToggle({ label, active, onClick }) {
 function Field({ label, children }) {
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">{label}</p>
       {children}
     </div>
   );

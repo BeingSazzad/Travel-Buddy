@@ -26,7 +26,7 @@ export default function CafeCard({ cafe }) {
             <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
           </span>
         </button>
-        <span className="absolute top-2 left-2 text-[11px] px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">
+        <span className="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">
           {PRICE_LABELS[cafe.price]}
         </span>
       </div>

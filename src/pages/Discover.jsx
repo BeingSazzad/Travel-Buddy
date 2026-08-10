@@ -56,7 +56,7 @@ export default function Discover() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState(null);
 
-  const myAvatar = user?.main_photo || user?.profile_photos?.[0] || "";
+  const myAvatar = user?.main_photo || user?.profile_photos?.[0] || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&h=200&q=80";
   const filtered = useMemo(() => deck.filter((m) => matchesFilters(m, filters)), [deck, filters]);
   const current = filtered[0];
   const activeFilterCount = Object.entries(filters).filter(([, v]) =>
@@ -101,7 +101,7 @@ export default function Discover() {
     <div className="px-5 safe-pt pb-6 min-h-screen flex flex-col">
       <header className="flex items-center justify-between gap-3 mb-4">
         <div>
-          <h1 className="font-display font-semibold text-2xl">Match</h1>
+          <h1 className="font-display font-bold text-lg">Match</h1>
           <p className="text-sm text-muted-foreground">Find your next travel connection</p>
         </div>
         <button

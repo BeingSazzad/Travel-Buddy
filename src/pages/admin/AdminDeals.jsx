@@ -79,7 +79,7 @@ export default function AdminDeals() {
             <Field label="Expires" type="date" value={form.expiration_date} onChange={(v) => setForm({ ...form, expiration_date: v })} />
             <Field label="Code prefix" value={form.code_prefix} onChange={(v) => setForm({ ...form, code_prefix: v })} placeholder="SELUNA" />
             <div>
-              <label className="text-[11px] text-muted-foreground">Category</label>
+              <label className="text-xs text-muted-foreground">Category</label>
               <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                 <SelectTrigger className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm">
                   <SelectValue placeholder="Category" />
@@ -105,7 +105,7 @@ export default function AdminDeals() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{d.title}</p>
                 <p className="text-xs text-muted-foreground">{d.partner} · {d.city}</p>
-                <p className="text-[11px] text-[#A1846B] mt-0.5">{d.discount} · expires {d.expiration_date}</p>
+                <p className="text-xs text-[#A1846B] mt-0.5">{d.discount} · expires {d.expiration_date}</p>
               </div>
               <button onClick={() => remove(d.id)} className="text-destructive self-start"><Trash2 className="w-4 h-4" strokeWidth={1.5} /></button>
             </div>
@@ -119,7 +119,7 @@ export default function AdminDeals() {
 function Field({ label, value, onChange, placeholder, type = "text", textarea }) {
   return (
     <div>
-      <label className="text-[11px] text-muted-foreground">{label}</label>
+      <label className="text-xs text-muted-foreground">{label}</label>
       {textarea ? (
         <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={2} placeholder={placeholder}
           className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none resize-none" />

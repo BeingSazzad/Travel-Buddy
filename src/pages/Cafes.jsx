@@ -31,7 +31,7 @@ export default function Cafes() {
 
   if (loading) return (
     <div className="px-5 safe-pt pb-6">
-      <h1 className="font-display font-semibold text-2xl">Cafés</h1>
+      <h1 className="font-display font-bold text-lg">Cafés</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Curated coffee spots for women who travel</p>
       <ListSkeleton count={4} />
     </div>
@@ -39,7 +39,7 @@ export default function Cafes() {
 
   return (
     <div className="px-5 safe-pt pb-6">
-      <h1 className="font-display font-semibold text-2xl">Cafés</h1>
+      <h1 className="font-display font-bold text-lg">Cafés</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Curated coffee spots for women who travel</p>
 
       {/* Tag filters */}

@@ -5,7 +5,7 @@ export function SectionHeader({ title, subtitle, right }) {
   return (
     <div className="flex items-end justify-between gap-3 mb-4">
       <div>
-        <h1 className="font-display font-semibold text-xl leading-tight">{title}</h1>
+        <h1 className="font-display font-bold text-lg leading-tight">{title}</h1>
         {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
       </div>
       {right}

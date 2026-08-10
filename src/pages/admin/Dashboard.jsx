@@ -61,8 +61,8 @@ export default function Dashboard() {
         {cards.map((c) => (
           <div key={c.label} className="rounded-2xl border border-border bg-card p-4">
             <c.icon className="w-4 h-4 text-[#A1846B] mb-2" strokeWidth={1.5} />
-            <p className="font-display font-semibold text-2xl">{c.value.toLocaleString()}</p>
-            <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{c.label}</p>
+            <p className="font-display font-bold text-lg">{c.value.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground leading-tight mt-0.5">{c.label}</p>
             {c.sub && <p className="text-[10px] text-amber-600 mt-0.5">{c.sub}</p>}
           </div>
         ))}

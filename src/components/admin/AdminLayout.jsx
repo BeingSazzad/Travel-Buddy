@@ -12,7 +12,7 @@ export default function AdminLayout() {
     return (
       <div className="px-5 pt-24 text-center">
         <ShieldAlert className="w-9 h-9 text-muted-foreground mx-auto mb-3" strokeWidth={1.5} />
-        <p className="font-display font-semibold text-xl">Admins only</p>
+        <p className="font-display font-bold text-lg">Admins only</p>
         <p className="text-sm text-muted-foreground mt-1">You don't have access to the Seluna admin dashboard.</p>
         <button onClick={() => navigate("/")} className="mt-4 text-sm text-[#A1846B] underline">Back to app</button>
       </div>

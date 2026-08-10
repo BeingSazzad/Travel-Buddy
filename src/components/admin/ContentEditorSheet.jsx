@@ -44,7 +44,7 @@ function ImageInput({ value, onChange, label }) {
   };
   return (
     <div>
-      <label className="text-[11px] text-muted-foreground">{label}</label>
+      <label className="text-xs text-muted-foreground">{label}</label>
       <div className="flex items-center gap-2 mt-1">
         {value && <img src={value} alt="" className="w-16 h-16 rounded-xl object-cover border border-border" />}
         <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border bg-background text-xs cursor-pointer">
@@ -74,7 +74,7 @@ function GalleryInput({ value, onChange, label }) {
   };
   return (
     <div>
-      <label className="text-[11px] text-muted-foreground">{label}</label>
+      <label className="text-xs text-muted-foreground">{label}</label>
       <div className="flex gap-2 flex-wrap mt-1">
         {(value || []).map((g, i) => (
           <div key={i} className="relative w-16 h-16">
@@ -136,7 +136,7 @@ export default function ContentEditorSheet({ open, item, fields, title, onSave, 
             if (f.type === "text" || f.type === "string") {
               return (
                 <div key={f.key}>
-                  <label className="text-[11px] text-muted-foreground">{f.label}{f.required ? " *" : ""}</label>
+                  <label className="text-xs text-muted-foreground">{f.label}{f.required ? " *" : ""}</label>
                   <input value={form[f.key] || ""} onChange={(e) => set(f.key, e.target.value)} placeholder={f.placeholder}
                     className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none mt-1" />
                 </div>
@@ -145,7 +145,7 @@ export default function ContentEditorSheet({ open, item, fields, title, onSave, 
             if (f.type === "textarea") {
               return (
                 <div key={f.key}>
-                  <label className="text-[11px] text-muted-foreground">{f.label}{f.required ? " *" : ""}</label>
+                  <label className="text-xs text-muted-foreground">{f.label}{f.required ? " *" : ""}</label>
                   <textarea value={form[f.key] || ""} onChange={(e) => set(f.key, e.target.value)} rows={3} placeholder={f.placeholder}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none resize-none mt-1" />
                 </div>
@@ -154,7 +154,7 @@ export default function ContentEditorSheet({ open, item, fields, title, onSave, 
             if (f.type === "number") {
               return (
                 <div key={f.key}>
-                  <label className="text-[11px] text-muted-foreground">{f.label}</label>
+                  <label className="text-xs text-muted-foreground">{f.label}</label>
                   <input type="number" value={form[f.key] ?? 0} onChange={(e) => set(f.key, Number(e.target.value))}
                     className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none mt-1" />
                 </div>
@@ -163,7 +163,7 @@ export default function ContentEditorSheet({ open, item, fields, title, onSave, 
             if (f.type === "select") {
               return (
                 <div key={f.key}>
-                  <label className="text-[11px] text-muted-foreground">{f.label}</label>
+                  <label className="text-xs text-muted-foreground">{f.label}</label>
                   <select value={form[f.key] || ""} onChange={(e) => set(f.key, e.target.value)}
                     className="w-full h-10 rounded-xl border border-border bg-background px-3 text-sm outline-none mt-1">
                     <option value="">—</option>
@@ -189,7 +189,7 @@ export default function ContentEditorSheet({ open, item, fields, title, onSave, 
             if (f.type === "tags") {
               return (
                 <div key={f.key}>
-                  <label className="text-[11px] text-muted-foreground">{f.label}</label>
+                  <label className="text-xs text-muted-foreground">{f.label}</label>
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {(f.options || []).map((o) => {
                       const on = !!form[f.key]?.[o.key];
@@ -207,7 +207,7 @@ export default function ContentEditorSheet({ open, item, fields, title, onSave, 
             if (f.type === "counts") {
               return (
                 <div key={f.key}>
-                  <label className="text-[11px] text-muted-foreground">{f.label}</label>
+                  <label className="text-xs text-muted-foreground">{f.label}</label>
                   <div className="grid grid-cols-3 gap-2 mt-1">
                     {(f.options || []).map((o) => (
                       <div key={o.key}>

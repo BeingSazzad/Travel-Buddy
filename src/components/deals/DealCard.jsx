@@ -45,7 +45,7 @@ export default function DealCard({ deal, onRedeem }) {
         {expired && <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center"><span className="px-3 py-1 rounded-full bg-white text-foreground text-xs font-semibold">Expired</span></div>}
       </div>
       <div className="p-4">
-        <p className="text-[11px] uppercase tracking-wide text-[#A1846B] font-medium">{deal.partner}</p>
+        <p className="text-xs uppercase tracking-wide text-[#A1846B] font-medium">{deal.partner}</p>
         <h3 className="font-semibold text-base leading-tight mt-0.5">{deal.title}</h3>
         <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
           <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {deal.city}{deal.country ? `, ${deal.country}` : ""}

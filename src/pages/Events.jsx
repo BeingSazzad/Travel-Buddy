@@ -28,7 +28,7 @@ export default function Events() {
     <div className="px-5 safe-pt pb-6">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="font-display font-semibold text-2xl">Events</h1>
+          <h1 className="font-display font-bold text-lg">Events</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Join or host a meetup</p>
         </div>
         <button

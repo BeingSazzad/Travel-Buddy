@@ -1,6 +1,29 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 import Stripe from 'npm:stripe@14.25.0';
-import { buildSubscriptionUpdate, mapSubscriptionStatus } from '../../shared/stripe-subscription.ts';
+import { buildSubscriptionUpdate } from '../../shared/stripe-subscription.ts';
+
+async function applySubscriptionUpdate(base44, userId, update) {
+  const me = await base44.auth.me();
+  if (me?.id === userId) {
+    return base44.auth.updateMe(update);
+  }
+  return base44.asServiceRole.entities.User.update(userId, update);
+}
+
+async function resolvePaidCheckoutSession(stripe, user, sessionId) {
+  if (sessionId) {
+    return stripe.checkout.sessions.retrieve(String(sessionId));
+  }
+
+  const sessions = await stripe.checkout.sessions.list({ limit: 25 });
+  return sessions.data.find((session) => {
+    const matchesUser =
+      session.metadata?.user_id === user.id ||
+      (session.customer_email && session.customer_email === user.email);
+    const isPaid = session.payment_status === 'paid' || session.status === 'complete';
+    return matchesUser && isPaid;
+  });
+}
 
 Deno.serve(async (req) => {
   try {
@@ -11,6 +34,39 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const action = body?.action || 'portal';
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
+
+    if (action === 'sync') {
+      const session = await resolvePaidCheckoutSession(stripe, user, body?.session_id);
+      if (!session) {
+        return Response.json({ error: 'No completed checkout session found for this account' }, { status: 404 });
+      }
+      if (session.metadata?.user_id && session.metadata.user_id !== user.id) {
+        return Response.json({ error: 'Checkout session does not belong to this user' }, { status: 403 });
+      }
+      if (session.payment_status !== 'paid' && session.status !== 'complete') {
+        return Response.json({ status: 'pending' });
+      }
+
+      let update = {
+        subscription_status: 'active',
+        subscription_plan: session.metadata?.plan || null,
+      };
+      if (session.subscription) {
+        const sub = await stripe.subscriptions.retrieve(String(session.subscription));
+        update = buildSubscriptionUpdate(sub);
+        if (!update.subscription_plan && session.metadata?.plan) {
+          update.subscription_plan = session.metadata.plan;
+        }
+      }
+
+      const updatedUser = await applySubscriptionUpdate(base44, user.id, update);
+      return Response.json({
+        status: update.subscription_status,
+        plan: update.subscription_plan,
+        current_period_end: update.subscription_current_period_end,
+        user: updatedUser,
+      });
+    }
 
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     const customer = customers.data[0];
@@ -25,11 +81,12 @@ Deno.serve(async (req) => {
         return Response.json({ status: 'none' });
       }
       const update = buildSubscriptionUpdate(sub);
-      await base44.asServiceRole.entities.User.update(user.id, update);
+      const updatedUser = await applySubscriptionUpdate(base44, user.id, update);
       return Response.json({
         status: update.subscription_status,
         plan: update.subscription_plan,
         current_period_end: update.subscription_current_period_end,
+        user: updatedUser,
       });
     }
 

@@ -31,11 +31,11 @@ export default function ReviewItem({ review, isAdmin, voted, voting, onVote, onR
             ))}
           </span>
         </div>
-        <span className="text-[11px] text-muted-foreground">{fmtDate(review.created_date)}</span>
+        <span className="text-xs text-muted-foreground">{fmtDate(review.created_date)}</span>
       </div>
 
       {review.visit_date && (
-        <p className="text-[11px] text-muted-foreground mt-2">Visited {fmtDate(review.visit_date)}</p>
+        <p className="text-xs text-muted-foreground mt-2">Visited {fmtDate(review.visit_date)}</p>
       )}
 
       <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{review.text}</p>

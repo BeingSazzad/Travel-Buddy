@@ -52,10 +52,12 @@ export default function Conversation() {
     );
   }
 
-  const otherIndex = conversation.participant_ids.findIndex((p) => p !== user?.id);
-  const otherId = conversation.participant_ids[otherIndex];
-  const otherName = conversation.participant_names?.[otherIndex] || "Travel friend";
-  const otherAvatar = conversation.participant_avatars?.[otherIndex] || "";
+  const myId = user?.id;
+  const otherIndex = conversation.participant_ids.findIndex((p) => p !== myId && p !== "me");
+  const resolvedIndex = otherIndex !== -1 ? otherIndex : 1;
+  const otherId = conversation.participant_ids[resolvedIndex];
+  const otherName = conversation.participant_names?.[resolvedIndex] || "Travel friend";
+  const otherAvatar = conversation.participant_avatars?.[resolvedIndex] || "";
   const otherTyping = conversation.typing?.[otherId] && Date.now() - conversation.typing[otherId] < 3000;
 
   const onType = (val) => {

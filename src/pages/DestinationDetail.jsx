@@ -108,9 +108,9 @@ export default function DestinationDetail() {
             <div className="flex items-center gap-1 text-white/80 text-xs mb-1"><MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {dest.city}, {dest.country}</div>
             <h1 className="font-display font-semibold text-3xl text-white">{dest.city}</h1>
             <div className="flex items-center gap-2 mt-2">
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/20 text-white">{dest.continent}</span>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/20 text-white flex items-center gap-1"><Sun className="w-3 h-3" strokeWidth={1.5} /> {dest.weather}</span>
-              {dest.tags.solo && <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/20 text-white">Solo-friendly</span>}
+              <span className="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white">{dest.continent}</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white flex items-center gap-1"><Sun className="w-3 h-3" strokeWidth={1.5} /> {dest.weather}</span>
+              {dest.tags.solo && <span className="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white">Solo-friendly</span>}
             </div>
           </div>
         </div>

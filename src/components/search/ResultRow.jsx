@@ -31,9 +31,9 @@ export default function ResultRow({ item }) {
           </span>
         </div>
         <div className="flex items-center gap-2 mt-1">
-          {item.info && <span className="text-[11px] text-[#A1846B] font-medium truncate">{item.info}</span>}
-          {item.price && <span className="text-[11px] text-muted-foreground">{item.price}</span>}
-          {item.distance != null && <span className="text-[11px] text-muted-foreground">{item.distance} km</span>}
+          {item.info && <span className="text-xs text-[#A1846B] font-medium truncate">{item.info}</span>}
+          {item.price && <span className="text-xs text-muted-foreground">{item.price}</span>}
+          {item.distance != null && <span className="text-xs text-muted-foreground">{item.distance} km</span>}
         </div>
       </div>
 

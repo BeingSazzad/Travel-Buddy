@@ -41,7 +41,7 @@ export default function Hotels() {
 
   if (loading) return (
     <div className="px-5 safe-pt pb-6">
-      <h1 className="font-display font-semibold text-2xl">Hotels</h1>
+      <h1 className="font-display font-bold text-lg">Hotels</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Stays curated for women who travel</p>
       <ListSkeleton count={4} />
     </div>
@@ -49,7 +49,7 @@ export default function Hotels() {
 
   return (
     <div className="px-5 safe-pt pb-6">
-      <h1 className="font-display font-semibold text-2xl">Hotels</h1>
+      <h1 className="font-display font-bold text-lg">Hotels</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Stays curated for women who travel</p>
 
       <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-2">

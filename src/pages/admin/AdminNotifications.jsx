@@ -34,12 +34,12 @@ export default function AdminNotifications() {
           <span className="text-xs uppercase tracking-wide">Broadcast</span>
         </div>
         <div>
-          <label className="text-[11px] text-muted-foreground">Title</label>
+          <label className="text-xs text-muted-foreground">Title</label>
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Announcement title"
             className="w-full h-11 rounded-xl border border-border bg-background px-3 text-sm outline-none" />
         </div>
         <div>
-          <label className="text-[11px] text-muted-foreground">Message (optional)</label>
+          <label className="text-xs text-muted-foreground">Message (optional)</label>
           <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={4} placeholder="Write your message…"
             className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none resize-none" />
         </div>
@@ -49,7 +49,7 @@ export default function AdminNotifications() {
           Send to all members
         </button>
         {result && <p className="text-xs text-center text-muted-foreground">{result}</p>}
-        <p className="text-[11px] text-muted-foreground text-center">Each member receives a notification in their Notification Center.</p>
+        <p className="text-xs text-muted-foreground text-center">Each member receives a notification in their Notification Center.</p>
       </div>
     </div>
   );

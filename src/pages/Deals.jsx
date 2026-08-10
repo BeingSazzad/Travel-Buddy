@@ -41,7 +41,7 @@ export default function Deals() {
       <div className="flex items-center gap-1.5 text-[#A1846B] mb-1">
         <span className="text-xs font-medium uppercase tracking-wide">Seluna members only</span>
       </div>
-      <h1 className="font-display font-semibold text-2xl">Deals</h1>
+      <h1 className="font-display font-bold text-lg">Deals</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Exclusive perks from partners who welcome women who travel.</p>
 
       <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 pb-2">

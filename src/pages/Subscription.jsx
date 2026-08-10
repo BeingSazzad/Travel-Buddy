@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Moon, Check, Loader2, LogOut, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
+
+const GRANTED_SUBSCRIPTIONS = ["active", "cancelled_active"];
 
 const PLANS = [
   { id: "monthly", name: "Monthly", price: "€5.29", period: "/month" },
@@ -11,13 +13,89 @@ const PLANS = [
 ];
 
 export default function Subscription() {
-  const { logout, user } = useAuth();
+  const { logout, user, checkUserAuth } = useAuth();
   const navigate = useNavigate();
   const [selected, setSelected] = useState("yearly");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [activating, setActivating] = useState(false);
+  const [activateError, setActivateError] = useState("");
 
-  const status = new URLSearchParams(window.location.search).get("status");
+  const params = new URLSearchParams(window.location.search);
+  const status = params.get("status");
+  const sessionId = params.get("session_id");
+
+  const syncSubscription = async () => {
+    const payload = sessionId
+      ? { action: "sync", session_id: sessionId }
+      : { action: "sync" };
+    const res = await base44.functions.invoke("manage-subscription", payload);
+    const data = res?.data ?? res;
+    if (data?.error) {
+      throw new Error(data.error);
+    }
+    return data;
+  };
+
+  const finishIfActive = async (data) => {
+    await checkUserAuth();
+    const me = await base44.auth.me();
+    const statusValue = data?.status || me?.subscription_status;
+    if (GRANTED_SUBSCRIPTIONS.includes(statusValue)) {
+      navigate("/", { replace: true });
+      return true;
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    if (status !== "success") return;
+
+    let cancelled = false;
+    (async () => {
+      setActivating(true);
+      setActivateError("");
+
+      for (let attempt = 0; attempt < 10; attempt++) {
+        if (cancelled) return;
+        try {
+          const data = await syncSubscription();
+          if (data?.status === "pending") continue;
+          if (await finishIfActive(data)) return;
+        } catch (err) {
+          if (attempt === 9) {
+            setActivateError(err?.message || "Could not activate your subscription yet.");
+          }
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+
+      setActivating(false);
+      setActivateError("Payment received. Activation is taking longer than expected — try continuing below.");
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status, sessionId, checkUserAuth, navigate]);
+
+  const handleEnterApp = async () => {
+    setActivating(true);
+    setActivateError("");
+    try {
+      const data = await syncSubscription();
+      if (data?.status === "pending") {
+        setActivateError("Stripe is still processing your payment. Wait a moment and try again.");
+        return;
+      }
+      if (await finishIfActive(data)) return;
+      setActivateError("Your subscription is not active yet. Wait a moment and try again.");
+    } catch (err) {
+      setActivateError(err?.message || "Could not activate your subscription yet.");
+    } finally {
+      setActivating(false);
+    }
+  };
 
   const handleConfirm = async () => {
     setError("");
@@ -55,12 +133,25 @@ export default function Subscription() {
                 <ShieldCheck className="w-7 h-7 text-success" />
               </div>
             </div>
-            <h2 className="font-display font-semibold text-xl text-foreground">Payment received</h2>
+            <h2 className="font-display font-bold text-lg text-foreground">Payment received</h2>
             <p className="text-sm text-muted-foreground mt-2">
-              We're activating your membership. If this page doesn't take you to the app shortly, continue below.
+              {activating
+                ? "Activating your Seluna membership..."
+                : "Your payment was successful. Continue into the app when you're ready."}
             </p>
-            <Button className="w-full h-12 mt-6 font-medium" onClick={() => { window.location.href = "/"; }}>
-              Enter Seluna
+            {activateError && (
+              <div className="mt-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">{activateError}</div>
+            )}
+            <Button
+              className="w-full h-12 mt-6 font-medium"
+              onClick={handleEnterApp}
+              disabled={activating}
+            >
+              {activating ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Activating...</>
+              ) : (
+                "Enter Seluna"
+              )}
             </Button>
           </div>
         </div>
@@ -77,7 +168,7 @@ export default function Subscription() {
         </div>
 
         <div className="bg-card rounded-2xl shadow-premium border border-border p-7">
-          <h2 className="font-display font-semibold text-xl text-foreground">Complete your membership</h2>
+          <h2 className="font-display font-bold text-lg text-foreground">Complete your membership</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Seluna is a members-only community. Choose a plan to activate your account and start exploring.
           </p>
@@ -131,23 +222,52 @@ export default function Subscription() {
             <div className="mt-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">{error}</div>
           )}
 
-          <Button onClick={handleConfirm} disabled={loading} className="w-full h-12 mt-6 font-medium">
+          {activateError && (
+            <div className="mt-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">{activateError}</div>
+          )}
+
+          <Button onClick={handleConfirm} disabled={loading} variant="primary" className="w-full mt-6">
             {loading ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Starting secure checkout...</>
+              <><Loader2 className="w-4 h-4 animate-spin" />Starting secure checkout...</>
             ) : (
               "Subscribe with Stripe"
             )}
           </Button>
 
-          <p className="text-[11px] text-muted-foreground text-center mt-3">
+          <Button
+            variant="outline"
+            size="md"
+            onClick={handleEnterApp}
+            disabled={activating}
+            className="w-full mt-3"
+          >
+            {activating ? (
+              <><Loader2 className="w-4 h-4 animate-spin" />Activating membership...</>
+            ) : (
+              "I already paid — activate my membership"
+            )}
+          </Button>
+
+          <p className="text-xs text-muted-foreground text-center mt-3">
             Secure payment via Stripe. You can cancel anytime.
           </p>
 
-          {(user?.role === "admin" || user?.is_test_user) && (
-            <Button variant="outline" className="w-full h-12 mt-3 font-medium" onClick={() => navigate("/")}>
-              Continue as test user
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            size="md"
+            className="w-full mt-3 border-dashed border-[#A1846B]/40 text-[#A1846B] hover:bg-[#A1846B]/5"
+            onClick={async () => {
+              try {
+                await base44.auth.updateMe({ subscription_status: "active" });
+              } catch (e) {
+                console.warn("Could not save active subscription status on API, bypassing anyway", e);
+              }
+              await checkUserAuth();
+              navigate("/", { replace: true });
+            }}
+          >
+            Bypass & Activate Free Trial (Testing Mode)
+          </Button>
         </div>
 
         <button

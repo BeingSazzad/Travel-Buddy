@@ -5,6 +5,69 @@ import { useSaved } from "@/lib/SavedContext";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+const MOCK_EVENTS = [
+  {
+    id: "event_mock_1",
+    title: "Sunset Yoga",
+    name: "Sunset Yoga",
+    city: "Santorini",
+    country: "Greece",
+    date: "2026-08-10",
+    time: "08:00 AM",
+    category: "wellness",
+    description: "Start your morning with a relaxing yoga session overlooking the beautiful caldera in Oia. All levels welcome!",
+    attendees_count: 8,
+    host_name: "Maya R.",
+    host_avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&h=100&q=80",
+    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=400&h=300&q=80"
+  },
+  {
+    id: "event_mock_2",
+    title: "Sunset Dinner in Santorini",
+    name: "Sunset Dinner in Santorini",
+    city: "Santorini",
+    country: "Greece",
+    date: "2026-08-12",
+    time: "06:00 PM",
+    category: "food",
+    description: "Join us for an unforgettable sunset dinner with amazing women travellers. Good food, great conversations, and memories to last a lifetime.",
+    attendees_count: 12,
+    host_name: "Anika K.",
+    host_avatar: "",
+    image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=400&h=300&q=80"
+  },
+  {
+    id: "event_mock_3",
+    title: "Wine & Paint Night",
+    name: "Wine & Paint Night",
+    city: "Lisbon",
+    country: "Portugal",
+    date: "2026-08-15",
+    time: "06:30 PM",
+    category: "social",
+    description: "Unleash your inner artist! We will sip local Portuguese wine and paint the beautiful scenery of Lisbon.",
+    attendees_count: 6,
+    host_name: "Ava L.",
+    host_avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80",
+    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=400&h=300&q=80"
+  },
+  {
+    id: "event_mock_4",
+    title: "Girls' Trip to Swiss Alps",
+    name: "Girls' Trip to Swiss Alps",
+    city: "Zermatt",
+    country: "Switzerland",
+    date: "2026-09-05",
+    time: "10:00 AM",
+    category: "adventure",
+    description: "Let's head to the mountains for fresh air, hiking trails, and beautiful chalet evenings. 4 days of adventure!",
+    attendees_count: 4,
+    host_name: "Isabella K.",
+    host_avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&h=300&q=80"
+  }
+];
+
 export function useEvents() {
   const { user, isAuthenticated } = useAuth();
   const { items: savedItems } = useSaved();
@@ -21,12 +84,14 @@ export function useEvents() {
         base44.entities.EventAttendance.list("-created_date", 200),
         base44.entities.Trip.list("-start_date", 100),
       ]);
-      setEvents(evs);
+      const dbIds = new Set(evs.map((e) => e.id));
+      const mockToAdd = MOCK_EVENTS.filter((m) => !dbIds.has(m.id));
+      setEvents([...evs, ...mockToAdd]);
       setAttendance(att);
       const upcoming = trips.filter((t) => (t.end_date || t.start_date || "") >= today());
       setTripCities(new Set(upcoming.map((t) => t.city).filter(Boolean)));
     } catch (e) {
-      setEvents([]);
+      setEvents(MOCK_EVENTS);
       setAttendance([]);
     } finally {
       setLoading(false);

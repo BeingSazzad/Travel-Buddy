@@ -7,7 +7,7 @@ function ChipRow({ label, items, tone }) {
   if (!items?.length) return null;
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">{label}</p>
       <div className="flex flex-wrap gap-1.5">
         {items.map((it) => (
           <span
@@ -71,7 +71,7 @@ export default function MatchCard({ member, onDecide, onProfile }) {
             CONNECT
           </motion.div>
           <div className="absolute bottom-3 left-4 right-4 text-white">
-            <h2 className="font-display font-semibold text-2xl drop-shadow">
+            <h2 className="font-display font-bold text-lg drop-shadow">
               {member.name}{member.age != null ? `, ${member.age}` : ""}
             </h2>
             <div className="flex items-center gap-1 text-sm mt-0.5">

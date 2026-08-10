@@ -50,7 +50,7 @@ export default function SavedSection() {
                         </span>
                       </div>
                       {item.info && (
-                        <p className="text-[11px] text-[#A1846B] font-medium mt-0.5 truncate">{item.info}</p>
+                        <p className="text-xs text-[#A1846B] font-medium mt-0.5 truncate">{item.info}</p>
                       )}
                     </div>
                     <button

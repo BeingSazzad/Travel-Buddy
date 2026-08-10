@@ -74,7 +74,7 @@ export default function AdminReports() {
                 Reason: <span className="text-foreground">{REASON_LABEL[r.reason] || r.reason}</span>
               </p>
               {r.explanation && <p className="text-xs text-muted-foreground mt-1 italic">“{r.explanation}”</p>}
-              <p className="text-[11px] text-muted-foreground mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 {new Date(r.created_date).toLocaleString()} · by {r.created_by_id?.slice(-6)}
               </p>
               <div className="flex flex-wrap gap-1.5 mt-3">
@@ -82,7 +82,7 @@ export default function AdminReports() {
                   <button
                     key={s}
                     onClick={() => setStatus(r.id, s)}
-                    className={`text-[11px] px-2.5 py-1 rounded-full border transition ${r.status === s ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}
+                    className={`text-xs px-2.5 py-1 rounded-full border transition ${r.status === s ? "bg-foreground text-background border-foreground" : "border-border text-muted-foreground"}`}
                   >
                     {s}
                   </button>

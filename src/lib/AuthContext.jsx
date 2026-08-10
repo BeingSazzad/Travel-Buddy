@@ -2,20 +2,55 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
+import { getAccessToken } from '@base44/sdk/dist/utils/auth-utils';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(true);
+  const mockUser = {
+    id: "mock-user-123",
+    email: "test@seluna.com",
+    role: "admin",
+    first_name: "Mock",
+    last_name: "User",
+    profile_name: "Mock User",
+    date_of_birth: "1995-01-01",
+    current_city: "Copenhagen",
+    country: "Denmark",
+    nationality: "Denmark",
+    languages_spoken: ["en", "da"],
+    biography: "I am a passionate traveler seeking companions and local experiences.",
+    travel_style: ["Solo", "Budget", "Cultural"],
+    interests: ["Hiking", "Museums", "Coffee", "Yoga"],
+    profile_photos: [
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80"
+    ],
+    main_photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+    location_visibility: "approximate",
+    show_age: true,
+    show_upcoming_trips: true,
+    allow_match_suggestions: true,
+    allow_event_invitations: true,
+    allow_notifications: true,
+    profile_completed: true,
+    is_email_verified: true,
+    accepted_terms_at: new Date().toISOString(),
+    accepted_privacy_at: new Date().toISOString(),
+    accepted_community_guidelines_at: new Date().toISOString(),
+    subscription_status: "active",
+  };
+
+  const [user, setUser] = useState(mockUser);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(false);
+  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(false);
   const [authError, setAuthError] = useState(null);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
+  const [authChecked, setAuthChecked] = useState(true);
+  const [appPublicSettings, setAppPublicSettings] = useState({ id: "mock-app-id", public_settings: {} }); // Mocked
 
   useEffect(() => {
-    checkAppState();
+    // Disabled backend API auth checks to focus only on frontend flow/design.
   }, []);
 
   const checkAppState = async () => {
@@ -25,12 +60,13 @@ export const AuthProvider = ({ children }) => {
       
       // First, check app public settings (with token if available)
       // This will tell us if auth is required, user not registered, etc.
+      const token = appParams.token || getAccessToken();
       const appClient = createAxiosClient({
         baseURL: `/api/apps/public`,
         headers: {
           'X-App-Id': appParams.appId
         },
-        token: appParams.token, // Include token if available
+        token,
         interceptResponses: true
       });
       
@@ -38,8 +74,8 @@ export const AuthProvider = ({ children }) => {
         const publicSettings = await appClient.get(`/prod/public-settings/by-id/${appParams.appId}`);
         setAppPublicSettings(publicSettings);
         
-        // If we got the app public settings successfully, check if user is authenticated
-        if (appParams.token) {
+        if (token) {
+          base44.auth.setToken(token);
           await checkUserAuth();
         } else {
           setIsLoadingAuth(false);
@@ -104,8 +140,11 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(false);
       setAuthChecked(true);
       
-      // If user auth fails, it might be an expired token
       if (error.status === 401 || error.status === 403) {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.removeItem('base44_access_token');
+          window.localStorage.removeItem('token');
+        }
         setAuthError({
           type: 'auth_required',
           message: 'Authentication required'

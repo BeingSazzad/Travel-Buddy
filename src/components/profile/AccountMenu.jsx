@@ -31,6 +31,7 @@ export default function AccountMenu() {
         <Row icon={Pencil} label="Edit profile" onClick={() => navigate("/profile-setup")} />
         <Row icon={Plane} label="My trips" onClick={() => navigate("/trips")} />
         <Row icon={CalendarHeart} label="My events" onClick={() => navigate("/events")} />
+        <Row icon={Users} label="My friends" onClick={() => navigate("/friends")} />
         <Row icon={MessageCircle} label="Messages" onClick={() => navigate("/messages")} />
         <Row icon={Crown} label="Subscription" onClick={() => navigate("/subscription-management")} />
         {user?.role === "admin" && <Row icon={ShieldAlert} label="Admin dashboard" onClick={() => navigate("/admin")} />}

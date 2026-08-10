@@ -1,13 +1,15 @@
 import { Search, MessageCircle, UserPlus, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Friends() {
+  const navigate = useNavigate();
+
   const friends = [
-    { name: 'Aria K.', loc: 'Berlin, DE', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80' },
-    { name: 'Maya R.', loc: 'Lisbon, PT', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80' },
-    { name: 'Sofia L.', loc: 'Bali, ID', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80' },
-    { name: 'Nina T.', loc: 'Tokyo, JP', img: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=200&q=80' },
-    { name: 'Elena M.', loc: 'Marrakech, MA', img: 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?auto=format&fit=crop&w=200&q=80' },
+    { name: 'Aria K.', loc: 'Berlin, DE', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80', convId: 'sim_conv_mock_3' },
+    { name: 'Maya R.', loc: 'Lisbon, PT', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80', convId: 'sim_conv_mock_1' },
+    { name: 'Sofia L.', loc: 'Bali, ID', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80', convId: 'sim_conv_mock_2' },
+    { name: 'Nina T.', loc: 'Tokyo, JP', img: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=200&q=80', convId: 'sim_conv_mock_4' },
+    { name: 'Elena M.', loc: 'Marrakech, MA', img: 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?auto=format&fit=crop&w=200&q=80', convId: 'sim_conv_mock_1' },
   ];
 
   const suggestions = [
@@ -16,8 +18,8 @@ export default function Friends() {
   ];
 
   return (
-    <div className="px-5 safe-pt">
-      <h1 className="font-display font-semibold text-2xl mb-1">Friends</h1>
+    <div className="px-5 safe-pt pb-24">
+      <h1 className="font-display font-bold text-lg mb-1">Friends</h1>
       <p className="text-sm text-muted-foreground mb-4">Women exploring like you</p>
 
       <Link
@@ -46,7 +48,10 @@ export default function Friends() {
               <p className="font-semibold text-sm">{f.name}</p>
               <p className="text-xs text-muted-foreground">{f.loc}</p>
             </div>
-            <button className="w-9 h-9 rounded-full border border-border shadow-soft flex items-center justify-center text-muted-foreground">
+            <button
+              onClick={() => navigate(`/conversations/${f.convId}`)}
+              className="w-9 h-9 rounded-full border border-border shadow-soft flex items-center justify-center text-muted-foreground hover:text-foreground transition"
+            >
               <MessageCircle className="w-4 h-4" />
             </button>
           </div>
@@ -70,4 +75,4 @@ export default function Friends() {
       </div>
     </div>
   );
-}
+}

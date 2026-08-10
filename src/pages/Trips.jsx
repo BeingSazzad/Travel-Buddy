@@ -47,7 +47,7 @@ export default function Trips() {
     <div className="px-5 safe-pt pb-6">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="font-display font-semibold text-2xl">Trips</h1>
+          <h1 className="font-display font-bold text-lg">Trips</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Plan, discover, connect</p>
         </div>
         <button onClick={openNew} className="w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center active:scale-95 transition">

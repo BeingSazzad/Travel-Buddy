@@ -21,14 +21,14 @@ export default function ConversationRow({ name, avatar, lastMessage, time, unrea
           <p className={`font-semibold text-sm truncate ${unread > 0 ? "text-foreground" : "text-foreground/90"}`}>
             {name}
           </p>
-          {time && <span className="text-[11px] text-muted-foreground shrink-0">{time}</span>}
+          {time && <span className="text-xs text-muted-foreground shrink-0">{time}</span>}
         </div>
         <div className="flex items-center justify-between gap-2 mt-0.5">
           <p className={`text-xs truncate ${unread > 0 ? "text-foreground/80 font-medium" : "text-muted-foreground"}`}>
             {lastMessage || "Say hello 👋"}
           </p>
           {unread > 0 && (
-            <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-[#A1846B] text-white text-[11px] font-semibold flex items-center justify-center">
+            <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-[#A1846B] text-white text-xs font-semibold flex items-center justify-center">
               {unread > 99 ? "99+" : unread}
             </span>
           )}

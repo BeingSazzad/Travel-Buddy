@@ -75,7 +75,7 @@ export default function Subscriptions() {
                 <span className={`px-2 py-0.5 rounded-full capitalize ${STATUS_STYLE[u.subscription_status] || "bg-muted"}`}>
                   {u.subscription_status.replace(/_/g, " ")}
                 </span>
-                <p className="text-[11px] text-muted-foreground mt-1 capitalize">{u.subscription_plan || "—"}</p>
+                <p className="text-xs text-muted-foreground mt-1 capitalize">{u.subscription_plan || "—"}</p>
                 {u.subscription_current_period_end && (
                   <p className="text-[10px] text-muted-foreground">{new Date(u.subscription_current_period_end).toLocaleDateString()}</p>
                 )}

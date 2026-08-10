@@ -15,7 +15,7 @@ export default function Profile() {
 
   return (
     <div className="px-5 safe-pt pb-10">
-      <h1 className="font-display font-semibold text-2xl mb-4">Profile</h1>
+      <h1 className="font-display font-bold text-lg mb-4">Profile</h1>
 
       <ProfileHeader />
 

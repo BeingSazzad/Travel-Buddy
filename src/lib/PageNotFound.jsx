@@ -28,7 +28,7 @@ export default function PageNotFound({}) {
                 </div>
                 <h1 className="font-display font-semibold text-5xl text-foreground">404</h1>
                 <div className="h-0.5 w-12 bg-border mx-auto my-4" />
-                <h2 className="font-display font-semibold text-xl text-foreground">Page not found</h2>
+                <h2 className="font-display font-bold text-lg text-foreground">Page not found</h2>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
                     The page <span className="font-medium text-foreground">"{pageName}"</span> could not be found in this application.
                 </p>

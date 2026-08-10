@@ -63,7 +63,7 @@ export default function Category({ category }) {
       >
         <ArrowLeft className="w-4 h-4" /> Back
       </button>
-      <h1 className="font-display font-semibold text-2xl mb-1">{category}</h1>
+      <h1 className="font-display font-bold text-lg mb-1">{category}</h1>
       <p className="text-sm text-muted-foreground mb-5">Curated for women who travel</p>
 
       <div className="space-y-4">

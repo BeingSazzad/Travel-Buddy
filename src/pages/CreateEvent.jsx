@@ -160,7 +160,7 @@ export default function CreateEvent() {
       <div className="flex-1 px-5 pb-6 overflow-y-auto">
         {step === 1 && (
           <>
-            <h2 className="font-display font-semibold text-xl">The basics</h2>
+            <h2 className="font-display font-bold text-lg">The basics</h2>
             <p className="text-sm text-muted-foreground mb-5">What's the event about?</p>
             <div className="space-y-4">
               <div className="space-y-2">
@@ -185,7 +185,7 @@ export default function CreateEvent() {
 
         {step === 2 && (
           <>
-            <h2 className="font-display font-semibold text-xl">Date & time</h2>
+            <h2 className="font-display font-bold text-lg">Date & time</h2>
             <p className="text-sm text-muted-foreground mb-5">When does it happen?</p>
             <div className="space-y-4">
               <div className="space-y-2">
@@ -208,7 +208,7 @@ export default function CreateEvent() {
 
         {step === 3 && (
           <>
-            <h2 className="font-display font-semibold text-xl">Location</h2>
+            <h2 className="font-display font-bold text-lg">Location</h2>
             <p className="text-sm text-muted-foreground mb-5">Where will you meet?</p>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
@@ -229,7 +229,7 @@ export default function CreateEvent() {
               <div className="space-y-2">
                 <Label>Venue / meeting location *</Label>
                 <Input value={data.location} onChange={(e) => set("location", e.target.value)} placeholder="A general spot — avoid private home addresses" className="h-12" />
-                <p className="text-[11px] text-muted-foreground">Share a public meeting point; never a private home address.</p>
+                <p className="text-xs text-muted-foreground">Share a public meeting point; never a private home address.</p>
               </div>
             </div>
           </>
@@ -237,7 +237,7 @@ export default function CreateEvent() {
 
         {step === 4 && (
           <>
-            <h2 className="font-display font-semibold text-xl">Details</h2>
+            <h2 className="font-display font-bold text-lg">Details</h2>
             <p className="text-sm text-muted-foreground mb-5">Finalise the setup.</p>
             <div className="space-y-4">
               <div className="space-y-2">
@@ -306,7 +306,7 @@ export default function CreateEvent() {
 
         {step === 5 && (
           <>
-            <h2 className="font-display font-semibold text-xl">Community & safety</h2>
+            <h2 className="font-display font-bold text-lg">Community & safety</h2>
             <p className="text-sm text-muted-foreground mb-5">Please agree before publishing.</p>
             <div className="rounded-2xl border border-border bg-card p-4 space-y-3 text-sm">
               <div className="flex items-center gap-2 text-[#A1846B]"><ShieldCheck className="w-4 h-4" /><span className="font-medium">Seluna event guidelines</span></div>
@@ -327,7 +327,7 @@ export default function CreateEvent() {
 
         {step === 6 && (
           <>
-            <h2 className="font-display font-semibold text-xl">Preview</h2>
+            <h2 className="font-display font-bold text-lg">Preview</h2>
             <p className="text-sm text-muted-foreground mb-5">This is how members will see your event.</p>
             <EventCard event={previewEvent} joined={false} onRsvp={() => {}} />
             <div className="rounded-2xl border border-border bg-card p-4 mt-5 space-y-2 text-sm">

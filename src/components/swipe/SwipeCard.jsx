@@ -52,7 +52,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
             CONNECT
           </motion.div>
           <div className="absolute bottom-3 left-4 right-4 text-white">
-            <h2 className="font-display font-semibold text-2xl drop-shadow flex items-center gap-1.5">
+            <h2 className="font-display font-bold text-lg drop-shadow flex items-center gap-1.5">
               {member.name}{member.age != null ? `, ${member.age}` : ""}
               {member.verified && <BadgeCheck className="w-5 h-5 text-white drop-shadow" strokeWidth={2} />}
             </h2>
@@ -68,7 +68,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
 
           {member.languages?.length > 0 && (
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Languages</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Languages</p>
               <div className="flex flex-wrap gap-1.5">
                 {member.languages.map((l) => (
                   <span key={l} className="text-xs px-2 py-0.5 rounded-full bg-muted">{l}</span>
@@ -79,7 +79,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
 
           {member.interests?.length > 0 && (
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Interests</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Interests</p>
               <div className="flex flex-wrap gap-1.5">
                 {member.interests.map((i) => (
                   <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-[#A1846B]/10 text-[#A1846B] capitalize">{i}</span>
@@ -90,7 +90,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
 
           {member.travel_style?.length > 0 && (
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Travel style</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Travel style</p>
               <div className="flex flex-wrap gap-1.5">
                 {member.travel_style.map((s) => (
                   <span key={s} className="text-xs px-2 py-0.5 rounded-full bg-[#A1846B]/10 text-[#A1846B] capitalize">{s}</span>
@@ -101,7 +101,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
 
           {member.trip?.looking_for?.length > 0 && (
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Looking for</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Looking for</p>
               <div className="flex flex-wrap gap-1.5">
                 {member.trip.looking_for.map((lf) => (
                   <span key={lf} className="text-xs px-2 py-0.5 rounded-full bg-[#A1846B]/10 text-[#A1846B] capitalize">{lf}</span>

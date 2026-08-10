@@ -55,7 +55,7 @@ export default function Destinations() {
 
   return (
     <div className="px-5 safe-pt pb-6">
-      <h1 className="font-display font-semibold text-2xl">Destinations</h1>
+      <h1 className="font-display font-bold text-lg">Destinations</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-5">Curated cities, loved by women who travel</p>
 
       {/* Featured */}

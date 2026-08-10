@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock, MapPin, Users, Globe, ShieldCheck, Flag, Share2, MessageCircle, Bookmark, Pencil, UserX, UserCheck } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Globe, ShieldCheck, Flag, Share2, MessageCircle, Bookmark, Pencil, UserX, UserCheck } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Image } from "@/components/ui/image";
@@ -45,7 +45,7 @@ export default function EventDetail() {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line
+     
   }, [id]);
 
   if (loading) return <div className="h-screen flex items-center justify-center text-sm text-muted-foreground">Loading event…</div>;
@@ -119,12 +119,12 @@ export default function EventDetail() {
         <div className="relative h-56 -mt-2">
           <Image src={event.image} alt={event.title} fittingType="fill" className="w-full h-full" />
           <div className="absolute bottom-3 left-4">
-            <span className="bg-white/90 backdrop-blur text-[11px] uppercase tracking-wide font-medium text-[#7a5c44] px-2.5 py-1 rounded-full">{capitalize(event.category)}</span>
+            <span className="bg-white/90 backdrop-blur text-xs uppercase tracking-wide font-medium text-[#7a5c44] px-2.5 py-1 rounded-full">{capitalize(event.category)}</span>
           </div>
         </div>
 
         <div className="px-5 pt-4">
-          <h1 className="font-display font-semibold text-2xl leading-tight">{event.title}</h1>
+          <h1 className="font-display font-bold text-lg leading-tight">{event.title}</h1>
 
           {/* Host */}
           <div className="flex items-center gap-3 mt-4">

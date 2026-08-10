@@ -132,7 +132,7 @@ export default function CreateTrip() {
       <div className="flex-1 px-5 pb-6">
         {step === 1 && (
           <>
-            <h2 className="font-display font-semibold text-xl">Where to?</h2>
+            <h2 className="font-display font-bold text-lg">Where to?</h2>
             <p className="text-sm text-muted-foreground mb-5">Tell us your destination.</p>
             <div className="space-y-4">
               <div className="space-y-2">
@@ -159,7 +159,7 @@ export default function CreateTrip() {
 
         {step === 2 && (
           <>
-            <h2 className="font-display font-semibold text-xl">When?</h2>
+            <h2 className="font-display font-bold text-lg">When?</h2>
             <p className="text-sm text-muted-foreground mb-5">Choose your travel dates.</p>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
@@ -181,7 +181,7 @@ export default function CreateTrip() {
 
         {step === 3 && (
           <>
-            <h2 className="font-display font-semibold text-xl">Travel style</h2>
+            <h2 className="font-display font-bold text-lg">Travel style</h2>
             <p className="text-sm text-muted-foreground mb-5">How do you like to travel?</p>
             <div className="flex flex-wrap gap-2">
               {TRAVEL_STYLES.map((s) => (
@@ -195,7 +195,7 @@ export default function CreateTrip() {
 
         {step === 4 && (
           <>
-            <h2 className="font-display font-semibold text-xl">What are you looking for?</h2>
+            <h2 className="font-display font-bold text-lg">What are you looking for?</h2>
             <p className="text-sm text-muted-foreground mb-5">Select all that apply.</p>
             <div className="flex flex-wrap gap-2">
               {LOOKING_FOR.map((o) => (
@@ -209,7 +209,7 @@ export default function CreateTrip() {
 
         {step === 5 && (
           <>
-            <h2 className="font-display font-semibold text-xl">Almost done</h2>
+            <h2 className="font-display font-bold text-lg">Almost done</h2>
             <p className="text-sm text-muted-foreground mb-5">Add a note and choose who can see your trip.</p>
 
             <div className="space-y-4">
@@ -254,14 +254,14 @@ export default function CreateTrip() {
                   {data.looking_for.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {data.looking_for.map((o) => (
-                        <span key={o} className="text-[11px] capitalize px-2 py-0.5 rounded-full bg-[#A1846B]/10 text-[#A1846B]">
+                        <span key={o} className="text-xs capitalize px-2 py-0.5 rounded-full bg-[#A1846B]/10 text-[#A1846B]">
                           {o}
                         </span>
                       ))}
                     </div>
                   )}
                   <p className="text-xs mt-2">
-                    <span className={cn("px-2 py-0.5 rounded-full text-[11px] font-medium", data.visibility === "public" ? "bg-success/20 text-success-foreground" : "bg-muted text-muted-foreground")}>
+                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", data.visibility === "public" ? "bg-success/20 text-success-foreground" : "bg-muted text-muted-foreground")}>
                       {data.visibility === "public" ? "Public" : "Hidden"}
                     </span>
                   </p>

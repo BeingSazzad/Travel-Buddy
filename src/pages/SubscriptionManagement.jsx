@@ -82,7 +82,7 @@ export default function SubscriptionManagement() {
     <div className="px-5 pt-12 pb-10">
       <div className="flex items-center gap-3 mb-5">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full border border-border flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
-        <h1 className="font-display font-semibold text-2xl">Subscription</h1>
+        <h1 className="font-display font-bold text-lg">Subscription</h1>
       </div>
 
       {/* Status card */}
@@ -92,7 +92,7 @@ export default function SubscriptionManagement() {
           <span className="text-xs font-semibold uppercase tracking-widest opacity-90">Seluna Plus</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="font-display font-semibold text-2xl">{st.label}</span>
+          <span className="font-display font-bold text-lg">{st.label}</span>
         </div>
         <p className="text-xs opacity-80 mt-1">Members-only community · {plan}</p>
       </div>

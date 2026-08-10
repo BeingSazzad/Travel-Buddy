@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
+import { useAuth } from "@/lib/AuthContext";
 import HomeHeader from "@/components/home/HomeHeader";
 import CategoryGrid from "@/components/home/CategoryGrid";
 import SectionRow from "@/components/home/SectionRow";
@@ -10,9 +11,20 @@ import { SECTIONS } from "@/lib/home-data";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   return (
     <div className="pb-6">
       <HomeHeader />
+
+      {/* Welcome Greeting */}
+      <section className="px-5 mt-3 mb-2">
+        <p className="text-xs text-muted-foreground font-medium">
+          Good evening, {user?.first_name || "traveler"} 👋
+        </p>
+        <h2 className="text-2xl font-display font-semibold mt-0.5 tracking-tight text-foreground">
+          Where are you going next?
+        </h2>
+      </section>
 
       {/* Search */}
       <section className="px-5 mt-4">

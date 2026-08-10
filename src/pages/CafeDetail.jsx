@@ -58,7 +58,7 @@ export default function CafeDetail() {
         {/* Gallery */}
         <div className="relative h-64">
           <Image src={cafe.gallery[0]} alt={cafe.name} fittingType="fill" className="w-full h-full" />
-          <span className="absolute top-3 left-3 text-[11px] px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">{PRICE_LABELS[cafe.price]}</span>
+          <span className="absolute top-3 left-3 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">{PRICE_LABELS[cafe.price]}</span>
         </div>
         <div className="flex gap-2 px-5 -mt-6 relative">
           {cafe.gallery.map((g, i) => (
@@ -69,7 +69,7 @@ export default function CafeDetail() {
         </div>
 
         <div className="px-5 mt-4">
-          <h1 className="font-display font-semibold text-2xl">{cafe.name}</h1>
+          <h1 className="font-display font-bold text-lg">{cafe.name}</h1>
           <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground"><MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {cafe.city}, {cafe.country} · {cafe.distance} km</div>
 
           <div className="flex items-center gap-2 mt-3">

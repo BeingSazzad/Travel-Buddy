@@ -41,11 +41,11 @@ export default function AdminReviews() {
                 <p className="text-sm font-medium truncate">{r.item_title}</p>
                 <span className="flex items-center gap-1 text-xs"><Star className="w-3 h-3 text-amber-500" strokeWidth={1.5} /> {r.rating}</span>
               </div>
-              <p className="text-[11px] text-muted-foreground">{r.author_name} · {r.item_type}</p>
+              <p className="text-xs text-muted-foreground">{r.author_name} · {r.item_type}</p>
               <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{r.text}</p>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-[10px] text-muted-foreground">{new Date(r.created_date).toLocaleString()} · {r.helpful_count || 0} helpful</span>
-                <button onClick={() => remove(r.id)} className="text-[11px] text-destructive flex items-center gap-1">
+                <button onClick={() => remove(r.id)} className="text-xs text-destructive flex items-center gap-1">
                   <Trash2 className="w-3 h-3" strokeWidth={1.5} /> Remove
                 </button>
               </div>

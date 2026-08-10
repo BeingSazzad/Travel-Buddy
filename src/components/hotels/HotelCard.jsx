@@ -36,7 +36,7 @@ export default function HotelCard({ hotel }) {
             <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
           </span>
         </button>
-        <span className="absolute top-2 left-2 text-[11px] px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">€{h.pricePerNight}/night</span>
+        <span className="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">€{h.pricePerNight}/night</span>
       </div>
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">

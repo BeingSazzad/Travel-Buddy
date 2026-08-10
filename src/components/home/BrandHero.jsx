@@ -29,7 +29,7 @@ export default function BrandHero() {
         <span className="h-px flex-1 bg-[#A1846B]/30" />
       </div>
 
-      <p className="font-body text-[11px] tracking-[0.25em] uppercase text-[#A1846B] mt-3">
+      <p className="font-body text-xs tracking-[0.25em] uppercase text-[#A1846B] mt-3">
         Travel. Connect. Empower.
       </p>
     </div>

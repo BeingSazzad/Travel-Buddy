@@ -87,7 +87,7 @@ export default function Search() {
         >
           <SlidersHorizontal className="w-4 h-4" strokeWidth={1.5} />
           {activeCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#A1846B] text-white text-[9px] font-medium flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#A1846B] text-white text-[10px] font-medium flex items-center justify-center">
               {activeCount}
             </span>
           )}

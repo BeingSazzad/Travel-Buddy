@@ -1,7 +1,9 @@
+import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import SplashScreen from "@/components/common/SplashScreen";
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -110,7 +112,7 @@ const AuthenticatedApp = () => {
   // Access control: only verified, terms-accepted, active-subscription users may use the app
   const GRANTED_SUBSCRIPTIONS = ['active', 'cancelled_active'];
   const isAdmin = user?.role === 'admin';
-  const accountVerified = !!user?.is_email_verified;
+  const accountVerified = !!user?.is_email_verified || !!user?.is_verified;
   const termsAccepted = !!user?.accepted_terms_at;
   const subscriptionOk = GRANTED_SUBSCRIPTIONS.includes(user?.subscription_status);
   const bypassPayment = isAdmin || !!user?.is_test_user;
@@ -130,7 +132,7 @@ const AuthenticatedApp = () => {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center px-6 text-center gap-3 bg-background">
         <ShieldAlert className="w-9 h-9 text-muted-foreground" strokeWidth={1.5} />
-        <p className="font-display font-semibold text-xl">Access restricted</p>
+        <p className="font-display font-bold text-lg">Access restricted</p>
         <p className="text-sm text-muted-foreground max-w-xs">Seluna is only available to users aged 18 or older.</p>
         <button onClick={() => base44.auth.logout()} className="mt-2 text-sm text-[#A1846B] underline">Log out</button>
       </div>
@@ -172,7 +174,7 @@ const AuthenticatedApp = () => {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center px-6 text-center gap-3 bg-background">
         <ShieldAlert className="w-9 h-9 text-muted-foreground" strokeWidth={1.5} />
-        <p className="font-display font-semibold text-xl capitalize">Account {user.account_status}</p>
+        <p className="font-display font-bold text-lg capitalize">Account {user.account_status}</p>
         <p className="text-sm text-muted-foreground max-w-xs">
           Your Seluna account has been {user.account_status}. If you believe this is a mistake, please contact Seluna support.
         </p>
@@ -242,17 +244,30 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <ScrollToTop />
-          <SavedProvider>
-            <AuthenticatedApp />
-          </SavedProvider>
-        </Router>
+        {showSplash && <SplashScreen />}
+        <div className="min-h-screen bg-[#F5F3F0] dark:bg-[#121111] flex justify-center">
+          <div className="w-full max-w-md bg-background flex flex-col min-h-screen shadow-2xl relative border-x border-border/5 overflow-hidden">
+            <Router>
+              <ScrollToTop />
+              <SavedProvider>
+                <AuthenticatedApp />
+              </SavedProvider>
+            </Router>
+          </div>
+        </div>
         <Toaster />
       </QueryClientProvider>
     </AuthProvider>

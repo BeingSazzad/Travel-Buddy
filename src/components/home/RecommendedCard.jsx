@@ -9,7 +9,7 @@ export default function RecommendedCard() {
           alt="Friends together"
           className="w-full h-full object-cover"
         />
-        <span className="absolute top-3 right-3 text-[11px] font-medium bg-white/90 backdrop-blur text-foreground px-2.5 py-1 rounded-full">
+        <span className="absolute top-3 right-3 text-xs font-medium bg-white/90 backdrop-blur text-foreground px-2.5 py-1 rounded-full">
           Featured
         </span>
       </div>

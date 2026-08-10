@@ -1,6 +1,6 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.38';
 import Stripe from 'npm:stripe@14.25.0';
 import { buildSubscriptionUpdate } from '../../shared/stripe-subscription.ts';
+import { createBase44ClientFromRequest } from '../../shared/base44-request-client.ts';
 
 async function syncSubscription(base44, subscription) {
   const userId = subscription?.metadata?.user_id;
@@ -14,7 +14,6 @@ async function syncSubscription(base44, subscription) {
 
 Deno.serve(async (req) => {
   try {
-    const base44 = createClientFromRequest(req);
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
     const signature = req.headers.get('stripe-signature');
@@ -32,15 +31,28 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
+    const metadataAppId =
+      event?.data?.object?.metadata?.base44_app_id ||
+      event?.data?.object?.subscription_data?.metadata?.base44_app_id;
+    const base44 = createBase44ClientFromRequest(req, metadataAppId);
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       const userId = session?.metadata?.user_id;
       const plan = session?.metadata?.plan;
       if (userId) {
-        await base44.asServiceRole.entities.User.update(userId, {
+        let update = {
           subscription_status: 'active',
-          subscription_plan: plan,
-        });
+          subscription_plan: plan || null,
+        };
+        if (session.subscription) {
+          const sub = await stripe.subscriptions.retrieve(String(session.subscription));
+          update = buildSubscriptionUpdate(sub);
+          if (!update.subscription_plan && plan) {
+            update.subscription_plan = plan;
+          }
+        }
+        await base44.asServiceRole.entities.User.update(userId, update);
       } else {
         console.error('stripe-webhook: no user_id in session metadata');
       }

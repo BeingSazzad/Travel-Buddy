@@ -50,7 +50,7 @@ export default function MessageBubble({ message, mine, showTime, showSeen, selec
             <div className="p-3">
               <div className="flex items-center gap-1.5 text-[#A1846B]">
                 <meta.icon className="w-3.5 h-3.5" strokeWidth={1.5} />
-                <span className="text-[11px] font-medium uppercase tracking-wide">{meta.label}</span>
+                <span className="text-xs font-medium uppercase tracking-wide">{meta.label}</span>
               </div>
               <p className="font-display font-semibold text-sm mt-1">{message.content_data?.title}</p>
               {message.content_data?.location && <p className="text-xs text-muted-foreground">{message.content_data.location}</p>}
@@ -59,7 +59,7 @@ export default function MessageBubble({ message, mine, showTime, showSeen, selec
                 <p className="text-xs text-muted-foreground">{message.content_data.subtitle}</p>
               )}
               {message.content_type === "meeting" && (
-                <p className="text-[11px] text-muted-foreground mt-1 italic">Approximate area — no exact address shared</p>
+                <p className="text-xs text-muted-foreground mt-1 italic">Approximate area — no exact address shared</p>
               )}
             </div>
           </div>
@@ -73,7 +73,7 @@ export default function MessageBubble({ message, mine, showTime, showSeen, selec
         {mine && selected && (
           <button
             onClick={(e) => { e.stopPropagation(); onDelete?.(message); }}
-            className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive"
+            className="mt-1 flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive"
           >
             <Trash2 className="w-3 h-3" strokeWidth={1.5} /> Delete
           </button>

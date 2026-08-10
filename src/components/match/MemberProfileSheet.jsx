@@ -9,7 +9,7 @@ function ChipRow({ label, items, tone }) {
   if (!items?.length) return null;
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{label}</p>
+      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">{label}</p>
       <div className="flex flex-wrap gap-1.5">
         {items.map((it) => (
           <span
@@ -107,7 +107,7 @@ export default function MemberProfileSheet({ open, data, loading, matchId, onClo
 
                 {data.trips?.length > 0 && (
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">Upcoming trips</p>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Upcoming trips</p>
                     <div className="space-y-2">
                       {data.trips.map((t) => (
                         <div key={t.id} className="rounded-2xl bg-[#A1846B]/5 p-3">
