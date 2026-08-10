@@ -20,6 +20,28 @@ export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const handleSeeAll = (title) => {
+    if (title.includes("Recommended")) navigate("/destinations");
+    else if (title.includes("Trending")) navigate("/destinations");
+    else if (title.includes("Popular events")) navigate("/events");
+    else if (title.includes("Women travelling")) navigate("/discover");
+    else if (title.includes("Exclusive deals")) navigate("/deals");
+    else if (title.includes("reviewed places")) navigate("/cafes");
+    else navigate("/search");
+  };
+
+  const handleCardClick = (item) => {
+    if (item.type === "destination") navigate(`/destinations/${encodeURIComponent(item.location || item.title)}`);
+    else if (item.type === "event") navigate("/events");
+    else if (item.type === "trip") navigate("/trips");
+    else if (item.type === "member") navigate("/discover");
+    else if (item.type === "cafe") navigate(`/cafes/${encodeURIComponent(item.title)}`);
+    else if (item.type === "hotel") navigate(`/hotels/${encodeURIComponent(item.title)}`);
+    else if (item.type === "restaurant") navigate(`/restaurants/${encodeURIComponent(item.title)}`);
+    else if (item.type === "deal") navigate("/deals");
+    else navigate("/search");
+  };
+
   return (
     <div className="pb-6">
       <HomeHeader />
@@ -38,7 +60,7 @@ export default function Home() {
       <section className="px-5 mt-4">
         <button
           onClick={() => navigate("/search")}
-          className="w-full flex items-center gap-2 bg-card border border-border rounded-2xl px-4 py-3 shadow-soft text-left active:scale-[0.99] transition-transform"
+          className="w-full flex items-center gap-2 bg-card border border-border/80 rounded-2xl px-4 py-3 shadow-soft text-left active:scale-[0.99] transition-transform"
         >
           <Search className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
           <span className="flex-1 text-sm text-muted-foreground">Search destinations, events, members…</span>
@@ -60,7 +82,8 @@ export default function Home() {
           key={s.title}
           title={s.title}
           items={s.items}
-          renderCard={(item) => <ContentCard item={item} />}
+          onSeeAll={() => handleSeeAll(s.title)}
+          renderCard={(item) => <ContentCard item={item} onClick={() => handleCardClick(item)} />}
         />
       ))}
     </div>

@@ -81,7 +81,7 @@ export default function ProfileSetup() {
   useEffect(() => {
     if (!user) return;
     setProfileName(user.profile_name || user.full_name || user.first_name || "");
-    setDob(user.date_of_birth || "");
+    setDob((user.date_of_birth || "").slice(0, 10));
     setCity(user.current_city || "");
     setCountry(user.country || "");
     setNationality(user.nationality || "");

@@ -1,30 +1,46 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { MapPin, Star } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import SaveButton from "@/components/common/SaveButton";
 
 export default function ResultRow({ item }) {
+  const navigate = useNavigate();
   const isMember = item.type === "member";
 
+  const handleClick = () => {
+    if (item.type === "cafe") navigate(`/cafes/${encodeURIComponent(item.title)}`);
+    else if (item.type === "restaurant") navigate(`/restaurants/${encodeURIComponent(item.title)}`);
+    else if (item.type === "hotel") navigate(`/hotels/${encodeURIComponent(item.title)}`);
+    else if (item.type === "destination") navigate(`/destinations/${encodeURIComponent(item.title)}`);
+    else if (item.type === "event") navigate("/events");
+    else if (item.type === "member") navigate("/discover");
+    else if (item.type === "deal") navigate("/deals");
+    else navigate("/search");
+  };
+
   return (
-    <div className="w-full flex items-center gap-3 p-2.5 rounded-2xl hover:bg-card text-left active:scale-[0.99] transition">
+    <div
+      onClick={handleClick}
+      className="w-full flex items-center gap-3 p-2.5 rounded-2xl hover:bg-card text-left active:scale-[0.99] transition cursor-pointer"
+    >
       <div className={cn("shrink-0 overflow-hidden border border-border", isMember ? "w-12 h-12 rounded-full" : "w-14 h-14 rounded-xl")}>
-        <Image src={item.image} alt={item.title} fittingType="fill" className="w-full h-full" />
+        <Image src={item.image} alt={item.title} fittingType="fill" className="w-full h-full object-cover" />
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-display font-semibold text-sm text-foreground truncate">{item.title}</h3>
           {item.rating != null && (
-            <span className="flex items-center gap-0.5 text-xs text-foreground shrink-0">
+            <span className="flex items-center gap-0.5 text-xs text-foreground shrink-0 font-medium">
               <Star className="w-3 h-3 fill-[#A1846B] text-[#A1846B]" />
               {item.rating}
             </span>
           )}
         </div>
         <div className="flex items-center gap-1 mt-0.5 text-xs text-muted-foreground">
-          <MapPin className="w-3 h-3 shrink-0" strokeWidth={1.5} />
+          <MapPin className="w-3 h-3 shrink-0 text-[#A1846B]" strokeWidth={1.5} />
           <span className="truncate">
             {item.location}
             {item.country && item.country !== item.location ? `, ${item.country}` : ""}
@@ -38,7 +54,9 @@ export default function ResultRow({ item }) {
       </div>
 
       {!isMember && (
-        <SaveButton item={item} className="shrink-0 bg-background border border-border" />
+        <div onClick={(e) => e.stopPropagation()}>
+          <SaveButton item={item} className="shrink-0 bg-background border border-border" />
+        </div>
       )}
     </div>
   );
