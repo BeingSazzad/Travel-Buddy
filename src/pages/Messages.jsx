@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, MessageCircle } from "lucide-react";
+import { Search, MessageCircle, Sparkles } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import ConversationRow from "@/components/messages/ConversationRow";
@@ -135,7 +135,8 @@ export default function Messages() {
       <h1 className="font-display font-bold text-lg mb-1">Messages</h1>
       <p className="text-sm text-muted-foreground mb-4">Chat with your travel friends</p>
 
-      <div className="flex items-center gap-2 bg-card border border-border shadow-soft rounded-2xl px-4 py-3 mb-4">
+      {/* Search */}
+      <div className="flex items-center gap-2 bg-card border border-border/80 shadow-soft rounded-2xl px-4 py-3 mb-4">
         <Search className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
         <input
           value={query}
@@ -144,6 +145,38 @@ export default function Messages() {
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
         />
       </div>
+
+      {/* Recent Matches Horizontal Strip */}
+      {!loading && rows.length > 0 && !query && (
+        <div className="mb-5">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 px-0.5">
+            Your Matches
+          </p>
+          <div className="flex gap-3.5 overflow-x-auto no-scrollbar -mx-5 px-5 py-1">
+            {rows.map((r) => (
+              <button
+                key={r.id}
+                onClick={() => navigate(`/conversations/${r.id}`)}
+                className="flex flex-col items-center gap-1.5 shrink-0 active:scale-95 transition"
+              >
+                <div className="relative">
+                  <img
+                    src={r.avatar}
+                    alt={r.name}
+                    className="w-14 h-14 rounded-full object-cover border-2 border-[#A1846B] shadow-soft"
+                  />
+                  {r.unread > 0 && (
+                    <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#A1846B] ring-2 ring-card rounded-full" />
+                  )}
+                </div>
+                <span className="text-xs font-medium text-foreground truncate max-w-[64px]">
+                  {r.name.split(" ")[0]}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <p className="text-sm text-muted-foreground py-10 text-center">Loading…</p>
@@ -159,7 +192,10 @@ export default function Messages() {
           onAction={() => navigate("/discover")}
         />
       ) : (
-        <div>
+        <div className="space-y-1">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 px-0.5">
+            Chats
+          </p>
           {rows.map((r) => (
             <ConversationRow
               key={r.id}

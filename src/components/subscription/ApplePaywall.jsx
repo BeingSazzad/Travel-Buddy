@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Moon, Check, Loader2, RotateCcw, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +55,7 @@ export default function ApplePaywall({
   onTerms,
   onPrivacy,
 }) {
+  const navigate = useNavigate();
   const [selected, setSelected] = useState(defaultProductId);
   const [notice, setNotice] = useState("");
 
@@ -187,7 +189,7 @@ export default function ApplePaywall({
           <div className="flex items-center justify-center gap-4 mt-4 text-xs">
             <button
               type="button"
-              onClick={onTerms}
+              onClick={onTerms || (() => navigate("/terms"))}
               className="text-[#A1846B] underline-offset-2 hover:underline"
             >
               Terms of Use
@@ -195,7 +197,7 @@ export default function ApplePaywall({
             <span className="w-px h-3 bg-border" />
             <button
               type="button"
-              onClick={onPrivacy}
+              onClick={onPrivacy || (() => navigate("/privacy"))}
               className="text-[#A1846B] underline-offset-2 hover:underline"
             >
               Privacy Policy

@@ -63,6 +63,9 @@ import AdminSafetyTips from '@/pages/admin/AdminSafetyTips';
 import AdminFeatured from '@/pages/admin/AdminFeatured';
 import ContentManagement from '@/pages/admin/ContentManagement';
 import CommunityGuidelines from '@/pages/CommunityGuidelines';
+import Terms from '@/pages/Terms';
+import PrivacyPolicy from '@/pages/PrivacyPolicy';
+import HelpSupport from '@/pages/HelpSupport';
 import { ShieldAlert } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import PageTransition from "@/components/PageTransition";
@@ -104,6 +107,10 @@ const AuthenticatedApp = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/help" element={<HelpSupport />} />
+        <Route path="/community-guidelines" element={<CommunityGuidelines />} />
         <Route path="*" element={<Navigate to="/welcome" replace />} />
       </Routes>
     );
@@ -203,14 +210,15 @@ const AuthenticatedApp = () => {
         <Route path="/messages" element={<Messages />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/help" element={<HelpSupport />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/cafes" element={<Cafes />} />
         <Route path="/restaurants" element={<Restaurants />} />
         <Route path="/hotels" element={<Hotels />} />
         <Route path="/destinations" element={<Destinations />} />
-        <Route path="/reviews" element={<Category category="Reviews" />} />
-        <Route path="/deals" element={<Deals />} />
         <Route path="/subscription-management" element={<SubscriptionManagement />} />
       </Route>
       <Route element={<AdminLayout />}>

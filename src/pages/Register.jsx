@@ -43,13 +43,13 @@ function getAge(dob) {
   return age;
 }
 
-function ConsentRow({ id, checked, onCheck, text, linkLabel }) {
+function ConsentRow({ id, checked, onCheck, text, linkLabel, to }) {
   return (
     <div className="flex items-start gap-3">
       <Checkbox id={id} checked={checked} onCheckedChange={onCheck} className="mt-0.5" />
       <Label htmlFor={id} className="text-xs font-normal text-muted-foreground leading-snug cursor-pointer">
         {text}{" "}
-        <a href="#" className="text-primary font-medium hover:underline">{linkLabel}</a>
+        <Link to={to} className="text-primary font-medium hover:underline">{linkLabel}</Link>
       </Label>
     </div>
   );
@@ -362,9 +362,9 @@ export default function Register() {
               I confirm that I am at least 18 years old and that the information I provide is accurate.
             </Label>
           </div>
-          <ConsentRow id="terms" checked={acceptTerms} onCheck={setAcceptTerms} text="I agree to the" linkLabel="Terms and Conditions" />
-          <ConsentRow id="privacy" checked={acceptPrivacy} onCheck={setAcceptPrivacy} text="I agree to the" linkLabel="Privacy Policy" />
-          <ConsentRow id="community" checked={acceptCommunity} onCheck={setAcceptCommunity} text="I agree to the" linkLabel="Community Guidelines" />
+          <ConsentRow id="terms" checked={acceptTerms} onCheck={setAcceptTerms} text="I agree to the" linkLabel="Terms and Conditions" to="/terms" />
+          <ConsentRow id="privacy" checked={acceptPrivacy} onCheck={setAcceptPrivacy} text="I agree to the" linkLabel="Privacy Policy" to="/privacy" />
+          <ConsentRow id="community" checked={acceptCommunity} onCheck={setAcceptCommunity} text="I agree to the" linkLabel="Community Guidelines" to="/community-guidelines" />
         </div>
 
         <Button type="submit" variant="primary" className="w-full" disabled={loading}>

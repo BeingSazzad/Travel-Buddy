@@ -7,10 +7,6 @@ export const CATEGORIES = [
   { label: "Restaurants", icon: UtensilsCrossed, to: "/restaurants" },
   { label: "Hotels", icon: Building2, to: "/hotels" },
   { label: "Destinations", icon: Compass, to: "/destinations" },
-  { label: "Events", icon: CalendarHeart, to: "/events" },
-  { label: "Travel Friends", icon: Users, to: "/friends" },
-  { label: "Reviews", icon: Star, to: "/reviews" },
-  { label: "Deals", icon: Tag, to: "/deals" },
 ];
 
 const img = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=600&q=80`;

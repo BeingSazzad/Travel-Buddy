@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Moon, Loader2, LogOut, ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { Moon, Loader2, LogOut, ArrowRight, ArrowLeft, Check, Save } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import {
   COUNTRIES, LANGUAGES, INTERESTS, TRAVEL_STYLES,
@@ -19,6 +20,7 @@ import PhotoManager from "@/components/profile/PhotoManager";
 import VerificationCard from "@/components/profile/VerificationCard";
 
 function getAge(dob) {
+  if (!dob) return null;
   const today = new Date();
   const birth = new Date(dob);
   let age = today.getFullYear() - birth.getFullYear();
@@ -29,10 +31,10 @@ function getAge(dob) {
 
 function ToggleRow({ id, label, description, checked, onCheck }) {
   return (
-    <div className="flex items-start justify-between gap-4 py-3 border-b border-border last:border-0">
+    <div className="flex items-start justify-between gap-4 py-3 border-b border-border/80 last:border-0">
       <div className="flex-1">
-        <Label htmlFor={id} className="text-sm font-medium">{label}</Label>
-        {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
+        <Label htmlFor={id} className="text-xs font-medium text-foreground">{label}</Label>
+        {description && <p className="text-[11px] text-muted-foreground mt-0.5">{description}</p>}
       </div>
       <Switch id={id} checked={checked} onCheckedChange={onCheck} />
     </div>
@@ -48,7 +50,10 @@ const LOCATION_OPTIONS = [
 const STEPS = ["About you", "Your travel", "Privacy", "Photos"];
 
 export default function ProfileSetup() {
-  const { logout } = useAuth();
+  const { user, logout, checkUserAuth } = useAuth();
+  const navigate = useNavigate();
+  const isEditMode = !!user?.profile_completed;
+
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -72,7 +77,46 @@ export default function ProfileSetup() {
   const [allowNotifications, setAllowNotifications] = useState(true);
   const [ageConfirm, setAgeConfirm] = useState(false);
 
+  // Pre-populate when user data is available
+  useEffect(() => {
+    if (!user) return;
+    setProfileName(user.profile_name || user.full_name || user.first_name || "");
+    setDob(user.date_of_birth || "");
+    setCity(user.current_city || "");
+    setCountry(user.country || "");
+    setNationality(user.nationality || "");
+    setLanguages(user.languages_spoken || []);
+    setBio(user.biography || "");
+    setTravelStyle(user.travel_style || []);
+    setInterests(user.interests || []);
+    setPhotos(user.profile_photos || []);
+    setMainPhoto(user.main_photo || null);
+    setLocationVisibility(user.location_visibility || "approximate");
+    setShowAge(user.show_age !== false);
+    setShowUpcomingTrips(user.show_upcoming_trips !== false);
+    setAllowMatches(user.allow_match_suggestions !== false);
+    setAllowInvitations(user.allow_event_invitations !== false);
+    setAllowNotifications(user.allow_notifications !== false);
+    setAgeConfirm(!!user.date_of_birth);
+  }, [user]);
+
   const age = dob ? getAge(dob) : null;
+
+  const validateAll = () => {
+    if (!profileName.trim()) return "Enter your profile name";
+    if (!dob) return "Enter your date of birth";
+    if (age < 18) return "Seluna is only available to users aged 18 or older.";
+    if (!ageConfirm) return "Please confirm that you are at least 18 years old";
+    if (!city.trim()) return "Enter your current city";
+    if (!country) return "Select your country";
+    if (!nationality) return "Select your nationality";
+    if (languages.length === 0) return "Select at least one language";
+    if (!bio.trim()) return "Write a short biography";
+    if (travelStyle.length === 0) return "Select at least one travel style";
+    if (interests.length === 0) return "Select at least one interest";
+    if (photos.length < 2) return "Upload at least 2 photos";
+    return null;
+  };
 
   const goNext = () => {
     setError("");
@@ -96,9 +140,14 @@ export default function ProfileSetup() {
     }
   };
 
-  const complete = async () => {
+  const saveProfile = async () => {
     setError("");
-    if (photos.length < 2) return setError("Upload at least 2 photos");
+    const validationError = validateAll();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     const finalMain = mainPhoto || photos[0];
     setSaving(true);
     try {
@@ -126,7 +175,8 @@ export default function ProfileSetup() {
       } catch (apiErr) {
         console.warn("API updateMe failed during profile setup, bypassing for frontend preview", apiErr);
       }
-      window.location.href = "/";
+      await checkUserAuth();
+      navigate("/profile");
     } catch (err) {
       setError(err?.message || "Could not save your profile");
     } finally {
@@ -134,13 +184,195 @@ export default function ProfileSetup() {
     }
   };
 
+  /* ─────────────────────────────────────────────────────────────
+     EDIT MODE: Clean Single-Page Form (No 1-2-3-4 Stepper!)
+   ───────────────────────────────────────────────────────────── */
+  if (isEditMode) {
+    return (
+      <div className="min-h-screen bg-background pb-12">
+        <header className="sticky top-0 z-20 px-4 pt-10 pb-3 flex items-center justify-between bg-background/90 backdrop-blur border-b border-border">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition border border-border bg-card"
+            >
+              <ArrowLeft className="w-5 h-5 text-foreground" strokeWidth={1.75} />
+            </button>
+            <h1 className="font-display font-bold text-lg">Edit Profile</h1>
+          </div>
+          <Button
+            onClick={saveProfile}
+            disabled={saving}
+            variant="primary"
+            size="sm"
+            className="rounded-full px-4 h-9"
+          >
+            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5 mr-1" />}
+            Save
+          </Button>
+        </header>
+
+        <div className="max-w-md mx-auto px-5 py-6 space-y-6">
+          {error && (
+            <div className="p-3 rounded-2xl bg-destructive/10 text-destructive text-xs font-medium leading-relaxed">
+              {error}
+            </div>
+          )}
+
+          {/* Section 1: Photos */}
+          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-3">
+            <h2 className="font-display font-semibold text-sm text-foreground">Photos</h2>
+            <PhotoManager
+              photos={photos}
+              mainPhoto={mainPhoto}
+              onChange={({ photos, mainPhoto }) => { setPhotos(photos); setMainPhoto(mainPhoto); }}
+            />
+          </div>
+
+          {/* Section 2: Personal Details */}
+          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-4">
+            <h2 className="font-display font-semibold text-sm text-foreground">Personal Details</h2>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="profileName" className="text-xs font-medium">Profile name</Label>
+              <Input
+                id="profileName"
+                value={profileName}
+                onChange={(e) => setProfileName(e.target.value)}
+                className="h-11 rounded-2xl border-border/80"
+                placeholder="How others will see you"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="dob" className="text-xs font-medium">
+                Date of birth{age !== null && age >= 0 ? ` · ${age} years old` : ""}
+              </Label>
+              <Input
+                id="dob"
+                type="date"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                className="h-11 rounded-2xl border-border/80"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="city" className="text-xs font-medium">Current city</Label>
+              <Input
+                id="city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="h-11 rounded-2xl border-border/80"
+                placeholder="Where you live now"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">Country</Label>
+                <Select value={country} onValueChange={setCountry}>
+                  <SelectTrigger className="h-11 rounded-2xl border-border/80"><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>
+                    {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">Nationality</Label>
+                <Select value={nationality} onValueChange={setNationality}>
+                  <SelectTrigger className="h-11 rounded-2xl border-border/80"><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>
+                    {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Languages spoken</Label>
+              <InterestPicker options={LANGUAGES} selected={languages} onToggle={setLanguages} />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="bio" className="text-xs font-medium">Biography</Label>
+              <Textarea
+                id="bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                rows={3}
+                className="rounded-2xl border-border/80 text-xs"
+                placeholder="Tell the community a little about yourself..."
+              />
+            </div>
+          </div>
+
+          {/* Section 3: Travel & Interests */}
+          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-4">
+            <h2 className="font-display font-semibold text-sm text-foreground">Travel Style & Interests</h2>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Travel style</Label>
+              <InterestPicker options={TRAVEL_STYLES} selected={travelStyle} onToggle={setTravelStyle} />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Interests</Label>
+              <InterestPicker options={INTERESTS} selected={interests} onToggle={setInterests} />
+            </div>
+          </div>
+
+          {/* Section 4: Privacy & Preferences */}
+          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-4">
+            <h2 className="font-display font-semibold text-sm text-foreground">Privacy & Preferences</h2>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Location visibility</Label>
+              <RadioGroup value={locationVisibility} onValueChange={setLocationVisibility} className="gap-2">
+                {LOCATION_OPTIONS.map((o) => (
+                  <label
+                    key={o.value}
+                    className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition ${locationVisibility === o.value ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border/80"}`}
+                  >
+                    <RadioGroupItem value={o.value} />
+                    <span className="text-xs">{o.label}</span>
+                  </label>
+                ))}
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-1 pt-2 border-t border-border/60">
+              <ToggleRow id="showAge" label="Show my age" description="Display your age on your profile" checked={showAge} onCheck={setShowAge} />
+              <ToggleRow id="showTrips" label="Show upcoming trips" description="Let others see your planned trips" checked={showUpcomingTrips} onCheck={setShowUpcomingTrips} />
+              <ToggleRow id="matches" label="Allow match suggestions" description="Receive suggested travel companions" checked={allowMatches} onCheck={setAllowMatches} />
+              <ToggleRow id="invitations" label="Allow event invitations" description="Other members can invite you to events" checked={allowInvitations} onCheck={setAllowInvitations} />
+              <ToggleRow id="notifications" label="Allow notifications" description="Receive app notifications" checked={allowNotifications} onCheck={setAllowNotifications} />
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <Button onClick={saveProfile} disabled={saving} variant="primary" className="w-full">
+            {saving ? (
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving profile...</>
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     FIRST-TIME ONBOARDING SETUP MODE: 4-Step Guided Stepper
+   ───────────────────────────────────────────────────────────── */
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto px-5 py-8">
-        {/* Header */}
+        {/* Brand Header */}
         <div className="flex flex-col items-center mb-6">
           <Moon className="w-6 h-6 text-[#A1846B] mb-1" strokeWidth={1.5} />
-          <h1 className="font-display font-semibold text-3xl tracking-[0.08em] text-[#A1846B]">SELUNA</h1>
+          <h1 className="font-display font-semibold text-2xl tracking-[0.08em] text-[#A1846B]">SELUNA</h1>
         </div>
 
         {/* Stepper */}
@@ -177,12 +409,12 @@ export default function ProfileSetup() {
             <div className="space-y-4 mt-4">
               <div className="space-y-2">
                 <Label htmlFor="profileName">Profile name</Label>
-                <Input id="profileName" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="h-11" placeholder="How others will see you" />
+                <Input id="profileName" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="h-11 rounded-2xl" placeholder="How others will see you" />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="dob">Date of birth{age !== null && age >= 0 ? ` · ${age} years old` : ""}</Label>
-                <Input id="dob" type="date" value={dob} onChange={(e) => setDob(e.target.value)} className="h-11" />
+                <Input id="dob" type="date" value={dob} onChange={(e) => setDob(e.target.value)} className="h-11 rounded-2xl" />
               </div>
 
               <label className="flex items-start gap-3 cursor-pointer">
@@ -192,14 +424,14 @@ export default function ProfileSetup() {
 
               <div className="space-y-2">
                 <Label htmlFor="city">Current city</Label>
-                <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} className="h-11" placeholder="Where you live now" />
+                <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} className="h-11 rounded-2xl" placeholder="Where you live now" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>Country</Label>
                   <Select value={country} onValueChange={setCountry}>
-                    <SelectTrigger className="h-11"><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectTrigger className="h-11 rounded-2xl"><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent>
                       {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
@@ -208,7 +440,7 @@ export default function ProfileSetup() {
                 <div className="space-y-2">
                   <Label>Nationality</Label>
                   <Select value={nationality} onValueChange={setNationality}>
-                    <SelectTrigger className="h-11"><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectTrigger className="h-11 rounded-2xl"><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent>
                       {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
@@ -223,7 +455,7 @@ export default function ProfileSetup() {
 
               <div className="space-y-2">
                 <Label htmlFor="bio">Short biography</Label>
-                <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} placeholder="Tell the community a little about yourself..." />
+                <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} className="rounded-2xl" placeholder="Tell the community a little about yourself..." />
               </div>
             </div>
           )}
@@ -249,14 +481,14 @@ export default function ProfileSetup() {
                   {LOCATION_OPTIONS.map((o) => (
                     <label
                       key={o.value}
-                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${locationVisibility === o.value ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border"}`}
+                      className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition ${locationVisibility === o.value ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border"}`}
                     >
                       <RadioGroupItem value={o.value} />
-                      <span className="text-sm">{o.label}</span>
+                      <span className="text-xs">{o.label}</span>
                     </label>
                   ))}
                 </RadioGroup>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-[11px] text-muted-foreground mt-1">
                   Location is only used for destination matching, nearby events and relevant recommendations. Your exact home address is never shown.
                 </p>
               </div>
@@ -283,22 +515,22 @@ export default function ProfileSetup() {
           )}
 
           {error && (
-            <div className="mt-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">{error}</div>
+            <div className="mt-4 p-3 rounded-2xl bg-destructive/10 text-destructive text-xs font-medium leading-relaxed">{error}</div>
           )}
 
-          {/* Nav */}
+          {/* Stepper Nav */}
           <div className="flex items-center gap-3 mt-6">
             {step > 0 && (
-              <Button variant="outline" className="h-11" onClick={() => { setError(""); setStep(step - 1); }} disabled={saving}>
+              <Button variant="outline" size="md" onClick={() => { setError(""); setStep(step - 1); }} disabled={saving}>
                 <ArrowLeft className="w-4 h-4" /> Back
               </Button>
             )}
             {step < 3 ? (
-              <Button className="h-11 flex-1" onClick={goNext}>
+              <Button variant="primary" className="flex-1" onClick={goNext}>
                 Continue <ArrowRight className="w-4 h-4" />
               </Button>
             ) : (
-              <Button className="h-11 flex-1" onClick={complete} disabled={saving}>
+              <Button variant="primary" className="flex-1" onClick={saveProfile} disabled={saving}>
                 {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                 {saving ? "Saving..." : "Complete profile"}
               </Button>
@@ -308,7 +540,7 @@ export default function ProfileSetup() {
 
         <button
           onClick={() => logout()}
-          className="w-full text-center text-sm text-muted-foreground mt-6 hover:text-foreground"
+          className="w-full text-center text-xs text-muted-foreground mt-6 hover:text-foreground"
         >
           <LogOut className="w-3.5 h-3.5 inline mr-1.5" />Log out
         </button>
