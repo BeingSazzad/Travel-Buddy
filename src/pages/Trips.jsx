@@ -56,10 +56,10 @@ export default function Trips() {
       </div>
 
       <Tabs defaultValue="my">
-        <TabsList className="grid grid-cols-3 w-full">
-          <TabsTrigger value="my">My Trips</TabsTrigger>
-          <TabsTrigger value="discover">Discover</TabsTrigger>
-          <TabsTrigger value="nearby">Women Nearby</TabsTrigger>
+        <TabsList className="grid grid-cols-3 w-full bg-muted/60 p-1 rounded-2xl">
+          <TabsTrigger value="my" className="rounded-xl text-xs font-semibold">My Trips</TabsTrigger>
+          <TabsTrigger value="discover" className="rounded-xl text-xs font-semibold">Discover</TabsTrigger>
+          <TabsTrigger value="nearby" className="rounded-xl text-xs font-semibold">Women Nearby</TabsTrigger>
         </TabsList>
 
         {/* My Trips */}

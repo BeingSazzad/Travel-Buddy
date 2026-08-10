@@ -219,6 +219,8 @@ const AuthenticatedApp = () => {
         <Route path="/restaurants" element={<Restaurants />} />
         <Route path="/hotels" element={<Hotels />} />
         <Route path="/destinations" element={<Destinations />} />
+        <Route path="/reviews" element={<Category category="Reviews" />} />
+        <Route path="/deals" element={<Deals />} />
         <Route path="/subscription-management" element={<SubscriptionManagement />} />
       </Route>
       <Route element={<AdminLayout />}>
