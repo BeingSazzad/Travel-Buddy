@@ -108,10 +108,10 @@ export const HOTEL_TAG_FILTERS = [
   { key: "gym", label: "Gym" },
   { key: "spa", label: "Spa" },
   { key: "breakfast", label: "Breakfast" },
-  { key: "beach", label: "Beach access" },
-  { key: "cityCenter", label: "City center" },
-  { key: "solo", label: "Solo-friendly" },
-  { key: "womenReviews", label: "Women-friendly reviews" },
+  { key: "beach", label: "Beach access", shortLabel: "Beach" },
+  { key: "cityCenter", label: "City center", shortLabel: "City center" },
+  { key: "solo", label: "Solo-friendly", shortLabel: "Solo" },
+  { key: "womenReviews", label: "Women-friendly reviews", shortLabel: "Women reviews" },
 ];
 
 export const STAR_OPTIONS = [1, 2, 3, 4, 5];

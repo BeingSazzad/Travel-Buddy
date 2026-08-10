@@ -87,6 +87,16 @@ img { -webkit-user-drag: none; }
   .card-press:hover { transform: translateY(-2px); box-shadow: 0 12px 36px -10px rgba(78,64,56,.14); }
 }
 /* Unified brand gradients — full bleed end-to-end */
+.gradient-overlay-card {
+  @apply absolute inset-x-0 bottom-0 pointer-events-none z-10;
+  height: 55%;
+  background: linear-gradient(
+    to top,
+    hsl(0 0% 0% / 0.9) 0%,
+    hsl(0 0% 0% / 0.62) 42%,
+    transparent 100%
+  );
+}
 .gradient-overlay {
   @apply absolute inset-0 pointer-events-none z-10;
   background: linear-gradient(
@@ -364,7 +374,14 @@ img { -webkit-user-drag: none; }
   }
 }
 
-/* ─── App shell: 430px column, 20px gutters → 390px content ─ */
+/* App scroll region — single vertical scroll inside mobile shell */
+.app-scroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
 @layer components {
   .app-shell {
     @apply w-full max-w-app mx-auto;

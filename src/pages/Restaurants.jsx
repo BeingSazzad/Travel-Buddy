@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { RESTAURANT_TAG_FILTERS, PRICE_LABELS, CUISINES } from "@/lib/restaurants";
 import { useRestaurants } from "@/lib/useContent";
 import RestaurantCard from "@/components/restaurants/RestaurantCard";
-import { cn } from "@/lib/utils";
+import ListFilterBar from "@/components/common/ListFilterBar";
 import { UtensilsCrossed } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
 import FilterPicker from "@/components/common/FilterPicker";
@@ -44,29 +44,14 @@ export default function Restaurants() {
       <h1 className="font-display font-bold text-lg">Restaurants</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Where to eat, curated for women who travel</p>
 
-      <div className="flex gap-2 overflow-x-auto no-scrollbar app-gutter-x pb-2">
-        {RESTAURANT_TAG_FILTERS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => toggle(t.key)}
-            className={cn(
-              "px-3 py-1.5 rounded-full text-xs whitespace-nowrap border",
-              tags[t.key] ? "bg-[#A1846B] text-white border-[#A1846B]" : "border-border text-foreground"
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap gap-2 mt-2">
+      <ListFilterBar tagItems={RESTAURANT_TAG_FILTERS} tagActive={tags} onTagToggle={toggle}>
         <FilterPicker title="Cuisine" value={cuisine} onChange={setCuisine} options={[{ value: "All", label: "Any" }, ...CUISINES.map((c) => ({ value: c, label: c }))]} />
         <FilterPicker title="Price" value={price} onChange={setPrice} options={[{ value: "All", label: "Any" }, ...Object.entries(PRICE_LABELS).map(([p, l]) => ({ value: String(p), label: l }))]} />
         <FilterPicker title="Rating" value={rating} onChange={setRating} options={[{ value: "All", label: "Any" }, { value: "4", label: "4.0+" }, { value: "4.5", label: "4.5+" }]} />
         <FilterPicker title="Sort" value={sort} onChange={setSort} options={[{ value: "distance", label: "Nearest" }, { value: "rating", label: "Top rated" }]} />
-      </div>
+      </ListFilterBar>
 
-      <p className="text-xs text-muted-foreground mt-3 mb-3">{filtered.length} restaurants</p>
+      <p className="text-xs text-muted-foreground mb-3">{filtered.length} restaurants</p>
 
       <div className="space-y-4">
         {filtered.length === 0 ? (

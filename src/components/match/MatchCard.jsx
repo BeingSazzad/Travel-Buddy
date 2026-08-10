@@ -57,26 +57,26 @@ export default function MatchCard({ member, onDecide, onProfile }) {
       >
         <div className="relative h-60 shrink-0">
           <Image src={member.avatar} alt={member.name} fittingType="fill" className="w-full h-full" />
-          <div className="gradient-overlay-soft" />
+          <div className="gradient-overlay-card" />
           <motion.div
             style={{ opacity: skipOpacity }}
-            className="absolute top-4 left-4 border-4 border-[#B0897A] text-[#B0897A] font-display text-2xl font-bold rounded-xl px-3 py-1 -rotate-12"
+            className="absolute top-4 left-4 z-20 border-4 border-[#B0897A] text-[#B0897A] font-display text-2xl font-bold rounded-xl px-3 py-1 -rotate-12"
           >
             SKIP
           </motion.div>
           <motion.div
             style={{ opacity: connectOpacity }}
-            className="absolute top-4 right-4 border-4 border-[#A1846B] text-[#A1846B] font-display text-2xl font-bold rounded-xl px-3 py-1 rotate-12"
+            className="absolute top-4 right-4 z-20 border-4 border-[#A1846B] text-[#A1846B] font-display text-2xl font-bold rounded-xl px-3 py-1 rotate-12"
           >
             CONNECT
           </motion.div>
-          <div className="absolute bottom-3 left-4 right-4 text-white">
-            <h2 className="font-display font-bold text-lg drop-shadow">
+          <div className="absolute bottom-3 left-4 right-4 z-20 text-white">
+            <h2 className="font-display font-bold text-lg [text-shadow:0_1px_8px_rgba(0,0,0,0.55)]">
               {member.name}{member.age != null ? `, ${member.age}` : ""}
             </h2>
             <div className="flex items-center gap-1 text-sm mt-0.5">
               <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
-              <span className="drop-shadow">{[member.current_city, member.country].filter(Boolean).join(", ")}</span>
+              <span className="[text-shadow:0_1px_6px_rgba(0,0,0,0.55)]">{[member.current_city, member.country].filter(Boolean).join(", ")}</span>
             </div>
           </div>
         </div>

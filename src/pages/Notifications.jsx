@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, BellOff, CheckCheck, Loader2 } from "lucide-react";
+import { ArrowLeft, BellOff, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import NotificationItem from "@/components/notifications/NotificationItem";
@@ -12,28 +12,28 @@ const MOCK_NOTIFICATIONS = [
     id: "notif_mock_1",
     title: "New match with Maya R.! 🎉",
     body: "Maya is also travelling to Lisbon in August. Send a message to plan your trip together.",
-    type: "match",
+    type: "new_match",
     read: false,
     created_date: new Date(Date.now() - 30 * 60000).toISOString(),
-    action_url: "/conversations/sim_conv_mock_1",
+    link: "/conversations/sim_conv_mock_1",
   },
   {
     id: "notif_mock_2",
     title: "Upcoming event: Sunset Yoga",
     body: "Santorini Sunset Yoga is happening this Thursday at 8:00 AM.",
-    type: "event",
+    type: "event_reminder",
     read: false,
     created_date: new Date(Date.now() - 3 * 3600000).toISOString(),
-    action_url: "/events",
+    link: "/events",
   },
   {
     id: "notif_mock_3",
     title: "Isabella sent you a message",
     body: '"That sounds great! Let\'s meet at Café Norden."',
-    type: "message",
+    type: "new_message",
     read: true,
     created_date: new Date(Date.now() - 24 * 3600000).toISOString(),
-    action_url: "/conversations/sim_conv_mock_3",
+    link: "/conversations/sim_conv_mock_3",
   },
 ];
 
@@ -43,7 +43,6 @@ export default function Notifications() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [filter, setFilter] = useState("all");
 
   const load = useCallback(async () => {
     try {
@@ -65,58 +64,47 @@ export default function Notifications() {
   }, [load]);
 
   const unreadCount = items.filter((n) => !n.read).length;
-  const shown = filter === "unread" ? items.filter((n) => !n.read) : items;
+
+  const handleMarkRead = (id) => {
+    setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+  };
 
   const markAll = async () => {
     if (!unreadCount) return;
+    setItems((prev) => prev.map((n) => ({ ...n, read: true })));
     try {
       await base44.entities.Notification.updateMany(
         { user_id: user.id, read: false },
         { $set: { read: true } }
       );
     } catch (e) {
-      // Local fallback for mock
-      setItems((prev) => prev.map((n) => ({ ...n, read: true })));
+      /* local state already updated */
     }
-    load();
   };
 
   return (
-    <div className="px-5 safe-pt pb-6 min-h-screen">
+    <div className="app-px safe-pt pb-4">
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => navigate(-1)}
-            className="w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center active:scale-95 transition"
+            className="w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center tap-feedback"
+            aria-label="Go back"
           >
             <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
           </button>
-          <div>
-            <h1 className="font-display font-bold text-lg">Notifications</h1>
-            {unreadCount > 0 && <p className="text-xs text-muted-foreground">{unreadCount} unread</p>}
-          </div>
+          <h1 className="font-display font-bold text-lg">Notifications</h1>
         </div>
-        <button
-          onClick={markAll}
-          disabled={!unreadCount}
-          className="flex items-center gap-1.5 text-xs text-[#A1846B] disabled:opacity-40 active:scale-95 transition font-semibold"
-        >
-          <CheckCheck className="w-4 h-4" strokeWidth={1.5} /> Mark all read
-        </button>
-      </div>
-
-      <div className="flex gap-2 mb-4">
-        {["all", "unread"].map((f) => (
+        {unreadCount > 0 && (
           <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium capitalize transition ${
-              filter === f ? "bg-foreground text-background" : "bg-muted text-muted-foreground"
-            }`}
+            type="button"
+            onClick={markAll}
+            className="text-xs font-medium text-[#A1846B] tap-feedback"
           >
-            {f === "all" ? "All" : "Unread"}
+            Mark all read
           </button>
-        ))}
+        )}
       </div>
 
       {loading ? (
@@ -125,18 +113,16 @@ export default function Notifications() {
         </div>
       ) : error ? (
         <ErrorState onRetry={load} />
-      ) : shown.length === 0 ? (
+      ) : items.length === 0 ? (
         <EmptyState
           icon={BellOff}
-          title={filter === "unread" ? "No unread notifications" : "No notifications yet"}
+          title="No notifications yet"
           description="New matches, messages and updates will show here."
-          actionLabel={filter === "unread" ? "View all" : undefined}
-          onAction={filter === "unread" ? () => setFilter("all") : undefined}
         />
       ) : (
-        <div className="space-y-2.5">
-          {shown.map((n) => (
-            <NotificationItem key={n.id} n={n} onChange={load} />
+        <div className="space-y-2">
+          {items.map((n) => (
+            <NotificationItem key={n.id} n={n} onMarkRead={handleMarkRead} />
           ))}
         </div>
       )}

@@ -95,13 +95,13 @@ export const CAFES = [
 
 export const CAFE_TAG_FILTERS = [
   { key: "wifi", label: "Wi-Fi" },
-  { key: "work", label: "Work-friendly" },
-  { key: "outdoor", label: "Outdoor seating" },
+  { key: "work", label: "Work-friendly", shortLabel: "Work spot" },
+  { key: "outdoor", label: "Outdoor seating", shortLabel: "Outdoor" },
   { key: "seaView", label: "Sea view" },
-  { key: "vegan", label: "Vegan options" },
-  { key: "solo", label: "Solo-friendly" },
-  { key: "wheelchair", label: "Wheelchair accessible" },
-  { key: "pet", label: "Pet friendly" },
+  { key: "vegan", label: "Vegan options", shortLabel: "Vegan" },
+  { key: "solo", label: "Solo-friendly", shortLabel: "Solo" },
+  { key: "wheelchair", label: "Wheelchair accessible", shortLabel: "Accessible" },
+  { key: "pet", label: "Pet friendly", shortLabel: "Pet friendly" },
 ];
 
 export const PRICE_LABELS = { 1: "€", 2: "€€", 3: "€€€", 4: "€€€€" };

@@ -98,12 +98,12 @@ export const RESTAURANTS = [
 export const RESTAURANT_TAG_FILTERS = [
   { key: "vegetarian", label: "Vegetarian" },
   { key: "vegan", label: "Vegan" },
-  { key: "glutenFree", label: "Gluten-free" },
-  { key: "solo", label: "Solo-friendly" },
-  { key: "outdoor", label: "Outdoor seating" },
+  { key: "glutenFree", label: "Gluten-free", shortLabel: "Gluten-free" },
+  { key: "solo", label: "Solo-friendly", shortLabel: "Solo" },
+  { key: "outdoor", label: "Outdoor seating", shortLabel: "Outdoor" },
   { key: "romantic", label: "Romantic" },
-  { key: "local", label: "Local favorite" },
-  { key: "reservation", label: "Reservation available" },
+  { key: "local", label: "Local favorite", shortLabel: "Local" },
+  { key: "reservation", label: "Reservation available", shortLabel: "Reservation" },
 ];
 
 export const PRICE_LABELS = { 1: "€", 2: "€€", 3: "€€€", 4: "€€€€" };

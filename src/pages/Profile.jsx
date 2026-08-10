@@ -16,7 +16,7 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState("activity");
 
   return (
-    <div className="app-px safe-pt pb-24">
+    <div className="app-px safe-pt pb-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h1 className="font-display font-bold text-lg">Profile</h1>

@@ -98,7 +98,7 @@ export default function Discover() {
   const resetFilters = () => setFilters(DEFAULT_FILTERS);
 
   return (
-    <div className="px-5 safe-pt pb-6 min-h-screen flex flex-col">
+    <div className="px-5 safe-pt pb-4 flex flex-col">
       <header className="flex items-center justify-between gap-3 mb-4">
         <div>
           <h1 className="font-display font-bold text-lg">Match</h1>

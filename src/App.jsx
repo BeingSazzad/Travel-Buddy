@@ -80,6 +80,14 @@ function getAgeFromDob(dob) {
   return age;
 }
 
+function AppScroll({ children }) {
+  return <div className="flex-1 min-h-0 h-full app-scroll">{children}</div>;
+}
+
+function AppFrame({ children }) {
+  return <div className="flex-1 min-h-0 h-full overflow-hidden flex flex-col">{children}</div>;
+}
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, user, navigateToLogin } = useAuth();
 
@@ -100,7 +108,8 @@ const AuthenticatedApp = () => {
   // Not authenticated: show the welcome + onboarding flow, then login/register
   if (!isAuthenticated) {
     return (
-      <Routes>
+      <AppScroll>
+        <Routes>
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
@@ -112,7 +121,8 @@ const AuthenticatedApp = () => {
         <Route path="/help" element={<HelpSupport />} />
         <Route path="/community-guidelines" element={<CommunityGuidelines />} />
         <Route path="*" element={<Navigate to="/welcome" replace />} />
-      </Routes>
+        </Routes>
+      </AppScroll>
     );
   }
 
@@ -127,10 +137,12 @@ const AuthenticatedApp = () => {
   // Step 1: account must be verified and terms accepted
   if (!isAdmin && (!accountVerified || !termsAccepted)) {
     return (
-      <Routes>
-        <Route path="/account-pending" element={<AccountPending />} />
-        <Route path="*" element={<Navigate to="/account-pending" replace />} />
-      </Routes>
+      <AppScroll>
+        <Routes>
+          <Route path="/account-pending" element={<AccountPending />} />
+          <Route path="*" element={<Navigate to="/account-pending" replace />} />
+        </Routes>
+      </AppScroll>
     );
   }
 
@@ -149,30 +161,36 @@ const AuthenticatedApp = () => {
   // Step 2: subscription must be active (or cancelled but still within the billing period)
   if (!bypassPayment && !subscriptionOk) {
     return (
-      <Routes>
-        <Route path="/subscription" element={<Subscription />} />
-        <Route path="*" element={<Navigate to="/subscription" replace />} />
-      </Routes>
+      <AppScroll>
+        <Routes>
+          <Route path="/subscription" element={<Subscription />} />
+          <Route path="*" element={<Navigate to="/subscription" replace />} />
+        </Routes>
+      </AppScroll>
     );
   }
 
   // Step 3: profile must be completed before using the app
   if (!isAdmin && !user?.profile_completed) {
     return (
-      <Routes>
-        <Route path="/profile-setup" element={<ProfileSetup />} />
-        <Route path="*" element={<Navigate to="/profile-setup" replace />} />
-      </Routes>
+      <AppScroll>
+        <Routes>
+          <Route path="/profile-setup" element={<ProfileSetup />} />
+          <Route path="*" element={<Navigate to="/profile-setup" replace />} />
+        </Routes>
+      </AppScroll>
     );
   }
 
   // Step 4: community guidelines must be accepted before social features
   if (!isAdmin && !user?.accepted_community_guidelines_at) {
     return (
-      <Routes>
-        <Route path="/community-guidelines" element={<CommunityGuidelines />} />
-        <Route path="*" element={<Navigate to="/community-guidelines" replace />} />
-      </Routes>
+      <AppScroll>
+        <Routes>
+          <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+          <Route path="*" element={<Navigate to="/community-guidelines" replace />} />
+        </Routes>
+      </AppScroll>
     );
   }
 
@@ -192,6 +210,7 @@ const AuthenticatedApp = () => {
 
   // Authenticated: render the main app
   return (
+    <AppFrame>
     <Routes>
       <Route path="/trips/new" element={<PageTransition><CreateTrip /></PageTransition>} />
       <Route path="/events/new" element={<PageTransition><CreateEvent /></PageTransition>} />
@@ -249,6 +268,7 @@ const AuthenticatedApp = () => {
       <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </AppFrame>
   );
 };
 
@@ -269,13 +289,17 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         {showSplash && <SplashScreen />}
         <div className="min-h-screen bg-[#F5F3F0] dark:bg-[#121111] flex justify-center">
-          <div className="app-shell gradient-app-bg flex flex-col min-h-screen shadow-2xl relative border-x border-border/5 overflow-hidden">
+          <div className="app-shell gradient-app-bg flex flex-col h-dvh max-h-dvh shadow-2xl relative border-x border-border/5 overflow-hidden">
+            <div className="flex-1 min-h-0 flex flex-col h-full overflow-hidden">
             <Router>
               <ScrollToTop />
               <SavedProvider>
+                <div className="flex-1 min-h-0 h-full overflow-hidden flex flex-col">
                 <AuthenticatedApp />
+                </div>
               </SavedProvider>
             </Router>
+            </div>
           </div>
         </div>
         <Toaster />

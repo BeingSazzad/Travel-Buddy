@@ -44,18 +44,18 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
             fittingType="fill"
             className="w-full h-full object-cover"
           />
-          <div className="gradient-overlay" />
+          <div className="gradient-overlay-card" />
 
           {/* Swipe Action Overlay Stamps */}
           <motion.div
             style={{ opacity: passOpacity }}
-            className="absolute top-5 left-5 border-2 border-rose-500 text-rose-500 bg-black/40 backdrop-blur-md font-display text-sm font-bold rounded-2xl px-3.5 py-1 -rotate-12 shadow-lg tracking-wider"
+            className="absolute top-5 left-5 z-20 border-2 border-rose-500 text-rose-500 bg-black/40 backdrop-blur-md font-display text-sm font-bold rounded-2xl px-3.5 py-1 -rotate-12 shadow-lg tracking-wider"
           >
             SKIP
           </motion.div>
           <motion.div
             style={{ opacity: likeOpacity }}
-            className="absolute top-5 right-5 border-2 border-[#A1846B] text-[#F5C99A] bg-black/40 backdrop-blur-md font-display text-sm font-bold rounded-2xl px-3.5 py-1 rotate-12 shadow-lg tracking-wider"
+            className="absolute top-5 right-5 z-20 border-2 border-[#A1846B] text-[#F5C99A] bg-black/40 backdrop-blur-md font-display text-sm font-bold rounded-2xl px-3.5 py-1 rotate-12 shadow-lg tracking-wider"
           >
             CONNECT
           </motion.div>
@@ -70,10 +70,10 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
           </button>
 
           {/* Hero Bottom Photo Overlay Content */}
-          <div className="absolute bottom-0 inset-x-0 p-5 text-white flex flex-col justify-end">
+          <div className="absolute bottom-0 inset-x-0 z-20 p-5 text-white flex flex-col justify-end">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <h2 className="font-display font-bold text-2xl drop-shadow-md text-white">
+                <h2 className="font-display font-bold text-2xl text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.55)]">
                   {member.name}{member.age != null ? `, ${member.age}` : ""}
                 </h2>
                 {member.verified && (
@@ -101,7 +101,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
 
             {/* Compact 2-line Bio */}
             {member.bio && (
-              <p className="text-xs text-white/90 leading-relaxed mt-2.5 line-clamp-2 drop-shadow-sm font-normal">
+              <p className="text-sm text-white leading-relaxed mt-2.5 line-clamp-2 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]">
                 {member.bio}
               </p>
             )}
@@ -112,13 +112,13 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
                 {member.interests.slice(0, 4).map((i) => (
                   <span
                     key={i}
-                    className="text-[11px] px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-md text-white font-medium border border-white/10 capitalize"
+                    className="text-[11px] px-2.5 py-0.5 rounded-full bg-black/50 backdrop-blur-md text-white font-medium border border-white/25 capitalize"
                   >
                     {i}
                   </span>
                 ))}
                 {member.interests.length > 4 && (
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/10 text-white/80 font-medium">
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-black/45 text-white font-medium border border-white/20">
                     +{member.interests.length - 4}
                   </span>
                 )}

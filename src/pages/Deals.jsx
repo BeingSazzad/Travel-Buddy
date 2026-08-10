@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import DealCard from "@/components/deals/DealCard";
 import RedeemSheet from "@/components/deals/RedeemSheet";
-import { cn } from "@/lib/utils";
+import ScrollFilterChips from "@/components/common/ScrollFilterChips";
 import { Tag } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
@@ -44,20 +44,15 @@ export default function Deals() {
       <h1 className="font-display font-bold text-lg">Deals</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-4">Exclusive perks from partners who welcome women who travel.</p>
 
-      <div className="flex gap-2 overflow-x-auto no-scrollbar app-gutter-x pb-2">
-        {["All", ...DEAL_CATEGORIES].map((c) => (
-          <button
-            key={c}
-            onClick={() => setCategory(c)}
-            className={cn(
-              "px-3 py-1.5 rounded-full text-xs whitespace-nowrap border",
-              category === c ? "bg-foreground text-background border-foreground" : "border-border text-foreground"
-            )}
-          >
-            {c === "All" ? "All" : label(c)}
-          </button>
-        ))}
-      </div>
+      <ScrollFilterChips
+        items={["All", ...DEAL_CATEGORIES].map((c) => ({
+          key: c,
+          label: c === "All" ? "All" : label(c),
+        }))}
+        active={(c) => category === c}
+        onSelect={setCategory}
+        activeClass="bg-foreground text-background border-foreground"
+      />
 
       {loading ? (
         <ListSkeleton className="mt-4" count={3} />

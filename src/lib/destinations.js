@@ -67,5 +67,5 @@ export const TAG_FILTERS = [
   { key: "budget", label: "Budget" },
   { key: "nightlife", label: "Nightlife" },
   { key: "wellness", label: "Wellness" },
-  { key: "solo", label: "Solo-friendly" },
+  { key: "solo", label: "Solo-friendly", shortLabel: "Solo" },
 ];

@@ -60,7 +60,7 @@ export default function Search() {
   const hasQuery = query.trim() || activeCount > 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-0 bg-background">
       {/* Header */}
       <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-md px-app safe-pt pb-3 flex items-center gap-2">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center shrink-0">

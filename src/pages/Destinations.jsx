@@ -3,7 +3,8 @@ import { base44 } from "@/api/base44Client";
 import { CONTINENTS, WEATHERS, TAG_FILTERS } from "@/lib/destinations";
 import { useDestinations } from "@/lib/useContent";
 import DestinationCard from "@/components/destinations/DestinationCard";
-import { cn } from "@/lib/utils";
+import ScrollFilterChips from "@/components/common/ScrollFilterChips";
+import ListFilterBar from "@/components/common/ListFilterBar";
 import { MapPin } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
 import FilterPicker from "@/components/common/FilterPicker";
@@ -67,34 +68,17 @@ export default function Destinations() {
 
       {/* Filters */}
       <h2 className="font-display font-semibold text-base mb-2">Explore</h2>
-      <div className="flex gap-2 overflow-x-auto no-scrollbar app-gutter-x pb-2">
-        {CONTINENTS.map((c) => (
-          <button
-            key={c}
-            onClick={() => setContinent(c)}
-            className={cn(
-              "px-3 py-1.5 rounded-full text-xs whitespace-nowrap",
-              continent === c ? "bg-foreground text-background" : "bg-muted text-muted-foreground"
-            )}
-          >
-            {c}
-          </button>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2 mt-2">
-        {TAG_FILTERS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => toggle(t.key)}
-            className={cn(
-              "px-3 py-1.5 rounded-full text-xs border",
-              tags[t.key] ? "bg-[#A1846B] text-white border-[#A1846B]" : "border-border text-foreground"
-            )}
-          >
-            {t.label}
-          </button>
-        ))}
-        <FilterPicker title="Weather" value={weather} onChange={setWeather} options={WEATHERS.map((w) => ({ value: w, label: w }))} />
+      <ScrollFilterChips
+        items={CONTINENTS.map((c) => ({ key: c, label: c }))}
+        active={(c) => continent === c}
+        onSelect={setContinent}
+        activeClass="bg-foreground text-background border-foreground"
+        inactiveClass="bg-muted text-muted-foreground border-transparent"
+      />
+      <div className="mt-3">
+        <ListFilterBar tagItems={TAG_FILTERS} tagActive={tags} onTagToggle={toggle}>
+          <FilterPicker title="Weather" value={weather} onChange={setWeather} options={WEATHERS.map((w) => ({ value: w, label: w }))} />
+        </ListFilterBar>
       </div>
 
       {/* Results */}

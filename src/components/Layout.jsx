@@ -1,5 +1,4 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
 import BottomNav from "@/components/BottomNav";
 import Trips from "@/pages/Trips";
 import Messages from "@/pages/Messages";
@@ -8,8 +7,8 @@ import Discover from "@/pages/Discover";
 import PullToRefresh from "@/components/common/PullToRefresh";
 import { emitRefresh } from "@/lib/refresh-bus";
 
-const EASE = [0.22, 1, 0.36, 1];
-const ACTIVE = "absolute inset-0 overflow-y-auto pb-28";
+const SCROLL_PAD = "pb-[calc(5.5rem+env(safe-area-inset-bottom))]";
+const ACTIVE = `absolute inset-0 app-scroll ${SCROLL_PAD}`;
 
 // Preserved tab views stay mounted (display:none when inactive) to keep
 // scroll position and component state across tab switches.
@@ -27,8 +26,8 @@ export default function Layout() {
   const isPreserved = PRESERVED_PATHS.has(pathname);
 
   return (
-    <div className="relative w-full bg-background flex flex-col h-dvh safe-x">
-      <div className="flex-1 relative overflow-hidden">
+    <div className="relative w-full flex flex-col h-full min-h-0 safe-x">
+      <div className="flex-1 min-h-0 relative overflow-hidden">
         {PRESERVED.map((t) => {
           const cls = pathname === t.path ? ACTIVE : "hidden";
           if (t.ptr) {
@@ -52,13 +51,7 @@ export default function Layout() {
             </PullToRefresh>
           ) : (
             <div key={pathname} className={ACTIVE}>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.36, ease: EASE }}
-              >
-                <Outlet />
-              </motion.div>
+              <Outlet />
             </div>
           ))}
       </div>

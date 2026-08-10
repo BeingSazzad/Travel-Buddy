@@ -3,14 +3,17 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import {
   Sparkles, MessageCircle, CalendarPlus, CalendarCheck, BellRing,
-  Plane, Tag, Bookmark, ShieldCheck, Trash2, Users
+  Plane, Tag, Bookmark, ShieldCheck, Users, Heart,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const ICONS = {
   new_match: Sparkles,
+  match: Heart,
   new_message: MessageCircle,
+  message: MessageCircle,
   event_invitation: CalendarPlus,
+  event: CalendarPlus,
   event_approval: CalendarCheck,
   event_reminder: BellRing,
   trip_reminder: Plane,
@@ -20,51 +23,51 @@ const ICONS = {
   admin_message: ShieldCheck,
 };
 
-const TYPE_TONE = "text-[#A1846B]";
-
-export default function NotificationItem({ n, onChange }) {
+export default function NotificationItem({ n, onMarkRead }) {
   const navigate = useNavigate();
   const Icon = ICONS[n.type] || BellRing;
+  const target = n.link || n.action_url;
 
   const open = async () => {
-    try {
-      if (!n.read) await base44.entities.Notification.update(n.id, { read: true });
-    } catch (e) {}
-    onChange();
-    if (n.link) navigate(n.link);
-  };
-
-  const remove = async (e) => {
-    e.stopPropagation();
-    try { await base44.entities.Notification.delete(n.id); } catch (err) {}
-    onChange();
+    if (!n.read) {
+      try {
+        await base44.entities.Notification.update(n.id, { read: true });
+      } catch (e) {
+        /* mock / offline */
+      }
+      onMarkRead?.(n.id);
+    }
+    if (target) navigate(target);
   };
 
   return (
-    <div
+    <button
+      type="button"
       onClick={open}
-      className={`group flex items-start gap-3 p-3.5 rounded-2xl border transition active:scale-[0.99] cursor-pointer ${n.read ? "bg-card border-border" : "bg-[#A1846B]/5 border-[#A1846B]/25"}`}
+      className={`w-full flex items-start gap-3 p-3 rounded-2xl border text-left active:scale-[0.99] transition-transform ${
+        n.read ? "bg-card border-border/80" : "bg-card border-[#A1846B]/30"
+      }`}
     >
       <div className="relative shrink-0">
-        <div className="w-11 h-11 rounded-full bg-[#A1846B]/10 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full bg-[#A1846B]/10 flex items-center justify-center">
           {n.image ? (
-            <img src={n.image} alt="" className="w-11 h-11 rounded-full object-cover" />
+            <img src={n.image} alt="" className="w-10 h-10 rounded-full object-cover" />
           ) : (
-            <Icon className={`w-5 h-5 ${TYPE_TONE}`} strokeWidth={1.5} />
+            <Icon className="w-4 h-4 text-[#A1846B]" strokeWidth={1.5} />
           )}
         </div>
-        {!n.read && <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#A1846B] ring-2 ring-card" />}
+        {!n.read && (
+          <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-[#A1846B] ring-2 ring-card" />
+        )}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium leading-snug">{n.title}</p>
-        {n.body && <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{n.body}</p>}
-        <p className="text-[10px] text-muted-foreground/80 mt-1 uppercase tracking-wide">{moment(n.created_date).fromNow()}</p>
+        <p className={`text-sm leading-snug ${n.read ? "font-medium" : "font-semibold"}`}>{n.title}</p>
+        {n.body && (
+          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{n.body}</p>
+        )}
+        <p className="text-[10px] text-muted-foreground mt-1">{moment(n.created_date).fromNow()}</p>
       </div>
-
-      <button onClick={remove} className="shrink-0 p-1.5 -m-1 text-muted-foreground/60 hover:text-destructive transition" aria-label="Delete notification">
-        <Trash2 className="w-4 h-4" strokeWidth={1.5} />
-      </button>
-    </div>
+    </button>
   );
 }

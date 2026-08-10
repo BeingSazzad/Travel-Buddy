@@ -23,7 +23,7 @@ export default function BottomNav() {
             onClick={() => {
               const isCurrent = to === '/' ? pathname === '/' : pathname === to;
               if (isCurrent) {
-                const el = document.querySelector('.overflow-y-auto:not(.hidden)');
+                const el = document.querySelector('.app-scroll:not(.hidden)');
                 if (el) el.scrollTo({ top: 0, behavior: 'smooth' });
               }
             }}

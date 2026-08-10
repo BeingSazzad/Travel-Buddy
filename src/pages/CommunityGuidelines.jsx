@@ -68,7 +68,7 @@ export default function CommunityGuidelines() {
   };
 
   return (
-    <div className="max-w-app mx-auto min-h-screen bg-background flex flex-col">
+    <div className="max-w-app mx-auto min-h-0 bg-background flex flex-col">
       <header className="sticky top-0 z-20 px-app pt-10 pb-3 flex items-center gap-3 bg-background/90 backdrop-blur border-b border-border">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center">
           <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
