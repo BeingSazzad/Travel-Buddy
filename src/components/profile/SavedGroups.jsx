@@ -2,19 +2,9 @@ import React from "react";
 import { Bookmark, MapPin } from "lucide-react";
 import { useSaved } from "@/lib/SavedContext";
 import { useNavigate } from "react-router-dom";
+import { pathForSavedItem } from "@/lib/saved-item-key";
 
 const PLACE_TYPES = ["cafe", "restaurant", "hotel", "destination"];
-
-function pathFor(item) {
-  const enc = encodeURIComponent(item.title);
-  if (item.type === "cafe") return `/cafes/${enc}`;
-  if (item.type === "restaurant") return `/restaurants/${enc}`;
-  if (item.type === "hotel") return `/hotels/${enc}`;
-  if (item.type === "destination") return `/destinations/${encodeURIComponent(item.location || item.title)}`;
-  if (item.type === "event") return `/events`;
-  if (item.type === "deal") return `/deals`;
-  return null;
-}
 
 function Group({ label, items, navigate }) {
   if (items.length === 0) return null;
@@ -23,7 +13,7 @@ function Group({ label, items, navigate }) {
       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">{label} ({items.length})</p>
       <div className="space-y-2">
         {items.map((it) => {
-          const to = pathFor(it);
+          const to = pathForSavedItem(it);
           return (
             <button
               key={it.id}
@@ -51,22 +41,33 @@ function Group({ label, items, navigate }) {
   );
 }
 
-export default function SavedGroups() {
+export default function SavedGroups({ embedded = false }) {
   const { items, loading } = useSaved();
   const navigate = useNavigate();
   const places = items.filter((i) => PLACE_TYPES.includes(i.type));
   const events = items.filter((i) => i.type === "event");
   const deals = items.filter((i) => i.type === "deal");
 
-  if (loading) return <p className="text-sm text-muted-foreground mt-6">Loading saved…</p>;
-  if (places.length === 0 && events.length === 0 && deals.length === 0) return null;
+  if (loading) return <p className="text-sm text-muted-foreground">Loading saved…</p>;
+  if (places.length === 0 && events.length === 0 && deals.length === 0) {
+    return (
+      <section>
+        {!embedded && <h3 className="font-display font-semibold text-base mb-3">Saved</h3>}
+        <p className="text-sm text-muted-foreground rounded-2xl border border-dashed border-border p-4 text-center">
+          Save cafés, hotels and deals to find them here.
+        </p>
+      </section>
+    );
+  }
 
   return (
-    <div className="mt-6 space-y-5">
-      <h3 className="font-display font-semibold text-base">Saved</h3>
+    <section className={embedded ? "" : "mt-6 space-y-5"}>
+      {!embedded && <h3 className="font-display font-semibold text-base">Saved</h3>}
+      <div className="space-y-4">
       <Group label="Places" items={places} navigate={navigate} />
       <Group label="Events" items={events} navigate={navigate} />
       <Group label="Deals" items={deals} navigate={navigate} />
-    </div>
+      </div>
+    </section>
   );
 }

@@ -55,7 +55,7 @@ export default function Destinations() {
   const toggle = (k) => setTags((t) => ({ ...t, [k]: !t[k] }));
 
   return (
-    <div className="px-5 safe-pt pb-6">
+    <div className="page-shell">
       <h1 className="font-display font-bold text-lg">Destinations</h1>
       <p className="text-sm text-muted-foreground mt-0.5 mb-5">Curated cities, loved by women who travel</p>
 
@@ -72,7 +72,7 @@ export default function Destinations() {
         items={CONTINENTS.map((c) => ({ key: c, label: c }))}
         active={(c) => continent === c}
         onSelect={setContinent}
-        activeClass="bg-foreground text-background border-foreground"
+        activeClass="chip-active"
         inactiveClass="bg-muted text-muted-foreground border-transparent"
       />
       <div className="mt-3">

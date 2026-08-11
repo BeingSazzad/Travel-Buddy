@@ -5,10 +5,9 @@ import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, Mail, Lock, Loader2, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { LogIn, Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
-import AppleIcon from "@/components/AppleIcon";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -31,23 +30,8 @@ export default function Login() {
       await checkUserAuth();
       navigate("/", { replace: true });
     } catch (err) {
-      console.warn("API login failed, offering mock bypass:", err);
-      setError("Incorrect credentials. (TIP: You can click the 'Bypass with Mock User' button below to test the app without a backend database)");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBypass = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      // Fake successful token & auth state update
-      base44.auth.setToken("mock-jwt-token-12345");
-      await checkUserAuth();
-      navigate("/", { replace: true });
-    } catch (err) {
-      setError("Mock bypass failed: " + err.message);
+      console.warn("Login failed:", err);
+      setError("Incorrect email or password. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -57,41 +41,36 @@ export default function Login() {
     base44.auth.loginWithProvider("google", "/");
   };
 
-  const handleApple = () => {
-    base44.auth.loginWithProvider("apple", "/");
-  };
-
   return (
     <AuthLayout
       icon={LogIn}
       title="Welcome back"
-      subtitle="Log in to your account"
+      subtitle="Sign in to continue planning trips with women like you."
       footer={
         <>
-          Don't have an account?{" "}
-          <Link to="/register" className="text-primary font-medium hover:underline">
+          Don&apos;t have an account?{" "}
+          <Link to="/register" className="auth-link">
             Create one
           </Link>
         </>
       }
     >
-      <div className="space-y-3 mb-6">
-        <Button variant="outline" size="md" className="w-full" onClick={handleGoogle}>
-          <GoogleIcon className="w-4 h-4" />
-          Continue with Google
-        </Button>
-        <Button variant="outline" size="md" className="w-full" onClick={handleApple}>
-          <AppleIcon className="w-4 h-4" />
-          Continue with Apple
-        </Button>
-      </div>
+      <Button
+        variant="outline"
+        size="md"
+        className="w-full bg-card border-border/80"
+        onClick={handleGoogle}
+      >
+        <GoogleIcon className="w-4 h-4" />
+        Continue with Google
+      </Button>
 
-      <div className="relative mb-6">
+      <div className="relative my-5">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-border/80" />
         </div>
         <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-          <span className="bg-card px-3 text-muted-foreground/85">or email</span>
+          <span className="bg-card px-3 text-muted-foreground">or</span>
         </div>
       </div>
 
@@ -103,7 +82,7 @@ export default function Login() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-xs font-medium text-foreground/80">Email address</Label>
+          <Label htmlFor="email" className="text-xs font-medium text-foreground/80">Email</Label>
           <div className="relative">
             <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -114,15 +93,16 @@ export default function Login() {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 h-12 rounded-2xl border-border/80 focus-visible:ring-[#A1846B]/30"
+              className="pl-10 auth-input"
               required
             />
           </div>
         </div>
+
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label htmlFor="password" className="text-xs font-medium text-foreground/80">Password</Label>
-            <Link to="/forgot-password" className="text-xs text-[#A1846B] font-medium hover:underline">
+            <Link to="/forgot-password" className="auth-link text-xs">
               Forgot password?
             </Link>
           </div>
@@ -135,7 +115,7 @@ export default function Login() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 pr-10 h-12 rounded-2xl border-border/80 focus-visible:ring-[#A1846B]/30"
+              className="pl-10 pr-10 auth-input"
               required
             />
             <button
@@ -147,25 +127,16 @@ export default function Login() {
             </button>
           </div>
         </div>
+
         <Button type="submit" variant="primary" className="w-full" disabled={loading}>
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Logging in...
+              Signing in…
             </>
           ) : (
-            "Log in"
+            "Sign in"
           )}
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="md"
-          onClick={handleBypass}
-          className="w-full border-[#A1846B]/40 text-[#A1846B] hover:bg-[#A1846B]/5"
-        >
-          <ShieldCheck className="w-4 h-4" /> Bypass with Mock User
         </Button>
       </form>
     </AuthLayout>

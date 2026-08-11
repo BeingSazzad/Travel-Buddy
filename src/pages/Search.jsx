@@ -87,7 +87,7 @@ export default function Search() {
         >
           <SlidersHorizontal className="w-4 h-4" strokeWidth={1.5} />
           {activeCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#A1846B] text-white text-[10px] font-medium flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-white text-[10px] font-medium flex items-center justify-center">
               {activeCount}
             </span>
           )}
@@ -148,7 +148,7 @@ export default function Search() {
 
 function ActiveChip({ label, onClear }) {
   return (
-    <span className="inline-flex items-center gap-1 bg-[#A1846B]/10 text-[#A1846B] text-xs font-medium px-2.5 py-1 rounded-full capitalize">
+    <span className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs font-medium px-2.5 py-1 rounded-full capitalize">
       {label}
       <button onClick={onClear}><X className="w-3 h-3" /></button>
     </span>

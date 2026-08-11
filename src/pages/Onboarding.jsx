@@ -3,21 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HERO } from '@/lib/images';
 import OnboardingSlide from '@/components/onboarding/OnboardingSlide';
 
 const slides = [
   {
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80',
+    image: HERO.onboardMeet,
     title: 'Meet women travelling to the same destination',
     description: 'Find women heading to the same city or trip. Match, chat and plan your journey together before you even land.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=900&q=80',
+    image: HERO.onboardEvents,
     title: 'Join events and make real connections',
     description: 'From sunset yoga to wine nights and travel mixers — join meetups that turn strangers into friends.',
   },
   {
-    image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=900&q=80',
+    image: HERO.onboardPlaces,
     title: 'Discover trusted places recommended by women',
     description: 'Cafés, hotels and hidden gems vetted by women like you. Reviews you can trust, for places you’ll love.',
   },
@@ -33,9 +34,11 @@ export default function Onboarding() {
   const skip = () => navigate('/register');
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <div className="flex justify-end px-5 pt-12">
-        <button onClick={skip} className="text-sm font-medium text-muted-foreground">Skip</button>
+    <div className="flex flex-col min-h-screen bg-background gradient-top-bg">
+      <div className="flex justify-end app-px safe-pt">
+        <button onClick={skip} className="text-sm font-medium text-muted-foreground hover:text-foreground">
+          Skip
+        </button>
       </div>
 
       <div className="flex-1 px-5 pt-6">
@@ -58,7 +61,7 @@ export default function Onboarding() {
             key={idx}
             className={cn(
               'h-1.5 rounded-full transition-all duration-300',
-              idx === i ? 'w-6 bg-foreground' : 'w-1.5 bg-foreground/20'
+              idx === i ? 'w-6 bg-[hsl(var(--brand-sand))]' : 'w-1.5 bg-foreground/20'
             )}
           />
         ))}
@@ -75,7 +78,7 @@ export default function Onboarding() {
         )}
         <button
           onClick={next}
-          className="flex-1 h-12 rounded-2xl bg-foreground text-background text-base font-extrabold shadow-sm flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
+          className="flex-1 h-12 rounded-2xl gradient-brand-accent text-white text-base font-bold shadow-sm flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
         >
           {isLast ? 'Get started' : 'Continue'}
           <ArrowRight className="w-5 h-5" />

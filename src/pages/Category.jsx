@@ -1,62 +1,91 @@
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
+
+import { MOCK_MEMBERS } from '@/lib/member-profile';
+import { CAFES } from '@/lib/cafes';
+import { RESTAURANTS } from '@/lib/restaurants';
+import { HOTELS } from '@/lib/hotels';
+import { DESTINATIONS } from '@/lib/destinations';
+import { getMockTrips } from '@/lib/mock-trips';
+import { MOCK_EVENTS } from '@/lib/mock-events';
+import { MOCK_DEALS } from '@/lib/mock-deals';
+
+const memberSamples = MOCK_MEMBERS.slice(0, 3).map((m) => ({
+  name: m.name,
+  loc: m.current_city,
+  img: m.avatar,
+  memberId: m.user_id,
+}));
+
+const pick = (items, mapFn) => items.slice(0, 3).map(mapFn);
 
 const samples = {
-  Cafés: [
-    { name: 'Café Norden', loc: 'Copenhagen', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=500&q=80' },
-    { name: 'The Tiny Cup', loc: 'Lisbon', img: 'https://images.unsplash.com/photo-1453614512568-c4034dfb0fa0?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Brew & Bloom', loc: 'Bali', img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=500&q=80' },
-  ],
-  Restaurants: [
-    { name: 'Olive & Vine', loc: 'Paris', img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Saffron Table', loc: 'Marrakech', img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Harbor Light', loc: 'Copenhagen', img: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=500&q=80' },
-  ],
-  Hotels: [
-    { name: 'Sandhouse Hotel', loc: 'Lisbon', img: 'https://images.unsplash.com/photo-1566073771259-6a560657f57b?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Maison du Parc', loc: 'Paris', img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe595?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Bali Hideaway', loc: 'Ubud', img: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=500&q=80' },
-  ],
-  Trips: [
-    { name: 'Lisbon Solo Week', loc: 'Lisbon', img: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Bali Retreat', loc: 'Ubud', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Tokyo Spring', loc: 'Tokyo', img: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeed?auto=format&fit=crop&w=500&q=80' },
-  ],
-  Events: [
-    { name: 'Sunset Yoga', loc: 'Copenhagen', img: 'https://images.unsplash.com/photo-1545389336-cf090694435e?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Wine & Paint', loc: 'Lisbon', img: 'https://images.unsplash.com/photo-1513569771920-c9e1d31714ba?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Travel Mixer', loc: 'Paris', img: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=500&q=80' },
-  ],
-  Friends: [
-    { name: 'Aria K.', loc: 'Berlin', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Maya R.', loc: 'Lisbon', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Sofia L.', loc: 'Bali', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80' },
-  ],
+  Cafés: pick(CAFES, (c) => ({ name: c.name, loc: c.city, img: c.image })),
+  Restaurants: pick(RESTAURANTS, (r) => ({ name: r.name, loc: r.city, img: r.image })),
+  Hotels: pick(HOTELS, (h) => ({ name: h.name, loc: h.city, img: h.image })),
+  Trips: pick(getMockTrips(), (t) => ({
+    name: t.name,
+    loc: t.city,
+    img: t.cover_image,
+    tripId: t.id,
+  })),
+  Events: pick(MOCK_EVENTS, (e) => ({
+    name: e.title,
+    loc: e.city,
+    img: e.image,
+    eventId: e.id,
+  })),
+  Friends: memberSamples,
   Reviews: [
-    { name: 'Café Norden', loc: '★ 4.9', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Maison du Parc', loc: '★ 4.8', img: 'https://images.unsplash.com/photo-1551882547-ff40c63fe595?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Bali Retreat', loc: '★ 5.0', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80' },
+    { name: CAFES[0].name, loc: '★ 4.9', img: CAFES[0].image, type: 'cafe' },
+    { name: HOTELS[1]?.name || HOTELS[0].name, loc: '★ 4.8', img: HOTELS[1]?.image || HOTELS[0].image, type: 'hotel' },
+    { name: RESTAURANTS[0].name, loc: '★ 5.0', img: RESTAURANTS[0].image, type: 'restaurant' },
   ],
-  Deals: [
-    { name: 'Lisbon Stay 20% off', loc: 'Lisbon', img: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Bali Retreat Deal', loc: 'Ubud', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Paris Dinner 2-for-1', loc: 'Paris', img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=500&q=80' },
-  ],
-  Destinations: [
-    { name: 'Lisbon', loc: 'Portugal', img: 'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Bali', loc: 'Indonesia', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Marrakech', loc: 'Morocco', img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=500&q=80' },
-    { name: 'Copenhagen', loc: 'Denmark', img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=500&q=80' },
-  ],
+  Deals: pick(MOCK_DEALS, (d) => ({
+    name: d.title,
+    loc: d.city,
+    img: d.image,
+    dealId: d.id,
+  })),
+  Destinations: pick(DESTINATIONS, (d) => ({
+    name: d.city,
+    loc: d.country,
+    img: d.image,
+  })),
 };
+
+const CATEGORY_ROUTES = {
+  Cafés: (name) => `/cafes/${encodeURIComponent(name)}`,
+  Restaurants: (name) => `/restaurants/${encodeURIComponent(name)}`,
+  Hotels: (name) => `/hotels/${encodeURIComponent(name)}`,
+  Destinations: (name) => `/destinations/${encodeURIComponent(name)}`,
+  Trips: (name, item) => item.tripId ? `/trips/${item.tripId}` : "/trips",
+  Events: () => "/events",
+  Friends: () => "/friends",
+  Deals: (name, item) => item.dealId ? `/deals/${item.dealId}` : "/deals",
+};
+
+function itemRoute(category, item) {
+  if (category === "Reviews") {
+    if (item.type === "cafe") return `/cafes/${encodeURIComponent(item.name)}`;
+    if (item.type === "restaurant") return `/restaurants/${encodeURIComponent(item.name)}`;
+    if (item.type === "hotel") return `/hotels/${encodeURIComponent(item.name)}`;
+    return "/reviews";
+  }
+  if (item.eventId) return `/events/${item.eventId}`;
+  if (item.memberId) return `/members/${item.memberId}`;
+  if (item.tripId) return `/trips/${item.tripId}`;
+  if (item.dealId) return `/deals/${item.dealId}`;
+  const fn = CATEGORY_ROUTES[category];
+  return fn ? fn(item.name, item) : null;
+}
 
 export default function Category({ category }) {
   const navigate = useNavigate();
   const list = samples[category] || [];
 
   return (
-    <div className="px-5 safe-pt">
+    <div className="page-shell">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4"
@@ -67,20 +96,28 @@ export default function Category({ category }) {
       <p className="text-sm text-muted-foreground mb-5">Curated for women who travel</p>
 
       <div className="space-y-4">
-        {list.map((item) => (
-          <div key={item.name} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card">
-            <div className="h-40">
-              <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
-            </div>
-            <div className="p-4">
-              <h3 className="font-semibold text-base">{item.name}</h3>
-              <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
-                <MapPin className="w-3.5 h-3.5" />
-                <span>{item.loc}</span>
+        {list.map((item) => {
+          const route = itemRoute(category, item);
+          return (
+            <button
+              key={item.name}
+              type="button"
+              onClick={() => route && navigate(route)}
+              className="w-full rounded-2xl overflow-hidden border border-border shadow-soft bg-card text-left active:scale-[0.99] transition"
+            >
+              <div className="h-40">
+                <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
               </div>
-            </div>
-          </div>
-        ))}
+              <div className="p-4">
+                <h3 className="font-semibold text-base">{item.name}</h3>
+                <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
+                  <MapPin className="w-3.5 h-3.5" />
+                  <span>{item.loc}</span>
+                </div>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

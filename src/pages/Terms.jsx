@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, FileText, ShieldCheck } from "lucide-react";
+import ScrollPage, { ScrollPageHeader, ScrollPageBody } from "@/components/common/ScrollPage";
 
 const SECTIONS = [
   {
@@ -37,21 +38,21 @@ export default function Terms() {
   const navigate = useNavigate();
 
   return (
-    <div className="max-w-app mx-auto min-h-0 bg-background flex flex-col">
-      <header className="sticky top-0 z-20 px-app pt-10 pb-3 flex items-center gap-3 bg-background/90 backdrop-blur border-b border-border">
+    <ScrollPage>
+      <ScrollPageHeader>
         <button
           onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition"
+          className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition shrink-0"
         >
           <ArrowLeft className="w-5 h-5 text-foreground" strokeWidth={1.75} />
         </button>
         <h1 className="font-display font-bold text-lg">Terms & Conditions</h1>
-      </header>
+      </ScrollPageHeader>
 
-      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-5 pb-12">
+      <ScrollPageBody className="space-y-5">
         <div className="text-center mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-[#A1846B]/10 flex items-center justify-center mx-auto mb-3">
-            <FileText className="w-6 h-6 text-[#A1846B]" strokeWidth={1.5} />
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
+            <FileText className="w-6 h-6 text-primary" strokeWidth={1.5} />
           </div>
           <p className="font-display font-bold text-base">Seluna Terms of Service</p>
           <p className="text-xs text-muted-foreground mt-1">Last updated: August 2026</p>
@@ -66,13 +67,13 @@ export default function Terms() {
           ))}
         </div>
 
-        <div className="rounded-2xl bg-[#A1846B]/5 border border-[#A1846B]/15 p-4 flex gap-3 mt-6">
-          <ShieldCheck className="w-5 h-5 text-[#A1846B] shrink-0 mt-0.5" strokeWidth={1.5} />
+        <div className="rounded-2xl bg-primary/5 border border-primary/15 p-4 flex gap-3 mt-6">
+          <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" strokeWidth={1.5} />
           <p className="text-xs text-muted-foreground leading-relaxed">
             If you have any questions regarding our Terms & Conditions, please contact Seluna Support through the Help section in your profile settings.
           </p>
         </div>
-      </div>
-    </div>
+      </ScrollPageBody>
+    </ScrollPage>
   );
 }

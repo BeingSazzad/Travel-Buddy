@@ -10,9 +10,9 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-foreground text-background shadow-sm hover:bg-foreground/90",
+          "gradient-brand-button shadow-sm",
         primary:
-          "gradient-brand-accent text-white shadow-sm hover:brightness-105",
+          "gradient-brand-button shadow-sm",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
@@ -21,7 +21,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent/10 hover:text-accent-foreground rounded-xl",
         link: "text-primary underline-offset-4 hover:underline font-medium",
-        sand: "bg-[#A1846B]/10 text-[#A1846B] hover:bg-[#A1846B]/20",
+        sand: "bg-primary/10 text-primary hover:bg-primary/20",
       },
       size: {
         // Primary CTA — 48px, 16px text, extra-bold

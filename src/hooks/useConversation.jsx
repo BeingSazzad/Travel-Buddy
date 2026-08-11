@@ -2,13 +2,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 
+import { memberDisplayName } from "@/lib/member-profile";
+
 const getMockConversation = (convId, userId) => {
   const uid = userId || "me";
   const dataset = {
     sim_conv_mock_1: {
       id: "sim_conv_mock_1",
       participant_ids: [uid, "mock_1"],
-      participant_names: ["You", "Maya R."],
+      participant_names: ["You", memberDisplayName("mock_1")],
       participant_avatars: ["", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&h=100&q=80"],
       last_message: "Hey! Are you still planning for Bali?",
       last_message_at: new Date(Date.now() - 3600000).toISOString(),
@@ -18,7 +20,7 @@ const getMockConversation = (convId, userId) => {
     sim_conv_mock_2: {
       id: "sim_conv_mock_2",
       participant_ids: [uid, "mock_2"],
-      participant_names: ["You", "Ava L."],
+      participant_names: ["You", memberDisplayName("mock_2")],
       participant_avatars: ["", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80"],
       last_message: "Sure! Let's discuss the itinerary.",
       last_message_at: new Date(Date.now() - 86400000).toISOString(),
@@ -28,7 +30,7 @@ const getMockConversation = (convId, userId) => {
     sim_conv_mock_3: {
       id: "sim_conv_mock_3",
       participant_ids: [uid, "mock_4"],
-      participant_names: ["You", "Isabella K."],
+      participant_names: ["You", memberDisplayName("mock_4")],
       participant_avatars: ["", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80"],
       last_message: "That sounds great!",
       last_message_at: new Date(Date.now() - 86400000 * 4).toISOString(),
@@ -38,7 +40,7 @@ const getMockConversation = (convId, userId) => {
     sim_conv_mock_4: {
       id: "sim_conv_mock_4",
       participant_ids: [uid, "mock_5"],
-      participant_names: ["You", "Emma T."],
+      participant_names: ["You", memberDisplayName("mock_5")],
       participant_avatars: ["", "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=100&h=100&q=80"],
       last_message: "Let me know the details.",
       last_message_at: new Date(Date.now() - 86400000 * 5).toISOString(),
@@ -49,7 +51,7 @@ const getMockConversation = (convId, userId) => {
     sim_conv_mock_3_sophie: {
       id: "sim_conv_mock_3_sophie",
       participant_ids: [uid, "mock_3"],
-      participant_names: ["You", "Sophie M."],
+      participant_names: ["You", memberDisplayName("mock_3")],
       participant_avatars: ["", "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&h=100&q=80"],
       last_message: "Let's do a beachside sunset dinner! 🌅",
       last_message_at: new Date(Date.now() - 86400000 * 2).toISOString(),
@@ -61,7 +63,7 @@ const getMockConversation = (convId, userId) => {
   return dataset[convId] || {
     id: convId,
     participant_ids: [uid, "mock_1"],
-    participant_names: ["You", "Travel Friend"],
+    participant_names: ["You", memberDisplayName("mock_1")],
     participant_avatars: ["", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&h=100&q=80"],
     last_message: "Hi! Looking forward to traveling together ✈️",
     last_message_at: new Date(Date.now() - 3600000).toISOString(),

@@ -3,45 +3,12 @@ import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 import { getAccessToken } from '@base44/sdk/dist/utils/auth-utils';
+import { DEMO_USER } from "@/lib/demo-user";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const mockUser = {
-    id: "mock-user-123",
-    email: "test@seluna.com",
-    role: "admin",
-    first_name: "Mock",
-    last_name: "User",
-    profile_name: "Mock User",
-    date_of_birth: "1995-01-01",
-    current_city: "Copenhagen",
-    country: "Denmark",
-    nationality: "Denmark",
-    languages_spoken: ["en", "da"],
-    biography: "I am a passionate traveler seeking companions and local experiences.",
-    travel_style: ["Solo", "Budget", "Cultural"],
-    interests: ["Hiking", "Museums", "Coffee", "Yoga"],
-    profile_photos: [
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80"
-    ],
-    main_photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
-    location_visibility: "approximate",
-    show_age: true,
-    show_upcoming_trips: true,
-    allow_match_suggestions: true,
-    allow_event_invitations: true,
-    allow_notifications: true,
-    profile_completed: true,
-    is_email_verified: true,
-    accepted_terms_at: new Date().toISOString(),
-    accepted_privacy_at: new Date().toISOString(),
-    accepted_community_guidelines_at: new Date().toISOString(),
-    subscription_status: "active",
-  };
-
-  const [user, setUser] = useState(mockUser);
+  const [user, setUser] = useState(DEMO_USER);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [isLoadingAuth, setIsLoadingAuth] = useState(false);
   const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(false);
@@ -171,6 +138,17 @@ export const AuthProvider = ({ children }) => {
     base44.auth.redirectToLogin(window.location.href);
   };
 
+  const loginAsDemo = () => {
+    setUser(DEMO_USER);
+    setIsAuthenticated(true);
+    setAuthChecked(true);
+    setAuthError(null);
+  };
+
+  const patchUser = (partial) => {
+    setUser((prev) => (prev ? { ...prev, ...partial } : prev));
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -183,7 +161,9 @@ export const AuthProvider = ({ children }) => {
       logout,
       navigateToLogin,
       checkUserAuth,
-      checkAppState
+      checkAppState,
+      loginAsDemo,
+      patchUser,
     }}>
       {children}
     </AuthContext.Provider>

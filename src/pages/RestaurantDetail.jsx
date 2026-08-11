@@ -9,16 +9,21 @@ import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import ReportSheet from "@/components/reports/ReportSheet";
+import { fallbackRestaurant } from "@/lib/images";
+import { useRestaurants } from "@/lib/useContent";
 
 export default function RestaurantDetail() {
   const { name } = useParams();
   const navigate = useNavigate();
   const { isSaved, toggle } = useSaved();
+  const { items: restaurants, loading } = useRestaurants();
   const r = useMemo(() => {
-    const found = restaurants.find((x) => x.name.toLowerCase() === name?.toLowerCase());
+    const decoded = decodeURIComponent(name || "");
+    const found = restaurants.find((x) => x.name.toLowerCase() === decoded.toLowerCase());
     if (found) return found;
     if (!name) return null;
     const restName = decodeURIComponent(name);
+    const fb = fallbackRestaurant(restName);
     return {
       name: restName,
       city: "Travel Destination",
@@ -32,11 +37,9 @@ export default function RestaurantDetail() {
       phone: "+1 555-0199",
       website: "https://selunatribe.app",
       description: `An exquisite dining experience featuring local produce, authentic wine, and a warm atmosphere.`,
-      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80",
-      gallery: [
-        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80"
-      ],
+      cuisine: "International",
+      image: fb.image,
+      gallery: fb.gallery,
       tags: { outdoor: true, reservations: true, vegan: true }
     };
   }, [restaurants, name]);
@@ -47,13 +50,13 @@ export default function RestaurantDetail() {
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-3">
         <p className="font-display font-semibold">Restaurant not found</p>
-        <button onClick={() => navigate("/restaurants")} className="text-sm text-[#A1846B] underline">Back to restaurants</button>
+        <button onClick={() => navigate("/restaurants")} className="text-sm text-primary underline">Back to restaurants</button>
       </div>
     );
 
   const itemKey = `restaurant:${r.name}`;
   const saved = isSaved(itemKey);
-  const facilities = Object.entries(r.tags).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]);
+  const facilities = Object.entries(r.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${r.address}, ${r.city}`)}`;
 
   const onShare = async () => {
@@ -71,7 +74,7 @@ export default function RestaurantDetail() {
           <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={onShare} className="w-9 h-9 rounded-full flex items-center justify-center"><Share2 className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={() => toggle({ type: "restaurant", title: r.name, location: r.city, country: r.country, image: r.image, rating: r.rating })} className="w-9 h-9 rounded-full flex items-center justify-center">
-            <Bookmark className={cn("w-5 h-5", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
+            <Bookmark className={cn("w-5 h-5", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
           </button>
         </div>
       </header>
@@ -79,10 +82,10 @@ export default function RestaurantDetail() {
       <div className="flex-1 overflow-y-auto pb-6">
         <div className="relative h-64">
           <Image src={r.gallery[0]} alt={r.name} fittingType="fill" className="w-full h-full" />
-          <span className="absolute top-3 left-3 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">{PRICE_LABELS[r.price]}</span>
-          <span className="absolute bottom-3 left-3 text-xs px-2 py-0.5 rounded-full bg-[#A1846B] text-white">{r.cuisine}</span>
+          <span className="absolute top-3 left-3 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-primary font-medium">{PRICE_LABELS[r.price]}</span>
+          <span className="absolute bottom-3 left-3 text-xs px-2 py-0.5 rounded-full bg-primary text-white">{r.cuisine}</span>
         </div>
-        <div className="flex gap-2 px-5 -mt-6 relative">
+        <div className="flex gap-2 app-px -mt-6 relative">
           {r.gallery.map((g, i) => (
             <div key={i} className="w-20 h-20 rounded-xl overflow-hidden border-2 border-background shadow-card">
               <Image src={g} alt="" fittingType="fill" className="w-full h-full" />
@@ -90,13 +93,13 @@ export default function RestaurantDetail() {
           ))}
         </div>
 
-        <div className="px-5 mt-4">
+        <div className="detail-body">
           <h1 className="font-display font-bold text-lg">{r.name}</h1>
           <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground"><MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {r.city}, {r.country} · {r.distance} km</div>
 
           <div className="flex items-center gap-2 mt-3">
-            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#A1846B]/10 text-[#7a5c44]">
-              <Star className="w-3.5 h-3.5 fill-[#A1846B] text-[#A1846B]" strokeWidth={0} />
+            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary">
+              <Star className="w-3.5 h-3.5 fill-primary text-primary" strokeWidth={0} />
               <span className="font-semibold text-sm">{r.rating.toFixed(1)}</span>
               <span className="text-xs text-muted-foreground">Seluna rating</span>
             </span>
@@ -106,12 +109,13 @@ export default function RestaurantDetail() {
           <p className="text-sm text-muted-foreground leading-relaxed mt-4">{r.description}</p>
 
           <div className="mt-5 space-y-2">
-            <div className="flex items-start gap-2 text-sm"><MapPin className="w-4 h-4 text-[#A1846B] mt-0.5" strokeWidth={1.5} /><span>{r.address}</span></div>
-            <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-[#A1846B] mt-0.5" strokeWidth={1.5} /><span>{r.hours}</span></div>
-            <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-[#A1846B] mt-0.5" strokeWidth={1.5} /><span>{r.phone}</span></div>
-            <a href={r.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-[#A1846B]"><Globe className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">{r.website.replace("https://", "")}</span></a>
-            {r.menuUrl && <a href={r.menuUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-[#A1846B]"><UtensilsCrossed className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">View menu</span></a>}
-            {r.reservationUrl && <a href={r.reservationUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-[#A1846B]"><CalendarCheck className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">Make a reservation</span></a>}
+            <div className="flex items-start gap-2 text-sm"><MapPin className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{r.address}</span></div>
+            <EventMap compact query={r.address} label={[r.address, r.city].filter(Boolean).join(", ")} />
+            <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{r.hours}</span></div>
+            <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{r.phone}</span></div>
+            <a href={r.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">{r.website.replace("https://", "")}</span></a>
+            {r.menuUrl && <a href={r.menuUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><UtensilsCrossed className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">View menu</span></a>}
+            {r.reservationUrl && <a href={r.reservationUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><CalendarCheck className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">Make a reservation</span></a>}
           </div>
 
           <section className="mt-5">
@@ -119,11 +123,6 @@ export default function RestaurantDetail() {
             <div className="flex flex-wrap gap-2">
               {facilities.map((f) => <span key={f} className="text-xs px-2.5 py-1 rounded-full border border-border">{f}</span>)}
             </div>
-          </section>
-
-          <section className="mt-5">
-            <h2 className="font-display font-semibold text-base mb-2">Location</h2>
-            <EventMap query={r.address} />
           </section>
 
           <ReviewSection itemKey={itemKey} itemType="restaurant" itemTitle={r.name} />
@@ -135,14 +134,23 @@ export default function RestaurantDetail() {
         </div>
       </div>
 
-      <div className="sticky bottom-0 px-5 pt-3 safe-pb bg-background/95 backdrop-blur border-t border-border flex gap-2">
-        <Button variant="outline" className="flex-1" onClick={() => toggle({ type: "restaurant", title: r.name, location: r.city, country: r.country, image: r.image, rating: r.rating })}>
-          <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "")} strokeWidth={1.5} /> {saved ? "Saved" : "Save"}
-        </Button>
-        <Button variant="outline" className="flex-1" onClick={onShare}><Share2 className="w-4 h-4" strokeWidth={1.5} /> Share</Button>
+      <div className="sticky bottom-0 app-px pt-3 safe-pb bg-background/95 backdrop-blur border-t border-border flex gap-2">
         <a href={directionsUrl} target="_blank" rel="noreferrer" className="flex-1">
-          <Button className="w-full bg-foreground text-background"><Navigation className="w-4 h-4" strokeWidth={1.5} /> Directions</Button>
+          <Button variant="outline" className="w-full">
+            <Navigation className="w-4 h-4" strokeWidth={1.5} /> Directions
+          </Button>
         </a>
+        {r.reservationUrl ? (
+          <a href={r.reservationUrl} target="_blank" rel="noreferrer" className="flex-1">
+            <Button className="w-full bg-primary text-primary-foreground">
+              <CalendarCheck className="w-4 h-4" strokeWidth={1.5} /> Reserve
+            </Button>
+          </a>
+        ) : (
+          <Button className="flex-1 bg-primary text-primary-foreground" onClick={onShare}>
+            <Share2 className="w-4 h-4" strokeWidth={1.5} /> Share
+          </Button>
+        )}
       </div>
     </div>
   );

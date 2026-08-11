@@ -96,7 +96,7 @@ export default function PhotoManager({ photos = [], mainPhoto, onChange }) {
                     >
                       <Image src={url} alt="Profile" fittingType="fill" className="w-full h-full" />
                       {mainPhoto === url && (
-                        <span className="absolute top-1 left-1 bg-[#A1846B] text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium z-10">
+                        <span className="absolute top-1 left-1 bg-primary text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium z-10">
                           Main
                         </span>
                       )}
@@ -132,7 +132,7 @@ export default function PhotoManager({ photos = [], mainPhoto, onChange }) {
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="aspect-square rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:border-[#A1846B] hover:text-[#A1846B] transition"
+                  className="aspect-square rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition"
                 >
                   {uploading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />

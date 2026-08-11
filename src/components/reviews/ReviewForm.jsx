@@ -53,7 +53,7 @@ export default function ReviewForm({ itemKey, itemType, itemTitle, onPosted }) {
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="text-sm text-[#A1846B] flex items-center gap-1">
+      <button onClick={() => setOpen(true)} className="text-sm text-primary flex items-center gap-1">
         <Star className="w-3.5 h-3.5" strokeWidth={1.5} /> Write a review
       </button>
     );
@@ -69,7 +69,7 @@ export default function ReviewForm({ itemKey, itemType, itemTitle, onPosted }) {
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} onClick={() => setRating(n)}>
-            <Star className={cn("w-6 h-6", n <= rating ? "fill-[#A1846B] text-[#A1846B]" : "text-border")} strokeWidth={0} />
+            <Star className={cn("w-6 h-6", n <= rating ? "fill-primary text-primary" : "text-border")} strokeWidth={0} />
           </button>
         ))}
       </div>

@@ -83,13 +83,13 @@ export default function ApplePaywall({
       <div className="w-full max-w-app">
         {/* Brand */}
         <div className="flex flex-col items-center mb-8">
-          <Moon className="w-6 h-6 text-[#A1846B] mb-1" strokeWidth={1.5} />
-          <h1 className="font-display font-semibold text-3xl tracking-[0.08em] text-[#A1846B]">SELUNA</h1>
+          <Moon className="w-6 h-6 text-primary mb-1" strokeWidth={1.5} />
+          <h1 className="font-display font-semibold text-3xl tracking-[0.08em] text-primary">SELUNA</h1>
         </div>
 
         <div className="bg-card rounded-3xl shadow-premium border border-border p-7">
           <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="w-5 h-5 text-[#A1846B]" strokeWidth={1.5} />
+            <Sparkles className="w-5 h-5 text-primary" strokeWidth={1.5} />
             <h2 className="font-display font-bold text-lg text-foreground">Seluna Plus</h2>
           </div>
           <p className="text-sm text-muted-foreground">
@@ -109,7 +109,7 @@ export default function ApplePaywall({
                   className={cn(
                     "w-full flex items-center justify-between rounded-2xl border p-4 text-left transition card-press",
                     active
-                      ? "border-[#A1846B] bg-[#A1846B]/5 ring-1 ring-[#A1846B]/30"
+                      ? "border-primary bg-primary/5 ring-1 ring-primary/30"
                       : "border-border"
                   )}
                 >
@@ -133,7 +133,7 @@ export default function ApplePaywall({
                     <div
                       className={cn(
                         "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",
-                        active ? "border-[#A1846B] bg-[#A1846B]" : "border-border"
+                        active ? "border-primary bg-primary" : "border-border"
                       )}
                     >
                       {active && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
@@ -155,7 +155,7 @@ export default function ApplePaywall({
             type="button"
             onClick={handleContinue}
             disabled={purchasing}
-            className="w-full h-12 mt-6 rounded-full bg-[#A1846B] text-white font-medium text-sm flex items-center justify-center disabled:opacity-60 active:scale-[0.99] transition"
+            className="w-full h-12 mt-6 rounded-full bg-primary text-white font-medium text-sm flex items-center justify-center disabled:opacity-60 active:scale-[0.99] transition"
           >
             {purchasing ? (
               <>
@@ -190,7 +190,7 @@ export default function ApplePaywall({
             <button
               type="button"
               onClick={onTerms || (() => navigate("/terms"))}
-              className="text-[#A1846B] underline-offset-2 hover:underline"
+              className="text-primary underline-offset-2 hover:underline"
             >
               Terms of Use
             </button>
@@ -198,7 +198,7 @@ export default function ApplePaywall({
             <button
               type="button"
               onClick={onPrivacy || (() => navigate("/privacy"))}
-              className="text-[#A1846B] underline-offset-2 hover:underline"
+              className="text-primary underline-offset-2 hover:underline"
             >
               Privacy Policy
             </button>

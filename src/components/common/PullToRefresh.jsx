@@ -84,7 +84,7 @@ export default function PullToRefresh({ onRefresh, className = "", children }) {
   }, []);
 
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} className={`${className} min-h-0 min-w-0 max-w-full overflow-x-hidden`}>
       <div
         className="flex items-end justify-center overflow-hidden"
         style={{
@@ -93,7 +93,7 @@ export default function PullToRefresh({ onRefresh, className = "", children }) {
         }}
       >
         <Loader2
-          className={"w-5 h-5 text-[#A1846B] " + (refreshing ? "animate-spin" : "")}
+          className={"w-5 h-5 text-primary " + (refreshing ? "animate-spin" : "")}
           style={{ opacity: Math.min(1, distance / THRESHOLD) }}
           strokeWidth={1.5}
         />

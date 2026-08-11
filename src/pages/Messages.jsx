@@ -6,6 +6,9 @@ import { useAuth } from "@/lib/AuthContext";
 import ConversationRow from "@/components/messages/ConversationRow";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
+import ScreenHeader from "@/components/common/ScreenHeader";
+import { useDemoFallbacks } from "@/lib/demo-fallbacks";
+import { getMockConversations } from "@/lib/member-profile";
 import { onRefresh } from "@/lib/refresh-bus";
 
 function timeLabel(iso) {
@@ -22,49 +25,6 @@ function timeLabel(iso) {
   if (days < 7) return d.toLocaleDateString("en-US", { weekday: "short" });
   return d.toLocaleDateString("en-US", { month: "numeric", day: "numeric" });
 }
-
-const getMockConversations = (userId) => [
-  {
-    id: "sim_conv_mock_1",
-    participant_ids: [userId, "mock_1"],
-    participant_names: ["Anika K.", "Maya R."],
-    participant_avatars: ["", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&h=100&q=80"],
-    last_message: "Hey! Are you still planning for Bali?",
-    last_message_at: new Date(Date.now() - 3600000).toISOString(),
-    unread: { [userId]: 2 },
-    created_date: new Date().toISOString()
-  },
-  {
-    id: "sim_conv_mock_2",
-    participant_ids: [userId, "mock_2"],
-    participant_names: ["Anika K.", "Ava L."],
-    participant_avatars: ["", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80"],
-    last_message: "Sure! Let's discuss the itinerary.",
-    last_message_at: new Date(Date.now() - 86400000).toISOString(),
-    unread: { [userId]: 0 },
-    created_date: new Date().toISOString()
-  },
-  {
-    id: "sim_conv_mock_3",
-    participant_ids: [userId, "mock_4"],
-    participant_names: ["Anika K.", "Isabella K."],
-    participant_avatars: ["", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&h=100&q=80"],
-    last_message: "That sounds great!",
-    last_message_at: new Date(Date.now() - 86400000 * 4).toISOString(),
-    unread: { [userId]: 0 },
-    created_date: new Date().toISOString()
-  },
-  {
-    id: "sim_conv_mock_4",
-    participant_ids: [userId, "mock_5"],
-    participant_names: ["Anika K.", "Emma T."],
-    participant_avatars: ["", "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=100&h=100&q=80"],
-    last_message: "Let me know the details.",
-    last_message_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-    unread: { [userId]: 0 },
-    created_date: new Date().toISOString()
-  }
-];
 
 export default function Messages() {
   const navigate = useNavigate();
@@ -84,11 +44,13 @@ export default function Messages() {
         base44.entities.BlockedMember.list("-created_date", 200),
       ]);
       const dbIds = new Set(convs.map((c) => c.id));
-      const mockToAdd = getMockConversations(user?.id).filter((m) => !dbIds.has(m.id));
+      const mockToAdd = useDemoFallbacks
+        ? getMockConversations(user?.id).filter((m) => !dbIds.has(m.id))
+        : [];
       setConversations([...convs, ...mockToAdd]);
       setBlockedIds(new Set(blocked.map((b) => b.blocked_user_id)));
-    } catch (e) {
-      setConversations(getMockConversations(user?.id));
+    } catch {
+      setConversations(useDemoFallbacks ? getMockConversations(user?.id) : []);
       setBlockedIds(new Set());
     } finally {
       setLoading(false);
@@ -131,9 +93,8 @@ export default function Messages() {
   }, [conversations, blockedIds, user, query]);
 
   return (
-    <div className="px-5 pt-12 pb-24">
-      <h1 className="font-display font-bold text-lg mb-1">Messages</h1>
-      <p className="text-sm text-muted-foreground mb-4">Chat with your travel friends</p>
+    <div className="page-shell">
+      <ScreenHeader title="Messages" subtitle="Chat with your travel friends" />
 
       {/* Search */}
       <div className="flex items-center gap-2 bg-card border border-border/80 shadow-soft rounded-2xl px-4 py-3 mb-4">
@@ -152,7 +113,7 @@ export default function Messages() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5 px-0.5">
             Your Matches
           </p>
-          <div className="flex gap-3.5 overflow-x-auto no-scrollbar app-gutter-x py-1">
+          <div className="flex gap-3.5 h-scroll py-1">
             {rows.map((r) => (
               <button
                 key={r.id}
@@ -163,10 +124,10 @@ export default function Messages() {
                   <img
                     src={r.avatar}
                     alt={r.name}
-                    className="w-14 h-14 rounded-full object-cover border-2 border-[#A1846B] shadow-soft"
+                    className="w-14 h-14 rounded-full object-cover border-2 border-primary shadow-soft"
                   />
                   {r.unread > 0 && (
-                    <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#A1846B] ring-2 ring-card rounded-full" />
+                    <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-primary ring-2 ring-card rounded-full" />
                   )}
                 </div>
                 <span className="text-xs font-medium text-foreground truncate max-w-[64px]">

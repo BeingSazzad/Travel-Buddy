@@ -29,15 +29,15 @@ export default function ForgotPassword() {
     <AuthLayout
       icon={Mail}
       title="Reset password"
-      subtitle="We'll send you a link to reset it"
+      subtitle="We'll email you a secure link to choose a new password."
       footer={
-        <Link to="/login" className="text-primary font-medium hover:underline">
+        <Link to="/login" className="auth-link">
           <ArrowLeft className="w-3 h-3 inline mr-1" />Back to log in
         </Link>
       }
     >
       {sent ? (
-        <p className="text-sm text-foreground text-center">
+        <p className="text-sm text-muted-foreground leading-relaxed text-center">
           If an account exists with that email, you'll receive a password reset link shortly.
         </p>
       ) : (
@@ -54,12 +54,12 @@ export default function ForgotPassword() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="pl-10 h-12"
+                className="pl-10 auth-input"
                 required
               />
             </div>
           </div>
-          <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
+          <Button type="submit" variant="primary" className="w-full" disabled={loading}>
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />

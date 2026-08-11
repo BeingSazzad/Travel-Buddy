@@ -23,7 +23,7 @@ function Row({ icon: Icon, label, children, danger, onClick, disabled }) {
       disabled={disabled}
       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm transition ${danger ? "border-destructive/30 text-destructive" : "border-border"} disabled:opacity-50`}
     >
-      <Icon className={`w-4 h-4 ${danger ? "text-destructive" : "text-[#A1846B]"}`} strokeWidth={1.5} />
+      <Icon className={`w-4 h-4 ${danger ? "text-destructive" : "text-primary"}`} strokeWidth={1.5} />
       <span className="flex-1 text-left">{label}</span>
       {children}
     </button>
@@ -104,7 +104,7 @@ export default function AdminUserSheet({ open, user, onClose, onChanged }) {
               {user.account_status || "active"}
             </span>
             {user.verified && (
-              <span className="px-2 py-0.5 rounded-full bg-[#A1846B]/10 text-[#7a5c44] flex items-center gap-1">
+              <span className="px-2 py-0.5 rounded-full bg-primary/10 text-brand-strong flex items-center gap-1">
                 <BadgeCheck className="w-3 h-3" strokeWidth={1.5} /> Verified
               </span>
             )}

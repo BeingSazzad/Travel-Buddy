@@ -3,6 +3,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { Plane } from "lucide-react";
+import { SHARE_MOCK_SAVED } from "@/lib/mock-saved";
+import { SHARE_MOCK_TRIPS } from "@/lib/images";
 
 const TABS = [
   { id: "saved", label: "Saved" },
@@ -28,29 +30,14 @@ export default function ShareSheet({ open, onOpenChange, onShare }) {
           base44.entities.Trip.list("-start_date", 100).catch(() => []),
         ]);
         
-        const mockSaved = [
-          { id: "mock_s1", type: "cafe", item_key: "cafe_1", title: "Amoudi Sunset Cafe", location: "Santorini", country: "Greece", image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=400&q=80", info: "Cozy sunset views over the cliffs" },
-          { id: "mock_s2", type: "hotel", item_key: "hotel_1", title: "Copenhagen Boutique Hotel", location: "Copenhagen", country: "Denmark", image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80", info: "Lovely mid-century interior design" },
-          { id: "mock_s3", type: "restaurant", item_key: "rest_1", title: "Marrakech Rooftop Grill", location: "Marrakech", country: "Morocco", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=400&q=80", info: "Traditional tagines and fresh mint tea" }
-        ];
-        
-        const mockTrips = [
-          { id: "mock_t1", name: "Lisbon Getaway", city: "Lisbon", country: "Portugal", start_date: "2026-08-10", end_date: "2026-08-17", cover_image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=400&q=80" },
-          { id: "mock_t2", name: "Bali Retreat", city: "Bali", country: "Indonesia", start_date: "2026-08-20", end_date: "2026-08-28", cover_image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=400&q=80" }
-        ];
+        const mockSaved = SHARE_MOCK_SAVED;
+        const mockTrips = SHARE_MOCK_TRIPS;
 
         setSaved([...(s || []), ...mockSaved]);
         setTrips([...(t || []).filter((x) => x.visibility !== "hidden"), ...mockTrips]);
       } catch (e) {
-        setSaved([
-          { id: "mock_s1", type: "cafe", item_key: "cafe_1", title: "Amoudi Sunset Cafe", location: "Santorini", country: "Greece", image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=400&q=80", info: "Cozy sunset views over the cliffs" },
-          { id: "mock_s2", type: "hotel", item_key: "hotel_1", title: "Copenhagen Boutique Hotel", location: "Copenhagen", country: "Denmark", image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=400&q=80", info: "Lovely mid-century interior design" },
-          { id: "mock_s3", type: "restaurant", item_key: "rest_1", title: "Marrakech Rooftop Grill", location: "Marrakech", country: "Morocco", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=400&q=80", info: "Traditional tagines and fresh mint tea" }
-        ]);
-        setTrips([
-          { id: "mock_t1", name: "Lisbon Getaway", city: "Lisbon", country: "Portugal", start_date: "2026-08-10", end_date: "2026-08-17", cover_image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?auto=format&fit=crop&w=400&q=80" },
-          { id: "mock_t2", name: "Bali Retreat", city: "Bali", country: "Indonesia", start_date: "2026-08-20", end_date: "2026-08-28", cover_image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=400&q=80" }
-        ]);
+        setSaved(SHARE_MOCK_SAVED);
+        setTrips(SHARE_MOCK_TRIPS);
       } finally {
         setLoading(false);
       }
@@ -108,7 +95,7 @@ export default function ShareSheet({ open, onOpenChange, onShare }) {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium ${tab === t.id ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}`}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium border ${tab === t.id ? "chip-active" : "chip-inactive"}`}
             >
               {t.label}
             </button>
@@ -135,7 +122,7 @@ export default function ShareSheet({ open, onOpenChange, onShare }) {
                     <p className="text-sm font-medium truncate">{it.title}</p>
                     <p className="text-xs text-muted-foreground truncate">{[it.location, it.country].filter(Boolean).join(", ")}</p>
                   </div>
-                  <span className="text-[10px] uppercase text-[#A1846B] capitalize">{it.type}</span>
+                  <span className="text-[10px] uppercase text-primary capitalize">{it.type}</span>
                 </button>
               ))
             ))}
@@ -159,7 +146,7 @@ export default function ShareSheet({ open, onOpenChange, onShare }) {
                     <p className="text-sm font-medium truncate">{tr.name || tr.city}</p>
                     <p className="text-xs text-muted-foreground truncate">{[tr.city, tr.country].filter(Boolean).join(", ")}</p>
                   </div>
-                  <Plane className="w-4 h-4 text-[#A1846B]" strokeWidth={1.5} />
+                  <Plane className="w-4 h-4 text-primary" strokeWidth={1.5} />
                 </button>
               ))
             ))}

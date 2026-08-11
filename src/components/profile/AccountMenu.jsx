@@ -18,7 +18,7 @@ export default function AccountMenu() {
       onClick={onClick}
       className="w-full flex items-center gap-3 px-4 py-3 border-b border-border/60 last:border-0 active:bg-muted/40 transition"
     >
-      <Icon className={`w-4 h-4 ${danger ? "text-destructive" : "text-[#A1846B]"}`} strokeWidth={1.5} />
+      <Icon className={`w-4 h-4 ${danger ? "text-destructive" : "text-primary"}`} strokeWidth={1.5} />
       <span className={`flex-1 text-left text-xs font-medium ${danger ? "text-destructive" : "text-foreground"}`}>{label}</span>
       <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" strokeWidth={1.5} />
     </button>

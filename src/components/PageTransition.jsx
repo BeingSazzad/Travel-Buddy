@@ -1,19 +1,16 @@
-import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 
-const EASE = [0.22, 1, 0.36, 1];
+const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 export default function PageTransition({ children }) {
   const { pathname } = useLocation();
   return (
-    <motion.div
+    <div
       key={pathname}
-      className="h-full min-h-0 app-scroll"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.36, ease: EASE }}
+      className="h-full min-h-0 overflow-hidden overflow-x-hidden min-w-0 max-w-full animate-in fade-in slide-in-from-bottom-2 duration-300"
+      style={{ animationTimingFunction: EASE }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

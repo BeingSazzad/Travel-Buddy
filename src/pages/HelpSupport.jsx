@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, HelpCircle, Mail, ShieldAlert } from "lucide-react";
+import ScrollPage, { ScrollPageHeader, ScrollPageBody } from "@/components/common/ScrollPage";
 
 const FAQ = [
   {
@@ -29,33 +30,32 @@ export default function HelpSupport() {
   const navigate = useNavigate();
 
   return (
-    <div className="max-w-app mx-auto min-h-0 bg-background flex flex-col">
-      <header className="sticky top-0 z-20 px-app pt-10 pb-3 flex items-center gap-3 bg-background/90 backdrop-blur border-b border-border">
+    <ScrollPage>
+      <ScrollPageHeader>
         <button
           onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition"
+          className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition shrink-0"
         >
           <ArrowLeft className="w-5 h-5 text-foreground" strokeWidth={1.75} />
         </button>
         <h1 className="font-display font-bold text-lg">Help & Support</h1>
-      </header>
+      </ScrollPageHeader>
 
-      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 pb-12">
+      <ScrollPageBody className="space-y-6">
         <div className="text-center mb-4">
-          <div className="w-12 h-12 rounded-2xl bg-[#A1846B]/10 flex items-center justify-center mx-auto mb-3">
-            <HelpCircle className="w-6 h-6 text-[#A1846B]" strokeWidth={1.5} />
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
+            <HelpCircle className="w-6 h-6 text-primary" strokeWidth={1.5} />
           </div>
           <p className="font-display font-bold text-base">How can we help you?</p>
           <p className="text-xs text-muted-foreground mt-1">Frequently asked questions & member support</p>
         </div>
 
-        {/* Quick action cards */}
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => navigate("/community-guidelines")}
             className="flex flex-col items-start p-4 rounded-2xl border border-border bg-card shadow-soft text-left active:scale-[0.98] transition"
           >
-            <ShieldAlert className="w-5 h-5 text-[#A1846B] mb-2" strokeWidth={1.5} />
+            <ShieldAlert className="w-5 h-5 text-primary mb-2" strokeWidth={1.5} />
             <p className="font-semibold text-xs text-foreground">Community Rules</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">Read safety guidelines</p>
           </button>
@@ -63,13 +63,12 @@ export default function HelpSupport() {
             href="mailto:support@seluna.app"
             className="flex flex-col items-start p-4 rounded-2xl border border-border bg-card shadow-soft text-left active:scale-[0.98] transition"
           >
-            <Mail className="w-5 h-5 text-[#A1846B] mb-2" strokeWidth={1.5} />
+            <Mail className="w-5 h-5 text-primary mb-2" strokeWidth={1.5} />
             <p className="font-semibold text-xs text-foreground">Email Support</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">Contact support team</p>
           </a>
         </div>
 
-        {/* FAQ list */}
         <div>
           <h2 className="font-display font-semibold text-sm mb-3">Frequently Asked Questions</h2>
           <div className="space-y-3">
@@ -82,18 +81,17 @@ export default function HelpSupport() {
           </div>
         </div>
 
-        {/* Contact banner */}
-        <div className="rounded-2xl bg-[#A1846B]/10 p-4 text-center">
-          <p className="font-semibold text-xs text-[#5c4636]">Still need assistance?</p>
+        <div className="rounded-2xl bg-primary/10 p-4 text-center">
+          <p className="font-semibold text-xs text-brand-strong">Still need assistance?</p>
           <p className="text-[11px] text-muted-foreground mt-1">Our support team responds within 24 hours.</p>
           <a
             href="mailto:support@seluna.app"
-            className="inline-block mt-3 px-4 py-2 rounded-full bg-[#A1846B] text-white text-xs font-semibold shadow-soft active:scale-95 transition"
+            className="inline-block mt-3 px-4 py-2 rounded-full bg-primary text-white text-xs font-semibold shadow-soft active:scale-95 transition"
           >
             Contact Support
           </a>
         </div>
-      </div>
-    </div>
+      </ScrollPageBody>
+    </ScrollPage>
   );
 }

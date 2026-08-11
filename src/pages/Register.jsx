@@ -11,7 +11,6 @@ import { UserPlus, Mail, Lock, Loader2, CalendarDays, Globe, Languages, Clock, E
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
-import AppleIcon from "@/components/AppleIcon";
 import { toast } from "@/components/ui/use-toast";
 
 const COUNTRIES = [
@@ -49,7 +48,7 @@ function ConsentRow({ id, checked, onCheck, text, linkLabel, to }) {
       <Checkbox id={id} checked={checked} onCheckedChange={onCheck} className="mt-0.5" />
       <Label htmlFor={id} className="text-xs font-normal text-muted-foreground leading-snug cursor-pointer">
         {text}{" "}
-        <Link to={to} className="text-primary font-medium hover:underline">{linkLabel}</Link>
+        <Link to={to} className="auth-link">{linkLabel}</Link>
       </Label>
     </div>
   );
@@ -184,16 +183,15 @@ export default function Register() {
   };
 
   const handleGoogle = () => base44.auth.loginWithProvider("google", "/");
-  const handleApple = () => base44.auth.loginWithProvider("apple", "/");
 
   if (accessRequestPending) {
     return (
       <AuthLayout
         icon={Clock}
         title="Access request sent"
-        subtitle={`We received your request for ${email}`}
+        subtitle={`We received your request for ${email}. We'll email you when access is approved.`}
       >
-        <p className="text-sm text-muted-foreground text-center mb-6">
+        <p className="text-sm text-muted-foreground leading-relaxed mb-6">
           This app is currently private. An admin must approve your request before you can sign in.
           You will receive an email when your access is granted.
         </p>
@@ -206,7 +204,11 @@ export default function Register() {
 
   if (showOtp) {
     return (
-      <AuthLayout icon={Mail} title="Verify your email" subtitle={`We sent a code to ${email}`}>
+      <AuthLayout
+        icon={Mail}
+        title="Verify your email"
+        subtitle={`Enter the 6-digit code we sent to ${email}`}
+      >
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">{error}</div>
         )}
@@ -227,7 +229,7 @@ export default function Register() {
         </Button>
         <p className="text-center text-sm text-muted-foreground mt-4">
           Didn't receive the code?{" "}
-          <button onClick={handleResend} className="text-primary font-medium hover:underline">Resend</button>
+          <button onClick={handleResend} className="auth-link">Resend code</button>
         </p>
       </AuthLayout>
     );
@@ -237,22 +239,22 @@ export default function Register() {
     <AuthLayout
       icon={UserPlus}
       title="Create your account"
-      subtitle="Women-only travel community · 18+"
+      subtitle="Women-only travel community · ages 18+"
       footer={
         <>
           Already have an account?{" "}
-          <Link to="/login" className="text-[#A1846B] font-medium hover:underline">Log in</Link>
+          <Link to="/login" className="auth-link">Log in</Link>
         </>
       }
     >
-      <div className="space-y-3 mb-6">
-        <Button variant="outline" size="md" className="w-full" onClick={handleGoogle}>
-          <GoogleIcon className="w-4 h-4" /> Continue with Google
-        </Button>
-        <Button variant="outline" size="md" className="w-full" onClick={handleApple}>
-          <AppleIcon className="w-4 h-4" /> Continue with Apple
-        </Button>
-      </div>
+      <Button
+        variant="outline"
+        size="md"
+        className="w-full mb-6 bg-card border-border/80"
+        onClick={handleGoogle}
+      >
+        <GoogleIcon className="w-4 h-4" /> Continue with Google
+      </Button>
 
       <div className="relative mb-6">
         <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border/85" /></div>
@@ -269,11 +271,11 @@ export default function Register() {
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="firstName" className="text-xs font-medium text-foreground/80">First name</Label>
-            <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="h-12 rounded-2xl border-border/80 focus-visible:ring-[#A1846B]/30" required />
+            <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="auth-input" required />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="lastName" className="text-xs font-medium text-foreground/80">Last name</Label>
-            <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} className="h-12 rounded-2xl border-border/80 focus-visible:ring-[#A1846B]/30" required />
+            <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} className="auth-input" required />
           </div>
         </div>
 
@@ -281,7 +283,7 @@ export default function Register() {
           <Label htmlFor="email" className="text-xs font-medium text-foreground/80">Email</Label>
           <div className="relative">
             <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input id="email" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10 h-12 rounded-2xl border-border/80 focus-visible:ring-[#A1846B]/30" required />
+            <Input id="email" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10 auth-input" required />
           </div>
         </div>
 
@@ -290,7 +292,7 @@ export default function Register() {
             <Label htmlFor="password" className="text-xs font-medium text-foreground/80">Password</Label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-              <Input id="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10 pr-9 h-12 rounded-2xl border-border/80 focus-visible:ring-[#A1846B]/30" required />
+              <Input id="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10 pr-9 auth-input" required />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -304,7 +306,7 @@ export default function Register() {
             <Label htmlFor="confirm" className="text-xs font-medium text-foreground/80">Confirm</Label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-              <Input id="confirm" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="pl-10 pr-9 h-12 rounded-2xl border-border/80 focus-visible:ring-[#A1846B]/30" required />
+              <Input id="confirm" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="pl-10 pr-9 auth-input" required />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -320,7 +322,7 @@ export default function Register() {
           <Label htmlFor="dob" className="text-xs font-medium text-foreground/80">Date of birth</Label>
           <div className="relative">
             <CalendarDays className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input id="dob" type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className="pl-10 h-12 rounded-2xl border-border/80 focus-visible:ring-[#A1846B]/30" required />
+            <Input id="dob" type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} className="pl-10 auth-input" required />
           </div>
         </div>
 
@@ -328,7 +330,7 @@ export default function Register() {
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-foreground/80">Country</Label>
             <Select value={country} onValueChange={setCountry}>
-              <SelectTrigger id="country" className="h-12 rounded-2xl border-border/80">
+              <SelectTrigger id="country" className="auth-input">
                 <div className="flex items-center gap-2">
                   <Globe className="w-4 h-4 text-muted-foreground" />
                   <SelectValue placeholder="Select" />
@@ -342,7 +344,7 @@ export default function Register() {
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-foreground/80">Language</Label>
             <Select value={preferredLanguage} onValueChange={setPreferredLanguage}>
-              <SelectTrigger id="language" className="h-12 rounded-2xl border-border/80">
+              <SelectTrigger id="language" className="auth-input">
                 <div className="flex items-center gap-2">
                   <Languages className="w-4 h-4 text-muted-foreground" />
                   <SelectValue placeholder="Select" />

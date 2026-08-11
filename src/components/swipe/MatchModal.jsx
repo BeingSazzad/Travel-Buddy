@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Sparkles, MessageCircle, User, Compass, Ban, Flag, HeartCrack } from "lucide-react";
+import { MessageCircle, User, Compass, Ban, Flag, UserMinus, Users } from "lucide-react";
 
 export default function MatchModal({ open, myAvatar, theirAvatar, onMessage, onProfile, onKeepExploring, onUnmatch, onBlock, onReport }) {
   return (
@@ -37,16 +37,16 @@ export default function MatchModal({ open, myAvatar, theirAvatar, onMessage, onP
           initial={{ scale: 0, rotate: -30 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ delay: 0.18, type: "spring", stiffness: 320, damping: 14 }}
-          className="w-12 h-12 rounded-full bg-[#A1846B] mx-auto -mt-6 flex items-center justify-center text-white shadow-soft relative z-20"
+          className="w-12 h-12 rounded-full bg-primary mx-auto -mt-6 flex items-center justify-center text-white shadow-soft relative z-20"
         >
-          <Sparkles className="w-6 h-6 text-white" strokeWidth={1.5} />
+          <Users className="w-6 h-6 text-white" strokeWidth={2} />
         </motion.div>
 
-        <h2 className="font-display font-bold text-lg mt-3">It's a match!</h2>
+        <h2 className="font-display font-bold text-lg mt-3">You're connected!</h2>
         <p className="text-sm text-muted-foreground mt-1">You can now start chatting.</p>
 
         <div className="space-y-2 mt-5">
-          <Button className="w-full bg-foreground text-background" onClick={onMessage}>
+          <Button className="w-full" onClick={onMessage}>
             <MessageCircle className="w-4 h-4 mr-2" strokeWidth={1.5} /> Start chatting
           </Button>
           <Button variant="outline" className="w-full" onClick={onProfile}>
@@ -59,7 +59,7 @@ export default function MatchModal({ open, myAvatar, theirAvatar, onMessage, onP
 
         <div className="flex items-center justify-center gap-4 mt-4 text-xs text-muted-foreground">
           <button onClick={onUnmatch} className="flex items-center gap-1.5 active:scale-95 transition">
-            <HeartCrack className="w-3.5 h-3.5" strokeWidth={1.5} /> Unmatch
+            <UserMinus className="w-3.5 h-3.5" strokeWidth={2} /> Remove connection
           </button>
           <span className="w-px h-3 bg-border" />
           <button onClick={onBlock} className="flex items-center gap-1.5 active:scale-95 transition">

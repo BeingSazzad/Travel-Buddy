@@ -7,11 +7,14 @@ import NotificationItem from "@/components/notifications/NotificationItem";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 
+import { memberDisplayName } from "@/lib/member-profile";
+import { useDemoFallbacks } from "@/lib/demo-fallbacks";
+
 const MOCK_NOTIFICATIONS = [
   {
     id: "notif_mock_1",
-    title: "New match with Maya R.! 🎉",
-    body: "Maya is also travelling to Lisbon in August. Send a message to plan your trip together.",
+    title: `New match with ${memberDisplayName("mock_1")}! 🎉`,
+    body: "Maya is also travelling to Bali in August. Send a message to plan your trip together.",
     type: "new_match",
     read: false,
     created_date: new Date(Date.now() - 30 * 60000).toISOString(),
@@ -24,11 +27,11 @@ const MOCK_NOTIFICATIONS = [
     type: "event_reminder",
     read: false,
     created_date: new Date(Date.now() - 3 * 3600000).toISOString(),
-    link: "/events",
+    link: "/events/event_mock_1",
   },
   {
     id: "notif_mock_3",
-    title: "Isabella sent you a message",
+    title: `${memberDisplayName("mock_4").split(" ")[0]} sent you a message`,
     body: '"That sounds great! Let\'s meet at Café Norden."',
     type: "new_message",
     read: true,
@@ -47,10 +50,10 @@ export default function Notifications() {
   const load = useCallback(async () => {
     try {
       const list = await base44.entities.Notification.list("-created_date", 60);
-      setItems(list.length > 0 ? list : MOCK_NOTIFICATIONS);
+      setItems(list.length > 0 ? list : useDemoFallbacks ? MOCK_NOTIFICATIONS : []);
       setError(false);
-    } catch (e) {
-      setItems(MOCK_NOTIFICATIONS);
+    } catch {
+      setItems(useDemoFallbacks ? MOCK_NOTIFICATIONS : []);
       setError(false);
     } finally {
       setLoading(false);
@@ -100,7 +103,7 @@ export default function Notifications() {
           <button
             type="button"
             onClick={markAll}
-            className="text-xs font-medium text-[#A1846B] tap-feedback"
+            className="text-xs font-medium text-primary tap-feedback"
           >
             Mark all read
           </button>

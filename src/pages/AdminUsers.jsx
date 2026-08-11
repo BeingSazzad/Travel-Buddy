@@ -66,7 +66,7 @@ export default function AdminUsers() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate flex items-center gap-1">
                   {displayName(u)}
-                  {u.verified && <BadgeCheck className="w-3.5 h-3.5 text-[#A1846B]" strokeWidth={1.5} />}
+                  {u.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary" strokeWidth={1.5} />}
                   {(u.account_status === "suspended" || u.account_status === "banned") && <Ban className="w-3.5 h-3.5 text-red-600" strokeWidth={1.5} />}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">{u.email}</p>

@@ -21,7 +21,7 @@ function Toggle({ id, label, desc, checked, onCheck }) {
         <Label className="text-sm font-medium">{label}</Label>
         {desc && <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>}
       </div>
-      <Switch checked={checked} onCheckedChange={onCheck} />
+      <Switch id={id} checked={checked} onCheckedChange={onCheck} />
     </div>
   );
 }
@@ -39,9 +39,11 @@ export default function PrivacySheet({ onClose }) {
       await base44.auth.updateMe({ location_visibility: loc, show_age: showAge, show_upcoming_trips: showTrips });
       await checkUserAuth();
       onClose();
-    } catch (e) {
+    } catch {
       alert("Could not save settings.");
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -51,7 +53,10 @@ export default function PrivacySheet({ onClose }) {
           <Label>Location visibility</Label>
           <RadioGroup value={loc} onValueChange={setLoc} className="gap-2">
             {LOC.map((o) => (
-              <label key={o.value} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer ${loc === o.value ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border"}`}>
+              <label
+                key={o.value}
+                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer ${loc === o.value ? "border-primary bg-primary/5" : "border-border"}`}
+              >
                 <RadioGroupItem value={o.value} />
                 <span className="text-sm">{o.label}</span>
               </label>

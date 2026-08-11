@@ -1,33 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Flag, Ban } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { REPORT_REASONS } from "@/components/reports/ReportSheet";
+import { reasonsForReportType } from "@/components/reports/ReportSheet";
 
-export default function SafetySheet({ open, onOpenChange, otherId, otherName, onDone }) {
-  const [mode, setMode] = useState(null);
-  const [reason, setReason] = useState(REPORT_REASONS[0].value);
+export default function SafetySheet({ open, onOpenChange, otherId, otherName, onDone, defaultMode = null }) {
+  const messageReasons = reasonsForReportType("message");
+  const [mode, setMode] = useState(defaultMode);
+  const [reason, setReason] = useState(messageReasons[0].value);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const reset = () => { setMode(null); setReason(REPORT_REASONS[0].value); setNote(""); };
+  const reset = () => { setMode(null); setReason(messageReasons[0].value); setNote(""); };
+
+  useEffect(() => {
+    if (open) setMode(defaultMode);
+  }, [open, defaultMode]);
 
   const submit = async () => {
     try {
       setBusy(true);
       if (mode === "report") {
-        await base44.entities.Report.create({
-          reported_type: "message",
-          reported_id: otherId,
-          reported_title: `Conversation with ${otherName}`,
-          reported_user_id: otherId,
-          reason,
-          explanation: note.trim(),
-        });
-        await base44.entities.BlockedMember.create({ blocked_user_id: otherId, reason: "report", note });
+        try {
+          await base44.entities.Report.create({
+            reported_type: "message",
+            reported_id: otherId,
+            reported_title: `Conversation with ${otherName}`,
+            reported_user_id: otherId,
+            reason,
+            explanation: note.trim(),
+          });
+          await base44.entities.BlockedMember.create({ blocked_user_id: otherId, reason: "report", note });
+        } catch {
+          if (!import.meta.env.DEV) throw new Error("report failed");
+        }
       } else {
-        await base44.entities.BlockedMember.create({ blocked_user_id: otherId, reason: "block", note });
+        try {
+          await base44.entities.BlockedMember.create({ blocked_user_id: otherId, reason: "block", note });
+        } catch {
+          if (!import.meta.env.DEV) throw new Error("block failed");
+        }
       }
       reset();
       onDone();
@@ -56,7 +69,7 @@ export default function SafetySheet({ open, onOpenChange, otherId, otherName, on
                 onClick={() => setMode("report")}
                 className="w-full flex items-center gap-3 p-3 rounded-2xl border border-border hover:bg-muted/40 text-left"
               >
-                <Flag className="w-5 h-5 text-[#A1846B]" strokeWidth={1.5} />
+                <Flag className="w-5 h-5 text-primary" strokeWidth={1.5} />
                 <div>
                   <p className="text-sm font-medium">Report conversation</p>
                   <p className="text-xs text-muted-foreground">Tell us what happened</p>
@@ -66,7 +79,7 @@ export default function SafetySheet({ open, onOpenChange, otherId, otherName, on
                 onClick={() => setMode("block")}
                 className="w-full flex items-center gap-3 p-3 rounded-2xl border border-border hover:bg-muted/40 text-left"
               >
-                <Ban className="w-5 h-5 text-[#A1846B]" strokeWidth={1.5} />
+                <Ban className="w-5 h-5 text-primary" strokeWidth={1.5} />
                 <div>
                   <p className="text-sm font-medium">Block user</p>
                   <p className="text-xs text-muted-foreground">Hide this conversation</p>
@@ -80,12 +93,12 @@ export default function SafetySheet({ open, onOpenChange, otherId, otherName, on
               <DialogTitle className="font-display">{mode === "report" ? "Report conversation" : "Block user"}</DialogTitle>
             </DialogHeader>
             {mode === "report" && (
-              <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1 -mr-1">
-                {REPORT_REASONS.map((r) => (
+              <div className="space-y-2">
+                {messageReasons.map((r) => (
                   <button
                     key={r.value}
                     onClick={() => setReason(r.value)}
-                    className={`w-full text-left px-3 py-2 rounded-xl border text-sm ${reason === r.value ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border"}`}
+                    className={`w-full text-left px-3 py-2 rounded-xl border text-sm ${reason === r.value ? "border-primary bg-primary/5" : "border-border"}`}
                   >
                     {r.label}
                   </button>
@@ -102,7 +115,7 @@ export default function SafetySheet({ open, onOpenChange, otherId, otherName, on
               <Button variant="outline" className="flex-1" onClick={() => setMode(null)} disabled={busy}>
                 Back
               </Button>
-              <Button className="flex-1 bg-foreground text-background" onClick={submit} disabled={busy}>
+              <Button className="flex-1" onClick={submit} disabled={busy}>
                 {mode === "report" ? "Report" : "Block"}
               </Button>
             </div>

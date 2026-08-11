@@ -1,16 +1,16 @@
 import { cn } from "@/lib/utils";
 
-/** Horizontal chip row with edge-to-edge scroll inside padded pages */
+/** Horizontal chip row — scroll contained, no page-level overflow */
 export default function ScrollFilterChips({
   items,
   active,
   onSelect,
-  activeClass = "bg-foreground text-background border-foreground",
-  inactiveClass = "border-border text-foreground bg-background/60",
+  activeClass = "chip-active",
+  inactiveClass = "chip-inactive",
 }) {
   return (
-    <div className="-mx-5 px-5">
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+    <div className="h-scroll min-w-0 max-w-full">
+      <div className="flex gap-2 pb-1">
         {items.map((item) => {
           const key = item.key ?? item.value ?? item;
           const label = item.label ?? item;

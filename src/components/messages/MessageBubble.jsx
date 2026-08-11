@@ -48,7 +48,7 @@ export default function MessageBubble({ message, mine, showTime, showSeen, selec
               </div>
             )}
             <div className="p-3">
-              <div className="flex items-center gap-1.5 text-[#A1846B]">
+              <div className="flex items-center gap-1.5 text-primary">
                 <meta.icon className="w-3.5 h-3.5" strokeWidth={1.5} />
                 <span className="text-xs font-medium uppercase tracking-wide">{meta.label}</span>
               </div>
@@ -67,7 +67,7 @@ export default function MessageBubble({ message, mine, showTime, showSeen, selec
 
         <div className={`flex items-center gap-1.5 mt-0.5 px-1 ${mine ? "flex-row-reverse" : ""}`}>
           {showTime && <span className="text-[10px] text-muted-foreground">{fmtTime(message.created_date)}</span>}
-          {mine && showSeen && <span className="text-[10px] text-[#A1846B]">Seen</span>}
+          {mine && showSeen && <span className="text-[10px] text-primary">Seen</span>}
         </div>
 
         {mine && selected && (

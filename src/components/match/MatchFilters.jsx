@@ -11,7 +11,7 @@ function ChipToggle({ label, active, onClick }) {
       type="button"
       onClick={onClick}
       className={`text-xs px-3 py-1.5 rounded-full border capitalize transition active:scale-95 ${
-        active ? "bg-[#A1846B] text-white border-[#A1846B]" : "bg-card text-muted-foreground border-border"
+        active ? "bg-primary text-white border-primary" : "bg-card text-muted-foreground border-border"
       }`}
     >
       {label}
@@ -114,7 +114,7 @@ export default function MatchFilters({ open, onOpenChange, filters, onChange, on
           <Button variant="outline" className="flex-1" onClick={onReset}>
             <RotateCcw className="w-4 h-4 mr-2" strokeWidth={1.5} /> Reset
           </Button>
-          <Button className="flex-1 bg-foreground text-background" onClick={() => onOpenChange(false)}>
+          <Button className="flex-1" onClick={() => onOpenChange(false)}>
             Apply
           </Button>
         </div>

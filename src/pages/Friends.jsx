@@ -1,78 +1,153 @@
-import { Search, MessageCircle, UserPlus, Sparkles } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import ScreenHeader from '@/components/common/ScreenHeader';
+import EmptyState from '@/components/common/EmptyState';
+import { ConnectIconButton } from '@/components/common/ConnectIconButton';
+import { useFriends } from '@/hooks/useFriends';
+import { useConnectionRequests } from '@/hooks/useConnectionRequests';
+import ConnectionRequestsPrompt from '@/components/friends/ConnectionRequestsPrompt';
+import { getDiscoverDeckMembers } from '@/lib/member-profile';
+import { base44 } from '@/api/base44Client';
+
+function SuggestedRow({ member, onConnect, connecting, requested, onViewProfile }) {
+  return (
+    <div className="flex items-center gap-3 py-2.5">
+      <button
+        type="button"
+        onClick={() => onViewProfile(member.memberId)}
+        className="flex flex-1 min-w-0 items-center gap-3 text-left active:bg-muted/40 rounded-2xl py-1 pr-1 transition"
+      >
+        <img
+          src={member.img}
+          alt={member.name}
+          className="w-12 h-12 rounded-full object-cover border border-border shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-sm">{member.name}</p>
+          <p className="text-xs text-muted-foreground truncate">{member.loc}</p>
+        </div>
+        <ChevronRight className="w-4 h-4 text-muted-foreground/60 shrink-0" strokeWidth={1.5} aria-hidden />
+      </button>
+      <ConnectIconButton
+        loading={connecting}
+        pending={requested}
+        onClick={() => onConnect(member.memberId)}
+        aria-label={
+          requested ? `Request sent to ${member.name}` : `Connect with ${member.name}`
+        }
+      />
+    </div>
+  );
+}
 
 export default function Friends() {
   const navigate = useNavigate();
+  const { friends, loading, reload: reloadFriends } = useFriends();
+  const { requests } = useConnectionRequests();
+  const [connectingId, setConnectingId] = useState(null);
+  const [requestedIds, setRequestedIds] = useState(() => new Set());
 
-  const friends = [
-    { name: 'Aria K.', loc: 'Berlin, DE', img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80', convId: 'sim_conv_mock_3' },
-    { name: 'Maya R.', loc: 'Lisbon, PT', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80', convId: 'sim_conv_mock_1' },
-    { name: 'Sofia L.', loc: 'Bali, ID', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80', convId: 'sim_conv_mock_2' },
-    { name: 'Nina T.', loc: 'Tokyo, JP', img: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=200&q=80', convId: 'sim_conv_mock_4' },
-    { name: 'Elena M.', loc: 'Marrakech, MA', img: 'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?auto=format&fit=crop&w=200&q=80', convId: 'sim_conv_mock_1' },
-  ];
+  const friendIds = useMemo(() => new Set(friends.map((f) => f.memberId)), [friends]);
 
-  const suggestions = [
-    { name: 'Camille D.', loc: 'Paris, FR', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80' },
-    { name: 'Yuki S.', loc: 'Osaka, JP', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=200&q=80' },
-  ];
+  const suggestions = useMemo(
+    () =>
+      getDiscoverDeckMembers()
+        .filter((m) => !friendIds.has(m.user_id))
+        .slice(0, 4)
+        .map((m) => ({
+          memberId: m.user_id,
+          name: m.name,
+          loc: `${m.current_city}, ${m.country}`,
+          img: m.avatar,
+        })),
+    [friendIds]
+  );
+
+  const handleConnect = async (memberId) => {
+    setConnectingId(memberId);
+    try {
+      await base44.functions.invoke('record-like', {
+        liked_user_id: memberId,
+        action: 'like',
+      });
+    } catch {
+      /* demo fallback */
+    }
+    setRequestedIds((prev) => new Set(prev).add(memberId));
+    await reloadFriends();
+    setConnectingId(null);
+  };
 
   return (
-    <div className="app-px safe-pt pb-24">
-      <h1 className="font-display font-bold text-lg mb-1">Friends</h1>
-      <p className="text-sm text-muted-foreground mb-4">Women exploring like you</p>
+    <div className="page-shell">
+      <ScreenHeader
+        title="Friends"
+        subtitle="Women you've connected with"
+        extraActions={
+          <Link to="/discover" className="text-sm font-medium text-primary shrink-0">
+            Match
+          </Link>
+        }
+      />
 
-      <Link
-        to="/discover"
-        className="w-full flex items-center gap-3 gradient-brand-accent text-white rounded-2xl px-4 py-4 mb-5 shadow-soft tap-feedback transition-shadow hover:shadow-md text-left"
-      >
-        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-          <Sparkles className="w-5 h-5" strokeWidth={1.5} />
+      <ConnectionRequestsPrompt count={requests.length} className="mb-5" />
+
+      {loading ? (
+        <div className="flex items-center justify-center py-12 text-muted-foreground">
+          <Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading friends…
         </div>
-        <div className="flex-1">
-          <p className="font-display font-semibold">Find travel friends</p>
-          <p className="text-xs text-white/80">Connect with women heading your way</p>
-        </div>
-      </Link>
-
-      <div className="flex items-center gap-2 bg-card border border-border shadow-soft rounded-2xl px-4 py-3 mb-5">
-        <Search className="w-4 h-4 text-muted-foreground" />
-        <input placeholder="Find travelers" className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
-      </div>
-
-      <div className="space-y-2">
-        {friends.map((f) => (
-          <div key={f.name} className="flex items-center gap-3 py-2">
-            <img src={f.img} alt={f.name} className="w-12 h-12 rounded-full object-cover" />
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm">{f.name}</p>
-              <p className="text-xs text-muted-foreground">{f.loc}</p>
-            </div>
+      ) : friends.length === 0 ? (
+        <EmptyState
+          title="No friends yet"
+          description="Match with women on Discover to build your travel circle."
+          actionLabel="Go to Match"
+          onAction={() => navigate('/discover')}
+        />
+      ) : (
+        <div className="space-y-1">
+          {friends.map((f) => (
             <button
-              onClick={() => navigate(`/conversations/${f.convId}`)}
-              className="w-9 h-9 rounded-full border border-border shadow-soft flex items-center justify-center text-muted-foreground hover:text-foreground transition"
+              key={f.memberId}
+              type="button"
+              onClick={() => navigate(`/members/${f.memberId}`)}
+              className="w-full flex items-center gap-3 py-3 rounded-2xl text-left active:bg-muted/40 transition"
             >
-              <MessageCircle className="w-4 h-4" />
+              <img
+                src={f.avatar}
+                alt={f.name}
+                className="w-12 h-12 rounded-full object-cover border border-border shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm">{f.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{f.loc}</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground/60 shrink-0" strokeWidth={1.5} aria-hidden />
             </button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
-      <h2 className="font-display font-semibold text-base mt-7 mb-3">Suggested for you</h2>
-      <div className="space-y-2">
-        {suggestions.map((f) => (
-          <div key={f.name} className="flex items-center gap-3 py-2">
-            <img src={f.img} alt={f.name} className="w-12 h-12 rounded-full object-cover" />
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm">{f.name}</p>
-              <p className="text-xs text-muted-foreground">{f.loc}</p>
-            </div>
-            <button className="w-9 h-9 rounded-full bg-foreground text-background flex items-center justify-center">
-              <UserPlus className="w-4 h-4" />
-            </button>
+      {suggestions.length > 0 && (
+        <>
+          <h2 className="section-header mt-7 mb-2">Suggested for you</h2>
+          <p className="text-xs text-muted-foreground mb-3">
+            Use the connect button, or tap a row to view their profile
+          </p>
+          <div className="space-y-1">
+            {suggestions.map((member) => (
+              <SuggestedRow
+                key={member.memberId}
+                member={member}
+                connecting={connectingId === member.memberId}
+                requested={requestedIds.has(member.memberId)}
+                onConnect={handleConnect}
+                onViewProfile={(id) => navigate(`/members/${id}`)}
+              />
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 }

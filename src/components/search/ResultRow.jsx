@@ -4,6 +4,7 @@ import { MapPin, Star } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import SaveButton from "@/components/common/SaveButton";
+import { resolveEventId } from "@/lib/mock-events";
 
 export default function ResultRow({ item }) {
   const navigate = useNavigate();
@@ -13,11 +14,19 @@ export default function ResultRow({ item }) {
     if (item.type === "cafe") navigate(`/cafes/${encodeURIComponent(item.title)}`);
     else if (item.type === "restaurant") navigate(`/restaurants/${encodeURIComponent(item.title)}`);
     else if (item.type === "hotel") navigate(`/hotels/${encodeURIComponent(item.title)}`);
-    else if (item.type === "destination") navigate(`/destinations/${encodeURIComponent(item.title)}`);
-    else if (item.type === "event") navigate("/events");
-    else if (item.type === "member") navigate("/discover");
-    else if (item.type === "deal") navigate("/deals");
-    else navigate("/search");
+    else if (item.type === "destination") navigate(`/destinations/${encodeURIComponent(item.location || item.title)}`);
+    else if (item.type === "city") navigate(`/destinations/${encodeURIComponent(item.location || item.title)}`);
+    else if (item.type === "country") navigate("/destinations");
+    else if (item.type === "event") {
+      const eventId = resolveEventId(item);
+      navigate(eventId ? `/events/${eventId}` : "/events");
+    } else if (item.type === "member") {
+      navigate(item.memberId ? `/members/${item.memberId}` : "/discover");
+    } else if (item.type === "deal") {
+      navigate(item.dealId ? `/deals/${item.dealId}` : "/deals");
+    } else if (item.type === "trip") {
+      navigate(item.tripId ? `/trips/${item.tripId}` : "/trips");
+    } else navigate("/search");
   };
 
   return (
@@ -34,20 +43,20 @@ export default function ResultRow({ item }) {
           <h3 className="font-display font-semibold text-sm text-foreground truncate">{item.title}</h3>
           {item.rating != null && (
             <span className="flex items-center gap-0.5 text-xs text-foreground shrink-0 font-medium">
-              <Star className="w-3 h-3 fill-[#A1846B] text-[#A1846B]" />
+              <Star className="w-3 h-3 fill-primary text-primary" />
               {item.rating}
             </span>
           )}
         </div>
         <div className="flex items-center gap-1 mt-0.5 text-xs text-muted-foreground">
-          <MapPin className="w-3 h-3 shrink-0 text-[#A1846B]" strokeWidth={1.5} />
+          <MapPin className="w-3 h-3 shrink-0 text-primary" strokeWidth={1.5} />
           <span className="truncate">
             {item.location}
             {item.country && item.country !== item.location ? `, ${item.country}` : ""}
           </span>
         </div>
         <div className="flex items-center gap-2 mt-1">
-          {item.info && <span className="text-xs text-[#A1846B] font-medium truncate">{item.info}</span>}
+          {item.info && <span className="text-xs text-primary font-medium truncate">{item.info}</span>}
           {item.price && <span className="text-xs text-muted-foreground">{item.price}</span>}
           {item.distance != null && <span className="text-xs text-muted-foreground">{item.distance} km</span>}
         </div>

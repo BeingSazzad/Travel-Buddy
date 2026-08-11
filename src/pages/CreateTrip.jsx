@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
+import { base44 } from "@/api/base44Client";
 import { useTrips } from "@/hooks/useTrips";
 import { imageForCity, formatDates } from "@/lib/trip-utils";
 import { COUNTRIES } from "@/lib/profile-options";
@@ -17,8 +18,10 @@ import TripMatches from "@/components/trips/TripMatches";
 
 const TOTAL = 5;
 const EMPTY = {
+  name: "",
   city: "", country: "", start_date: "", end_date: "",
   travel_style: "", looking_for: [], description: "", visibility: "public",
+  cover_image: "",
 };
 
 function Chip({ active, onClick, children }) {
@@ -28,7 +31,7 @@ function Chip({ active, onClick, children }) {
       onClick={onClick}
       className={cn(
         "px-3.5 py-2 rounded-full text-sm border capitalize transition",
-        active ? "bg-[#A1846B] text-white border-[#A1846B]" : "border-border text-foreground"
+        active ? "bg-primary text-white border-primary" : "border-border text-foreground"
       )}
     >
       {children}
@@ -43,6 +46,7 @@ export default function CreateTrip() {
   const [data, setData] = useState(EMPTY);
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(null);
+  const [uploadingCover, setUploadingCover] = useState(false);
 
   useEffect(() => {
     const c = new URLSearchParams(window.location.search).get("city");
@@ -73,17 +77,34 @@ export default function CreateTrip() {
   const back = () => (step === 1 ? navigate(-1) : setStep((s) => s - 1));
   const next = () => setStep((s) => s + 1);
 
+  const coverPreview = data.cover_image || (data.city.trim() ? imageForCity(data.city) : null);
+
+  const onCoverImage = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploadingCover(true);
+    try {
+      const res = await base44.integrations.Core.UploadFile({ file });
+      set("cover_image", res.file_url);
+    } catch {
+      alert("Photo upload failed. Try again, or continue without a custom cover.");
+    } finally {
+      setUploadingCover(false);
+    }
+  };
+
   const finish = async () => {
     setCreating(true);
     try {
       const createdTrip = await create({
-        name: `Trip to ${data.city.trim()}`,
+        name: data.name.trim() || `Trip to ${data.city.trim()}`,
         city: data.city.trim(),
         country: data.country,
         start_date: data.start_date,
         end_date: data.end_date,
         travel_style: data.travel_style,
-        cover_image: imageForCity(data.city),
+        cover_image: data.cover_image || imageForCity(data.city),
         description: data.description.trim(),
         looking_for: data.looking_for,
         visibility: data.visibility,
@@ -123,7 +144,7 @@ export default function CreateTrip() {
         {Array.from({ length: TOTAL }).map((_, i) => (
           <div
             key={i}
-            className={cn("h-1 flex-1 rounded-full", i < step ? "bg-[#A1846B]" : "bg-border")}
+            className={cn("h-1 flex-1 rounded-full", i < step ? "bg-primary" : "bg-border")}
           />
         ))}
       </div>
@@ -148,11 +169,6 @@ export default function CreateTrip() {
                   </SelectContent>
                 </Select>
               </div>
-              {data.city && (
-                <div className="rounded-2xl overflow-hidden h-32 mt-2 border border-border">
-                  <Image src={imageForCity(data.city)} alt="Preview" fittingType="fill" className="w-full h-full" />
-                </div>
-              )}
             </div>
           </>
         )}
@@ -214,6 +230,45 @@ export default function CreateTrip() {
 
             <div className="space-y-4">
               <div className="space-y-2">
+                <Label>Trip name (optional)</Label>
+                <Input
+                  value={data.name}
+                  onChange={(e) => set("name", e.target.value)}
+                  placeholder={`Trip to ${data.city || "..."}`}
+                  className="h-12"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Cover photo (optional)</Label>
+                <p className="text-xs text-muted-foreground">
+                  Upload your own trip photo, or we&apos;ll use a destination image for {data.city || "your city"}.
+                </p>
+                {data.cover_image ? (
+                  <div className="relative rounded-2xl overflow-hidden h-36 border border-border">
+                    <Image src={data.cover_image} alt="Trip cover" fittingType="fill" className="w-full h-full" />
+                    <button
+                      type="button"
+                      onClick={() => set("cover_image", "")}
+                      className="absolute top-2 right-2 bg-background/90 backdrop-blur rounded-full px-2.5 py-1 text-xs font-medium"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : uploadingCover ? (
+                  <div className="flex items-center justify-center h-32 rounded-2xl border border-dashed border-border text-muted-foreground">
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" /> Uploading…
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center h-32 rounded-2xl border border-dashed border-border cursor-pointer text-muted-foreground hover:bg-muted/30 transition">
+                    <Upload className="w-5 h-5 mb-1" strokeWidth={1.5} />
+                    <span className="text-xs font-medium">Upload cover photo</span>
+                    <input type="file" accept="image/*" onChange={onCoverImage} className="hidden" />
+                  </label>
+                )}
+              </div>
+
+              <div className="space-y-2">
                 <Label>Description (optional)</Label>
                 <Textarea
                   value={data.description}
@@ -240,21 +295,30 @@ export default function CreateTrip() {
 
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mt-2">Review</p>
               <div className="rounded-2xl border border-border bg-card shadow-soft overflow-hidden">
-                <div className="h-28">
-                  <Image src={imageForCity(data.city)} alt="Trip" fittingType="fill" className="w-full h-full" />
-                </div>
+                {coverPreview && (
+                  <div className="h-28 relative">
+                    <Image src={coverPreview} alt="Trip" fittingType="fill" className="w-full h-full" />
+                    {!data.cover_image && (
+                      <span className="absolute bottom-2 left-2 text-[10px] px-2 py-0.5 rounded-full bg-black/50 text-white/90 backdrop-blur-sm">
+                        Destination photo
+                      </span>
+                    )}
+                  </div>
+                )}
                 <div className="p-4 space-y-1">
-                  <h3 className="font-display font-semibold">Trip to {data.city}</h3>
+                  <h3 className="font-display font-semibold">
+                    {data.name.trim() || `Trip to ${data.city}`}
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     {data.city}{data.country ? `, ${data.country}` : ""} · {formatDates(data)}
                   </p>
                   {data.travel_style && (
-                    <p className="text-xs text-[#A1846B] capitalize mt-1">{data.travel_style}</p>
+                    <p className="text-xs text-primary capitalize mt-1">{data.travel_style}</p>
                   )}
                   {data.looking_for.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {data.looking_for.map((o) => (
-                        <span key={o} className="text-xs capitalize px-2 py-0.5 rounded-full bg-[#A1846B]/10 text-[#A1846B]">
+                        <span key={o} className="text-xs capitalize px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                           {o}
                         </span>
                       ))}

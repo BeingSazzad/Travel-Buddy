@@ -28,7 +28,7 @@ export default function ConversationRow({ name, avatar, lastMessage, time, unrea
             {lastMessage || "Say hello 👋"}
           </p>
           {unread > 0 && (
-            <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-[#A1846B] text-white text-xs font-semibold flex items-center justify-center">
+            <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-primary text-white text-xs font-semibold flex items-center justify-center">
               {unread > 99 ? "99+" : unread}
             </span>
           )}

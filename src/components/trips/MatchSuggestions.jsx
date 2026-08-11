@@ -1,86 +1,73 @@
 import React from "react";
-import { MapPin, Sparkles, Ban, Flag } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { MapPin, ChevronRight, Calendar } from "lucide-react";
 import { Image } from "@/components/ui/image";
-
-function cap(s) {
-  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-}
+import { cn } from "@/lib/utils";
 
 function Avatar({ match }) {
   if (match.avatar) {
     return (
-      <div className="w-16 h-16 rounded-full overflow-hidden border border-border shrink-0">
-        <Image src={match.avatar} alt={match.name} fittingType="fill" className="w-full h-full" />
+      <div className="w-14 h-14 rounded-2xl overflow-hidden border border-border/80 shadow-soft shrink-0">
+        <Image src={match.avatar} alt={match.name} fittingType="fill" className="w-full h-full object-cover" />
       </div>
     );
   }
   return (
-    <div className="w-16 h-16 rounded-full bg-[#A1846B]/15 flex items-center justify-center text-[#A1846B] font-display text-xl shrink-0">
+    <div className="w-14 h-14 rounded-2xl bg-primary/12 border border-primary/20 flex items-center justify-center text-primary font-display text-lg shrink-0">
       {(match.name || "?")[0].toUpperCase()}
     </div>
   );
 }
 
-export default function MatchSuggestions({ matches, onBlock }) {
+export default function MatchSuggestions({ matches }) {
+  const navigate = useNavigate();
+
   return (
-    <div className="space-y-4">
-      {matches.map((m) => (
-        <div key={m.user_id} className="rounded-2xl border border-border bg-card shadow-soft overflow-hidden">
-          <div className="flex gap-3 p-4">
+    <div className="space-y-3">
+      {matches.map((m) => {
+        const memberId = m.user_id || m.memberId || m.id;
+        return (
+          <button
+            key={memberId || m.name}
+            type="button"
+            onClick={() => memberId && navigate(`/members/${memberId}`)}
+            className={cn(
+              "w-full rounded-2xl border border-border/80 bg-card shadow-soft",
+              "px-4 py-3.5 text-left flex items-center gap-4",
+              "tap-feedback active:scale-[0.99] transition hover:border-primary/30 hover:bg-muted/20"
+            )}
+          >
             <Avatar match={m} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="font-display font-semibold truncate">{m.name}</h3>
-                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[#A1846B]/10 text-[#A1846B] shrink-0">
-                  {m.matchPercent}% match
-                </span>
-              </div>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                <MapPin className="w-3 h-3 shrink-0" strokeWidth={1.5} />
+
+            <div className="flex-1 min-w-0 py-0.5">
+              <h3 className="font-display font-semibold text-base text-foreground truncate leading-snug">
+                {m.name}
+              </h3>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
+                <MapPin className="w-3.5 h-3.5 text-primary shrink-0" strokeWidth={1.75} />
                 <span className="truncate">
-                  {[m.locationText, m.city, m.country].filter(Boolean).join(" · ")}
+                  {[m.city, m.country].filter(Boolean).join(", ")}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {m.dates}{m.age != null ? ` · ${m.age} yrs` : ""}
-              </p>
+              {m.dates && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
+                  <Calendar className="w-3.5 h-3.5 text-primary/80 shrink-0" strokeWidth={1.75} />
+                  <span className="truncate">{m.dates}</span>
+                </div>
+              )}
             </div>
-          </div>
 
-          <div className="px-4">
-            <div className="flex items-start gap-2 rounded-xl bg-[#A1846B]/5 p-3">
-              <Sparkles className="w-4 h-4 text-[#A1846B] shrink-0 mt-0.5" strokeWidth={1.5} />
-              <p className="text-sm leading-snug">{m.explanation}</p>
+            <div className="flex flex-col items-center justify-center gap-2 shrink-0 pl-1 self-stretch">
+              {m.matchPercent != null && (
+                <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-primary/12 text-primary border border-primary/25 tabular-nums">
+                  {m.matchPercent}%
+                </span>
+              )}
+              <ChevronRight className="w-4 h-4 text-muted-foreground/50" strokeWidth={1.5} aria-hidden />
             </div>
-          </div>
-
-          <div className="flex flex-wrap gap-1.5 px-4 mt-3">
-            {m.reasons.map((r, i) => (
-              <span
-                key={i}
-                className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground capitalize"
-              >
-                {cap(r.label)}
-              </span>
-            ))}
-          </div>
-
-          <div className="flex gap-2 px-4 py-4">
-            <button
-              onClick={() => onBlock(m.user_id, "block")}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-full border border-border transition"
-            >
-              <Ban className="w-3.5 h-3.5" strokeWidth={1.5} /> Block
-            </button>
-            <button
-              onClick={() => onBlock(m.user_id, "report")}
-              className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-full border border-border transition"
-            >
-              <Flag className="w-3.5 h-3.5" strokeWidth={1.5} /> Report
-            </button>
-          </div>
-        </div>
-      ))}
+          </button>
+        );
+      })}
     </div>
   );
 }

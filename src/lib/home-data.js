@@ -1,6 +1,16 @@
 import {
   Coffee, UtensilsCrossed, Building2, Compass, CalendarHeart, Users, Star, Tag,
 } from "lucide-react";
+import {
+  unsplash,
+  CITY_IMAGES,
+  cafeImage,
+  restaurantImage,
+  hotelImage,
+  dealImage,
+  eventImageFor,
+  memberAvatar,
+} from "@/lib/images";
 
 export const CATEGORIES = [
   { label: "Cafes", icon: Coffee, to: "/cafes" },
@@ -13,61 +23,65 @@ export const CATEGORIES = [
   { label: "Deals", icon: Tag, to: "/deals" },
 ];
 
-const img = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=600&q=80`;
-
 export const SECTIONS = [
   {
     title: "Recommended for you",
+    seeAllPath: "/destinations",
     items: [
-      { type: "trip", image: img("1530103862676-de8c9debad1d"), title: "Girls' weekend in Copenhagen", location: "Copenhagen", info: "18 attending", badge: "Featured" },
-      { type: "destination", image: img("1537996194471-e657df975ab4"), title: "Bali wellness retreat", location: "Ubud", info: "★ 4.9" },
-      { type: "destination", image: img("1414235077428-338989a2e8c0"), title: "Paris art & cafés", location: "Paris", info: "★ 4.8" },
-      { type: "destination", image: img("1555881400-74d7acaacd8b"), title: "Lisbon coastal escape", location: "Lisbon", info: "★ 4.7" },
+      { type: "trip", tripId: "trip_mock_5", image: CITY_IMAGES.copenhagen, title: "Girls' weekend in Copenhagen", location: "Copenhagen", info: "18 attending", badge: "Featured" },
+      { type: "destination", city: "Bali", image: CITY_IMAGES.bali, title: "Bali wellness retreat", location: "Ubud", info: "★ 4.9" },
+      { type: "destination", city: "Paris", image: CITY_IMAGES.paris, title: "Paris art & cafés", location: "Paris", info: "★ 4.8" },
+      { type: "destination", city: "Lisbon", image: CITY_IMAGES.lisbon, title: "Lisbon coastal escape", location: "Lisbon", info: "★ 4.7" },
     ],
   },
   {
     title: "Trending destinations",
+    seeAllPath: "/destinations",
     items: [
-      { type: "destination", image: img("1555881400-74d7acaacd8b"), title: "Lisbon", location: "Portugal", info: "Trending", badge: "🔥" },
-      { type: "destination", image: img("1537996194471-e657df975ab4"), title: "Bali", location: "Indonesia", info: "★ 4.9" },
-      { type: "destination", image: img("1414235077428-338989a2e8c0"), title: "Marrakech", location: "Morocco", info: "Hot" },
-      { type: "destination", image: img("1554118811-1e0d58224f24"), title: "Copenhagen", location: "Denmark", info: "Popular" },
+      { type: "destination", city: "Lisbon", image: CITY_IMAGES.lisbon, title: "Lisbon", location: "Portugal", info: "Trending", badge: "🔥" },
+      { type: "destination", city: "Bali", image: CITY_IMAGES.bali, title: "Bali", location: "Indonesia", info: "★ 4.9" },
+      { type: "destination", city: "Marrakech", image: CITY_IMAGES.marrakech, title: "Marrakech", location: "Morocco", info: "Hot" },
+      { type: "destination", city: "Copenhagen", image: CITY_IMAGES.copenhagen, title: "Copenhagen", location: "Denmark", info: "Popular" },
     ],
   },
   {
     title: "Popular events",
+    seeAllPath: "/events",
     items: [
-      { type: "event", image: img("1545389336-cf090694435e"), title: "Sunset Yoga", location: "Copenhagen", info: "Aug 12" },
-      { type: "event", image: img("1513569771920-c9e1d31714ba"), title: "Wine & Paint", location: "Lisbon", info: "Aug 18" },
-      { type: "event", image: img("1530103862676-de8c9debad1d"), title: "Travel Mixer", location: "Paris", info: "Aug 20" },
-      { type: "event", image: img("1495474472287-4d71bcdd2085"), title: "Coffee Crawl", location: "Berlin", info: "Aug 25" },
+      { type: "event", eventId: "event_mock_1", image: eventImageFor({ city: "Santorini", category: "wellness" }), title: "Sunset Yoga", location: "Santorini", info: "Aug 12" },
+      { type: "event", eventId: "event_mock_3", image: eventImageFor({ city: "Lisbon", category: "wine" }), title: "Wine & Paint", location: "Lisbon", info: "Aug 18" },
+      { type: "event", eventId: "event_mock_2", image: eventImageFor({ city: "Santorini", category: "dinner" }), title: "Travel Mixer", location: "Paris", info: "Aug 20" },
+      { type: "event", eventId: "event_mock_4", image: eventImageFor({ city: "Zermatt", category: "hiking" }), title: "Coffee Crawl", location: "Berlin", info: "Aug 25" },
     ],
   },
   {
     title: "Women travelling soon",
+    seeAllPath: "/discover",
     items: [
-      { type: "member", image: img("1494790108377-be9c29b29330"), title: "Aria K.", location: "Berlin → Lisbon", info: "Travelling Aug 10" },
-      { type: "member", image: img("1438761681033-6461ffad8d80"), title: "Maya R.", location: "Lisbon → Bali", info: "Travelling Aug 15" },
-      { type: "member", image: img("1534528741775-53994a69daeb"), title: "Sofia L.", location: "Bali → Paris", info: "Travelling Sep 1" },
-      { type: "member", image: img("1517841905240-472988babdf9"), title: "Nora J.", location: "Paris → Tokyo", info: "Travelling Sep 5" },
+      { type: "member", memberId: "mock_4", image: memberAvatar("mock_4"), title: "Isabella Chen", location: "Berlin → Paris", info: "Travelling Sep 2" },
+      { type: "member", memberId: "mock_1", image: memberAvatar("mock_1"), title: "Maya Rivera", location: "London → Bali", info: "Travelling Aug 15" },
+      { type: "member", memberId: "mock_2", image: memberAvatar("mock_2"), title: "Ava Laurent", location: "New York → Lisbon", info: "Travelling Aug 10" },
+      { type: "member", memberId: "mock_3", image: memberAvatar("mock_3"), title: "Sophie Martin", location: "Paris → Santorini", info: "Travelling Aug 12" },
     ],
   },
   {
     title: "Exclusive deals",
+    seeAllPath: "/deals",
     items: [
-      { type: "deal", image: img("1555881400-74d7acaacd8b"), title: "Lisbon Stay 20% off", location: "Lisbon", info: "Save 20%", badge: "Deal" },
-      { type: "deal", image: img("1537996194471-e657df975ab4"), title: "Bali Retreat Deal", location: "Ubud", info: "Save 15%", badge: "Deal" },
-      { type: "deal", image: img("1414235077428-338989a2e8c0"), title: "Paris Dinner 2-for-1", location: "Paris", info: "2-for-1", badge: "Deal" },
-      { type: "deal", image: img("1414235077428-338989a2e8c0"), title: "Marrakech Spa 30% off", location: "Marrakech", info: "Save 30%", badge: "Deal" },
+      { type: "deal", dealId: "deal_mock_1", image: dealImage(0), title: "Lisbon Stay 20% off", location: "Lisbon", info: "20% off", partner: "Memmo Alfama" },
+      { type: "deal", dealId: "deal_mock_2", image: dealImage(1), title: "Bali Retreat Deal", location: "Ubud", info: "15% off", partner: "Ubud Wellness Lodge" },
+      { type: "deal", dealId: "deal_mock_3", image: dealImage(2), title: "Paris Dinner 2-for-1", location: "Paris", info: "2-for-1", partner: "Olive & Vine" },
+      { type: "deal", dealId: "deal_mock_4", image: dealImage(3), title: "Marrakech Spa 30% off", location: "Marrakech", info: "30% off", partner: "Riad Spa Collective" },
     ],
   },
   {
     title: "Recently reviewed places",
+    seeAllPath: "/reviews",
     items: [
-      { type: "cafe", image: img("1554118811-1e0d58224f24"), title: "Café Norden", location: "Copenhagen", info: "★ 4.9" },
-      { type: "hotel", image: img("1551882547-ff40c63fe595"), title: "Maison du Parc", location: "Paris", info: "★ 4.8" },
-      { type: "hotel", image: img("1537996194471-e657df975ab4"), title: "Bali Retreat", location: "Ubud", info: "★ 5.0" },
-      { type: "restaurant", image: img("1414235077428-338989a2e8c0"), title: "Olive & Vine", location: "Paris", info: "★ 4.7" },
+      { type: "cafe", image: cafeImage(0), title: "Café Norden", location: "Copenhagen", rating: 4.9, reviewSnippet: "Perfect morning latte spot" },
+      { type: "hotel", image: hotelImage(7), title: "Maison du Parc", location: "Paris", rating: 4.8, reviewSnippet: "Quiet garden views" },
+      { type: "hotel", image: hotelImage(5), title: "Bambu Indah", location: "Ubud", rating: 4.9, reviewSnippet: "Magical jungle stay" },
+      { type: "restaurant", image: restaurantImage(5), title: "Olive & Vine", location: "Paris", rating: 4.6, reviewSnippet: "Best wine pairing dinner" },
     ],
   },
 ];

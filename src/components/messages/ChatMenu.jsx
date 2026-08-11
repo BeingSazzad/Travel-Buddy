@@ -1,20 +1,22 @@
 import React, { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { User, Flag, Ban, HeartCrack, Trash2, ChevronLeft } from "lucide-react";
+import { User, Flag, Ban, UserMinus, Trash2, ChevronLeft } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 
-const REPORT_REASONS = ["Spam or scam", "Inappropriate messages", "Harassment", "Fake profile", "Other"];
+import { reasonsForReportType } from "@/components/reports/ReportSheet";
+
+const CHAT_REPORT_REASONS = reasonsForReportType("profile").map((r) => r.label);
 
 export default function ChatMenu({ open, onOpenChange, otherId, otherName, matchId, conversationId, onViewProfile, onDone }) {
   const { user } = useAuth();
   const [view, setView] = useState("menu");
-  const [reason, setReason] = useState(REPORT_REASONS[0]);
+  const [reason, setReason] = useState(CHAT_REPORT_REASONS[0]);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const reset = () => { setView("menu"); setReason(REPORT_REASONS[0]); setNote(""); };
+  const reset = () => { setView("menu"); setReason(CHAT_REPORT_REASONS[0]); setNote(""); };
 
   const close = () => { reset(); onOpenChange(false); };
 
@@ -76,16 +78,16 @@ export default function ChatMenu({ open, onOpenChange, otherId, otherName, match
               <span className="text-sm">View profile</span>
             </button>
             <button onClick={() => setView("report")} className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-muted/40 text-left">
-              <Flag className="w-5 h-5 text-[#A1846B]" strokeWidth={1.5} />
+              <Flag className="w-5 h-5 text-primary" strokeWidth={1.5} />
               <div><p className="text-sm">Report user</p><p className="text-xs text-muted-foreground">Send to admin review</p></div>
             </button>
             <button onClick={() => setView("block")} className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-muted/40 text-left">
-              <Ban className="w-5 h-5 text-[#A1846B]" strokeWidth={1.5} />
+              <Ban className="w-5 h-5 text-primary" strokeWidth={1.5} />
               <div><p className="text-sm">Block user</p><p className="text-xs text-muted-foreground">Hide conversation, stop messages</p></div>
             </button>
             <button onClick={doUnmatch} disabled={busy} className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-muted/40 text-left disabled:opacity-50">
-              <HeartCrack className="w-5 h-5 text-muted-foreground" strokeWidth={1.5} />
-              <span className="text-sm">Unmatch</span>
+              <UserMinus className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
+              <span className="text-sm">Remove connection</span>
             </button>
             <button onClick={doDelete} disabled={busy} className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-muted/40 text-left disabled:opacity-50">
               <Trash2 className="w-5 h-5 text-muted-foreground" strokeWidth={1.5} />
@@ -97,8 +99,8 @@ export default function ChatMenu({ open, onOpenChange, otherId, otherName, match
         {view === "report" && (
           <div className="px-4 mt-2 space-y-2">
             <div className="space-y-2">
-              {REPORT_REASONS.map((r) => (
-                <button key={r} onClick={() => setReason(r)} className={`w-full text-left px-3 py-2 rounded-xl border text-sm ${reason === r ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border"}`}>
+              {CHAT_REPORT_REASONS.map((r) => (
+                <button key={r} onClick={() => setReason(r)} className={`w-full text-left px-3 py-2 rounded-xl border text-sm ${reason === r ? "border-primary bg-primary/5" : "border-border"}`}>
                   {r}
                 </button>
               ))}
@@ -106,7 +108,7 @@ export default function ChatMenu({ open, onOpenChange, otherId, otherName, match
             <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Additional details (optional)" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none min-h-[80px] resize-none" />
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1" onClick={() => setView("menu")} disabled={busy}><ChevronLeft className="w-4 h-4" /> Back</Button>
-              <Button className="flex-1 bg-foreground text-background" onClick={doReport} disabled={busy}>Report</Button>
+              <Button className="flex-1" onClick={doReport} disabled={busy}>Report</Button>
             </div>
           </div>
         )}
@@ -117,7 +119,7 @@ export default function ChatMenu({ open, onOpenChange, otherId, otherName, match
             <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Reason (optional)" className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none min-h-[64px] resize-none" />
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={() => setView("menu")} disabled={busy}><ChevronLeft className="w-4 h-4" /> Back</Button>
-              <Button className="flex-1 bg-foreground text-background" onClick={doBlock} disabled={busy}>Block</Button>
+              <Button variant="outline" className="flex-1" onClick={doBlock} disabled={busy}>Block</Button>
             </div>
           </div>
         )}

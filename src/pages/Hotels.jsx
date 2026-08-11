@@ -2,13 +2,26 @@ import React, { useMemo, useState } from "react";
 import { HOTEL_TAG_FILTERS, STAR_OPTIONS } from "@/lib/hotels";
 import { useHotels } from "@/lib/useContent";
 import HotelCard from "@/components/hotels/HotelCard";
-import ListFilterBar from "@/components/common/ListFilterBar";
 import { BedDouble } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
-import FilterPicker from "@/components/common/FilterPicker";
 import ListSkeleton from "@/components/common/ListSkeleton";
+import ScreenHeader from "@/components/common/ScreenHeader";
+import VenueFilterSheet, { VenueListToolbar, countVenueFilters } from "@/components/common/VenueFilterSheet";
 
 const emptyTags = () => Object.fromEntries(HOTEL_TAG_FILTERS.map((t) => [t.key, false]));
+
+const PRICE_OPTIONS = [
+  { value: "All", label: "Any" },
+  { value: "<100", label: "Under €100" },
+  { value: "100-250", label: "€100–250" },
+  { value: "250-400", label: "€250–400" },
+  { value: "400+", label: "€400+" },
+];
+const RATING_OPTIONS = [
+  { value: "All", label: "Any" },
+  { value: "4", label: "4.0+" },
+  { value: "4.5", label: "4.5+" },
+];
 
 export default function Hotels() {
   const { items: hotels, loading } = useHotels();
@@ -17,8 +30,18 @@ export default function Hotels() {
   const [stars, setStars] = useState("All");
   const [rating, setRating] = useState("All");
   const [sort, setSort] = useState("distance");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const toggle = (k) => setTags((t) => ({ ...t, [k]: !t[k] }));
+
+  const activeFilterCount = countVenueFilters(tags, [price, stars, rating]);
+
+  const resetFilters = () => {
+    setTags(emptyTags());
+    setPrice("All");
+    setStars("All");
+    setRating("All");
+  };
 
   const filtered = useMemo(() => {
     let list = hotels.filter((h) =>
@@ -32,43 +55,66 @@ export default function Hotels() {
       (rating === "All" || h.memberRating >= Number(rating))
     );
     list = [...list].sort((a, b) =>
-      sort === "distance" ? (a.distance || 0) - (b.distance || 0) :
-      sort === "rating" ? (b.memberRating || 0) - (a.memberRating || 0) :
-      (a.pricePerNight || 0) - (b.pricePerNight || 0)
+      sort === "distance"
+        ? (a.distance || 0) - (b.distance || 0)
+        : sort === "rating"
+          ? (b.memberRating || 0) - (a.memberRating || 0)
+          : (a.pricePerNight || 0) - (b.pricePerNight || 0)
     );
     return list;
   }, [hotels, tags, price, stars, rating, sort]);
 
-  if (loading) return (
-    <div className="px-5 safe-pt pb-6">
-      <h1 className="font-display font-bold text-lg">Hotels</h1>
-      <p className="text-sm text-muted-foreground mt-0.5 mb-4">Stays curated for women who travel</p>
-      <ListSkeleton count={4} />
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="page-shell">
+        <ScreenHeader title="Hotels" subtitle="Stays curated for women who travel" className="mb-4" />
+        <ListSkeleton count={4} />
+      </div>
+    );
+  }
 
   return (
-    <div className="px-5 safe-pt pb-6">
-      <h1 className="font-display font-bold text-lg">Hotels</h1>
-      <p className="text-sm text-muted-foreground mt-0.5 mb-4">Stays curated for women who travel</p>
+    <div className="page-shell">
+      <ScreenHeader title="Hotels" subtitle="Stays curated for women who travel" />
 
-      <ListFilterBar tagItems={HOTEL_TAG_FILTERS} tagActive={tags} onTagToggle={toggle}>
-        <FilterPicker title="Price" value={price} onChange={setPrice} options={[{ value: "All", label: "Any" }, { value: "<100", label: "Under €100" }, { value: "100-250", label: "€100–250" }, { value: "250-400", label: "€250–400" }, { value: "400+", label: "€400+" }]} />
-        <FilterPicker title="Stars" value={stars} onChange={setStars} options={[{ value: "All", label: "Any" }, ...STAR_OPTIONS.map((s) => ({ value: String(s), label: `${s} stars` }))]} />
-        <FilterPicker title="Rating" value={rating} onChange={setRating} options={[{ value: "All", label: "Any" }, { value: "4", label: "4.0+" }, { value: "4.5", label: "4.5+" }]} />
-        <FilterPicker title="Sort" value={sort} onChange={setSort} options={[{ value: "distance", label: "Nearest" }, { value: "rating", label: "Top rated" }, { value: "price", label: "Price" }]} />
-      </ListFilterBar>
+      <VenueListToolbar
+        resultLabel={`${filtered.length} hotels`}
+        sort={sort}
+        onSortChange={setSort}
+        sortOptions={[
+          { value: "distance", label: "Nearest" },
+          { value: "rating", label: "Top rated" },
+          { value: "price", label: "Price" },
+        ]}
+        filterOpen={filterOpen}
+        onFilterOpen={setFilterOpen}
+        activeFilterCount={activeFilterCount}
+      />
 
-      <p className="text-xs text-muted-foreground mb-3">{filtered.length} hotels</p>
+      <VenueFilterSheet
+        open={filterOpen}
+        onOpenChange={setFilterOpen}
+        title="Hotel filters"
+        tagItems={HOTEL_TAG_FILTERS}
+        tagActive={tags}
+        onTagToggle={toggle}
+        activeCount={activeFilterCount}
+        onReset={resetFilters}
+        pickers={[
+          { title: "Price", value: price, onChange: setPrice, options: PRICE_OPTIONS },
+          { title: "Stars", value: stars, onChange: setStars, options: [{ value: "All", label: "Any" }, ...STAR_OPTIONS.map((s) => ({ value: String(s), label: `${s} stars` }))] },
+          { title: "Rating", value: rating, onChange: setRating, options: RATING_OPTIONS },
+        ]}
+      />
 
       <div className="space-y-4">
         {filtered.length === 0 ? (
           <EmptyState
             icon={BedDouble}
             title="No hotels match your filters"
-            description="Try removing a filter or widening your search to see more stays."
+            description="Try widening filters or reset to see more stays."
             actionLabel="Reset filters"
-            onAction={() => { setTags(emptyTags()); setPrice("All"); setStars("All"); setRating("All"); }}
+            onAction={resetFilters}
           />
         ) : (
           filtered.map((h) => <HotelCard key={h.name} hotel={h} />)

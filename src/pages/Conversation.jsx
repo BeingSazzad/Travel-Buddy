@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Send, Plus, Smile, Image as ImageIcon, Flag } from "lucide-react";
+import { ArrowLeft, Send, Plus, Smile, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useConversation } from "@/hooks/useConversation";
 import { base44 } from "@/api/base44Client";
@@ -8,9 +8,7 @@ import { Image } from "@/components/ui/image";
 import MessageBubble from "@/components/messages/MessageBubble";
 import EmojiPicker from "@/components/messages/EmojiPicker";
 import ShareSheet from "@/components/messages/ShareSheet";
-import SafetySheet from "@/components/messages/SafetySheet";
-import MemberProfileSheet from "@/components/swipe/MemberProfileSheet";
-import { FALLBACK_AVATAR_URL } from "@/lib/images";
+import ConversationMenu from "@/components/messages/ConversationMenu";
 
 export default function Conversation() {
   const { id } = useParams();
@@ -20,8 +18,6 @@ export default function Conversation() {
   const [text, setText] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [safetyOpen, setSafetyOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [, setNow] = useState(Date.now());
   const fileRef = useRef(null);
@@ -48,7 +44,7 @@ export default function Conversation() {
     return (
       <div className="h-dvh flex flex-col items-center justify-center gap-3 px-6 text-center">
         <p className="font-display font-semibold">Conversation not found</p>
-        <button onClick={() => navigate("/messages")} className="text-sm text-[#A1846B] underline">
+        <button onClick={() => navigate("/messages")} className="text-sm text-primary underline">
           Back to messages
         </button>
       </div>
@@ -95,7 +91,7 @@ export default function Conversation() {
     try {
       const res = await base44.integrations.Core.UploadFile({ file });
       await send({ type: "image", image_url: res.file_url });
-    } catch (err) {
+    } catch {
       /* ignore */
     }
   };
@@ -118,12 +114,17 @@ export default function Conversation() {
 
   return (
     <div className="h-dvh flex flex-col">
-      <header className="px-3 safe-pt pb-3 flex items-center gap-2 border-b border-border bg-card">
-        <button onClick={() => navigate(-1)} className="w-9 h-9 flex items-center justify-center">
+      <header className="app-px safe-pt pb-3 flex items-center gap-3 border-b border-border bg-card">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="w-9 h-9 shrink-0 flex items-center justify-center rounded-full hover:bg-muted/50 tap-feedback"
+          aria-label="Back"
+        >
           <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
         </button>
         <div
-          onClick={() => setProfileOpen(true)}
+          onClick={() => otherId && navigate(`/members/${otherId}`)}
           className="flex-1 flex items-center gap-2 cursor-pointer min-w-0 hover:opacity-90 active:scale-[0.99] transition"
         >
           <div className="w-10 h-10 rounded-full overflow-hidden border border-border shrink-0">
@@ -134,9 +135,13 @@ export default function Conversation() {
             <p className="text-xs text-muted-foreground">{otherTyping ? "typing…" : "Tap to view profile"}</p>
           </div>
         </div>
-        <button onClick={() => setSafetyOpen(true)} className="w-9 h-9 flex items-center justify-center text-muted-foreground">
-          <Flag className="w-5 h-5" strokeWidth={1.5} />
-        </button>
+        <ConversationMenu
+          otherId={otherId}
+          otherName={otherName}
+          conversationId={conversation.id}
+          onViewProfile={(memberId) => memberId && navigate(`/members/${memberId}`)}
+          onDone={() => navigate("/messages")}
+        />
       </header>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
@@ -186,7 +191,7 @@ export default function Conversation() {
         <button
           type="button"
           onClick={() => setShowEmoji((s) => !s)}
-          className={`w-9 h-9 rounded-full flex items-center justify-center ${showEmoji ? "text-[#A1846B]" : "text-muted-foreground"}`}
+          className={`w-9 h-9 rounded-full flex items-center justify-center ${showEmoji ? "text-primary" : "text-muted-foreground"}`}
         >
           <Smile className="w-5 h-5" strokeWidth={1.5} />
         </button>
@@ -203,28 +208,13 @@ export default function Conversation() {
         <button
           type="submit"
           disabled={!text.trim() || sending}
-          className="w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center disabled:opacity-40 shrink-0"
+          className="w-10 h-10 rounded-full fab-primary disabled:opacity-40 shrink-0"
         >
           <Send className="w-4 h-4" strokeWidth={1.5} />
         </button>
       </form>
 
       <ShareSheet open={shareOpen} onOpenChange={setShareOpen} onShare={onShare} />
-      <MemberProfileSheet
-        open={profileOpen}
-        data={{ name: otherName, avatar: otherAvatar, user_id: otherId, current_city: "Travel Spot", bio: "Traveling enthusiast sharing memories and adventures." }}
-        onClose={() => setProfileOpen(false)}
-      />
-      <SafetySheet
-        open={safetyOpen}
-        onOpenChange={setSafetyOpen}
-        otherId={otherId}
-        otherName={otherName}
-        onDone={() => {
-          setSafetyOpen(false);
-          navigate("/messages");
-        }}
-      />
     </div>
   );
 }

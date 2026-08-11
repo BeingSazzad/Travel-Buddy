@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Moon, Loader2, LogOut, ArrowRight, ArrowLeft, Check, Save } from "lucide-react";
+import { Moon, Loader2, LogOut, ArrowRight, ArrowLeft, Check, Save, Lock, ChevronRight } from "lucide-react";
+import NotificationSettingsPanel, { NOTIFICATION_CATEGORIES } from "@/components/profile/NotificationSettingsPanel";
+import BlockedMembersPanel from "@/components/profile/BlockedMembersPanel";
 import { useAuth } from "@/lib/AuthContext";
 import {
   COUNTRIES, LANGUAGES, INTERESTS, TRAVEL_STYLES,
@@ -18,6 +20,7 @@ import {
 import InterestPicker from "@/components/profile/InterestPicker";
 import PhotoManager from "@/components/profile/PhotoManager";
 import VerificationCard from "@/components/profile/VerificationCard";
+import ScrollPage, { ScrollPageHeader, ScrollPageBody } from "@/components/common/ScrollPage";
 
 function getAge(dob) {
   if (!dob) return null;
@@ -50,7 +53,7 @@ const LOCATION_OPTIONS = [
 const STEPS = ["About you", "Your travel", "Privacy", "Photos"];
 
 export default function ProfileSetup() {
-  const { user, logout, checkUserAuth } = useAuth();
+  const { user, logout, checkUserAuth, patchUser } = useAuth();
   const navigate = useNavigate();
   const isEditMode = !!user?.profile_completed;
 
@@ -75,6 +78,9 @@ export default function ProfileSetup() {
   const [allowMatches, setAllowMatches] = useState(true);
   const [allowInvitations, setAllowInvitations] = useState(true);
   const [allowNotifications, setAllowNotifications] = useState(true);
+  const [notifPrefs, setNotifPrefs] = useState(() =>
+    Object.fromEntries(NOTIFICATION_CATEGORIES.map((c) => [c.key, true]))
+  );
   const [ageConfirm, setAgeConfirm] = useState(false);
 
   // Pre-populate when user data is available
@@ -97,6 +103,7 @@ export default function ProfileSetup() {
     setAllowMatches(user.allow_match_suggestions !== false);
     setAllowInvitations(user.allow_event_invitations !== false);
     setAllowNotifications(user.allow_notifications !== false);
+    setNotifPrefs(Object.fromEntries(NOTIFICATION_CATEGORIES.map((c) => [c.key, user[c.key] !== false])));
     setAgeConfirm(!!user.date_of_birth);
   }, [user]);
 
@@ -142,40 +149,49 @@ export default function ProfileSetup() {
 
   const saveProfile = async () => {
     setError("");
-    const validationError = validateAll();
-    if (validationError) {
-      setError(validationError);
-      return;
+    if (!isEditMode) {
+      const validationError = validateAll();
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
     }
 
     const finalMain = mainPhoto || photos[0];
     setSaving(true);
     try {
+      const payload = {
+        profile_name: profileName.trim(),
+        date_of_birth: dob,
+        current_city: city.trim(),
+        country,
+        nationality,
+        languages_spoken: languages,
+        biography: bio.trim(),
+        travel_style: travelStyle,
+        interests,
+        profile_photos: photos,
+        main_photo: finalMain,
+        location_visibility: locationVisibility,
+        show_age: showAge,
+        show_upcoming_trips: showUpcomingTrips,
+        allow_match_suggestions: allowMatches,
+        allow_event_invitations: allowInvitations,
+        allow_notifications: allowNotifications,
+        ...notifPrefs,
+        profile_completed: true,
+      };
       try {
-        await base44.auth.updateMe({
-          profile_name: profileName.trim(),
-          date_of_birth: dob,
-          current_city: city.trim(),
-          country,
-          nationality,
-          languages_spoken: languages,
-          biography: bio.trim(),
-          travel_style: travelStyle,
-          interests,
-          profile_photos: photos,
-          main_photo: finalMain,
-          location_visibility: locationVisibility,
-          show_age: showAge,
-          show_upcoming_trips: showUpcomingTrips,
-          allow_match_suggestions: allowMatches,
-          allow_event_invitations: allowInvitations,
-          allow_notifications: allowNotifications,
-          profile_completed: true,
-        });
+        await base44.auth.updateMe(payload);
       } catch (apiErr) {
-        console.warn("API updateMe failed during profile setup, bypassing for frontend preview", apiErr);
+        console.warn("API updateMe failed during profile setup, applying locally", apiErr);
       }
-      await checkUserAuth();
+      patchUser(payload);
+      try {
+        await checkUserAuth();
+      } catch {
+        /* keep local patch */
+      }
       navigate("/profile");
     } catch (err) {
       setError(err?.message || "Could not save your profile");
@@ -189,30 +205,31 @@ export default function ProfileSetup() {
    ───────────────────────────────────────────────────────────── */
   if (isEditMode) {
     return (
-      <div className="min-h-screen bg-background pb-12">
-        <header className="sticky top-0 z-20 px-app pt-10 pb-3 flex items-center justify-between bg-background/90 backdrop-blur border-b border-border">
-          <div className="flex items-center gap-3">
+      <ScrollPage>
+        <ScrollPageHeader className="justify-between">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => navigate(-1)}
-              className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition border border-border bg-card"
+              className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition border border-border bg-card shrink-0"
             >
               <ArrowLeft className="w-5 h-5 text-foreground" strokeWidth={1.75} />
             </button>
-            <h1 className="font-display font-bold text-lg">Edit Profile</h1>
+            <h1 className="font-display font-bold text-lg truncate">Edit Profile</h1>
           </div>
           <Button
             onClick={saveProfile}
             disabled={saving}
             variant="primary"
             size="sm"
-            className="rounded-full px-4 h-9"
+            className="rounded-full px-4 h-9 shrink-0"
           >
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5 mr-1" />}
             Save
           </Button>
-        </header>
+        </ScrollPageHeader>
 
-        <div className="max-w-app mx-auto px-5 py-6 space-y-6">
+        <ScrollPageBody className="px-0">
+          <div className="px-5 space-y-6 max-w-app mx-auto w-full">
           {error && (
             <div className="p-3 rounded-2xl bg-destructive/10 text-destructive text-xs font-medium leading-relaxed">
               {error}
@@ -322,9 +339,9 @@ export default function ProfileSetup() {
             </div>
           </div>
 
-          {/* Section 4: Privacy & Preferences */}
+          {/* Section 4: Privacy */}
           <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-4">
-            <h2 className="font-display font-semibold text-sm text-foreground">Privacy & Preferences</h2>
+            <h2 className="font-display font-semibold text-sm text-foreground">Privacy</h2>
 
             <div className="space-y-2">
               <Label className="text-xs font-medium">Location visibility</Label>
@@ -332,7 +349,7 @@ export default function ProfileSetup() {
                 {LOCATION_OPTIONS.map((o) => (
                   <label
                     key={o.value}
-                    className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition ${locationVisibility === o.value ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border/80"}`}
+                    className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition ${locationVisibility === o.value ? "border-primary bg-primary/5" : "border-border/80"}`}
                   >
                     <RadioGroupItem value={o.value} />
                     <span className="text-xs">{o.label}</span>
@@ -346,8 +363,44 @@ export default function ProfileSetup() {
               <ToggleRow id="showTrips" label="Show upcoming trips" description="Let others see your planned trips" checked={showUpcomingTrips} onCheck={setShowUpcomingTrips} />
               <ToggleRow id="matches" label="Allow match suggestions" description="Receive suggested travel companions" checked={allowMatches} onCheck={setAllowMatches} />
               <ToggleRow id="invitations" label="Allow event invitations" description="Other members can invite you to events" checked={allowInvitations} onCheck={setAllowInvitations} />
-              <ToggleRow id="notifications" label="Allow notifications" description="Receive app notifications" checked={allowNotifications} onCheck={setAllowNotifications} />
             </div>
+          </div>
+
+          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-3">
+            <h2 className="font-display font-semibold text-sm text-foreground">Notifications</h2>
+            <p className="text-xs text-muted-foreground">Choose what you want to be notified about.</p>
+            <NotificationSettingsPanel
+              master={allowNotifications}
+              onMasterChange={setAllowNotifications}
+              prefs={notifPrefs}
+              onPrefChange={(key, val) => setNotifPrefs((p) => ({ ...p, [key]: val }))}
+            />
+          </div>
+
+          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-3">
+            <h2 className="font-display font-semibold text-sm text-foreground">Blocked members</h2>
+            <BlockedMembersPanel embedded />
+          </div>
+
+          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-3">
+            <h2 className="font-display font-semibold text-sm text-foreground">Account & security</h2>
+            {user?.email && (
+              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+            )}
+            <button
+              type="button"
+              onClick={() => navigate("/change-password")}
+              className="w-full flex items-center gap-3 py-2 rounded-xl text-left active:bg-muted/40 transition"
+            >
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <Lock className="w-4 h-4 text-primary" strokeWidth={1.75} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Change password</p>
+                <p className="text-[11px] text-muted-foreground">Update your sign-in password</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" strokeWidth={1.5} />
+            </button>
           </div>
 
           {/* Save Button */}
@@ -358,8 +411,9 @@ export default function ProfileSetup() {
               "Save Changes"
             )}
           </Button>
-        </div>
-      </div>
+          </div>
+        </ScrollPageBody>
+      </ScrollPage>
     );
   }
 
@@ -367,12 +421,13 @@ export default function ProfileSetup() {
      FIRST-TIME ONBOARDING SETUP MODE: 4-Step Guided Stepper
    ───────────────────────────────────────────────────────────── */
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-app mx-auto px-5 py-8">
+    <ScrollPage>
+      <ScrollPageBody className="px-0 pb-8">
+        <div className="max-w-app mx-auto px-5 py-8">
         {/* Brand Header */}
         <div className="flex flex-col items-center mb-6">
-          <Moon className="w-6 h-6 text-[#A1846B] mb-1" strokeWidth={1.5} />
-          <h1 className="font-display font-semibold text-2xl tracking-[0.08em] text-[#A1846B]">SELUNA</h1>
+          <Moon className="w-6 h-6 text-primary mb-1" strokeWidth={1.5} />
+          <h1 className="font-display font-semibold text-2xl tracking-[0.08em] text-primary">SELUNA</h1>
         </div>
 
         {/* Stepper */}
@@ -383,9 +438,9 @@ export default function ProfileSetup() {
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition ${
                     i < step
-                      ? "bg-[#A1846B] text-white"
+                      ? "bg-primary text-white"
                       : i === step
-                        ? "bg-[#A1846B] text-white ring-4 ring-[#A1846B]/20"
+                        ? "bg-primary text-white ring-4 ring-primary/20"
                         : "bg-muted text-muted-foreground"
                   }`}
                 >
@@ -396,7 +451,7 @@ export default function ProfileSetup() {
                 </span>
               </div>
               {i < STEPS.length - 1 && (
-                <div className={`h-0.5 flex-1 -mt-4 rounded ${i < step ? "bg-[#A1846B]" : "bg-muted"}`} />
+                <div className={`h-0.5 flex-1 -mt-4 rounded ${i < step ? "bg-primary" : "bg-muted"}`} />
               )}
             </div>
           ))}
@@ -418,7 +473,7 @@ export default function ProfileSetup() {
               </div>
 
               <label className="flex items-start gap-3 cursor-pointer">
-                <input type="checkbox" checked={ageConfirm} onChange={(e) => setAgeConfirm(e.target.checked)} className="mt-0.5 w-4 h-4 shrink-0 accent-[#A1846B]" />
+                <input type="checkbox" checked={ageConfirm} onChange={(e) => setAgeConfirm(e.target.checked)} className="mt-0.5 w-4 h-4 shrink-0 accent-primary" />
                 <span className="text-xs text-muted-foreground leading-snug">I confirm that I am at least 18 years old and that the information I provide is accurate.</span>
               </label>
 
@@ -481,7 +536,7 @@ export default function ProfileSetup() {
                   {LOCATION_OPTIONS.map((o) => (
                     <label
                       key={o.value}
-                      className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition ${locationVisibility === o.value ? "border-[#A1846B] bg-[#A1846B]/5" : "border-border"}`}
+                      className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition ${locationVisibility === o.value ? "border-primary bg-primary/5" : "border-border"}`}
                     >
                       <RadioGroupItem value={o.value} />
                       <span className="text-xs">{o.label}</span>
@@ -544,7 +599,8 @@ export default function ProfileSetup() {
         >
           <LogOut className="w-3.5 h-3.5 inline mr-1.5" />Log out
         </button>
-      </div>
-    </div>
+        </div>
+      </ScrollPageBody>
+    </ScrollPage>
   );
 }

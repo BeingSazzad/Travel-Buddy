@@ -7,6 +7,8 @@ import { Tag } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import ListSkeleton from "@/components/common/ListSkeleton";
+import { MOCK_DEALS } from "@/lib/mock-deals";
+import { useDemoFallbacks } from "@/lib/demo-fallbacks";
 
 export const DEAL_CATEGORIES = [
   "hotels", "restaurants", "cafes", "tours", "activities",
@@ -25,8 +27,14 @@ export default function Deals() {
   const reload = () => {
     setLoading(true);
     base44.entities.Deal.list("-expiration_date")
-      .then((d) => { setDeals(d); setError(false); })
-      .catch(() => setError(true))
+      .then((d) => {
+        setDeals(d.length > 0 ? d : useDemoFallbacks ? MOCK_DEALS : []);
+        setError(false);
+      })
+      .catch(() => {
+        setDeals(useDemoFallbacks ? MOCK_DEALS : []);
+        setError(false);
+      })
       .finally(() => setLoading(false));
   };
   useEffect(() => { reload(); }, []);
@@ -37,8 +45,8 @@ export default function Deals() {
   }, [deals, category]);
 
   return (
-    <div className="px-5 safe-pt pb-6">
-      <div className="flex items-center gap-1.5 text-[#A1846B] mb-1">
+    <div className="page-shell">
+      <div className="flex items-center gap-1.5 text-primary mb-1">
         <span className="text-xs font-medium uppercase tracking-wide">Seluna members only</span>
       </div>
       <h1 className="font-display font-bold text-lg">Deals</h1>
@@ -51,7 +59,7 @@ export default function Deals() {
         }))}
         active={(c) => category === c}
         onSelect={setCategory}
-        activeClass="bg-foreground text-background border-foreground"
+        activeClass="chip-active"
       />
 
       {loading ? (

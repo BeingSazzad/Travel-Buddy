@@ -5,10 +5,11 @@ import { useAuth } from "@/lib/AuthContext";
 import { useDiscover } from "@/hooks/useDiscover";
 import SwipeCard from "@/components/swipe/SwipeCard";
 import MatchModal from "@/components/swipe/MatchModal";
-import MemberProfileSheet from "@/components/swipe/MemberProfileSheet";
 import MatchFilterSheet from "@/components/match/MatchFilterSheet";
+import ScreenHeader from "@/components/common/ScreenHeader";
 import ReportSheet from "@/components/reports/ReportSheet";
 import EmptyState from "@/components/common/EmptyState";
+import { memberAvatar } from "@/lib/images";
 
 const DEFAULT_FILTERS = {
   ageMin: "",
@@ -48,7 +49,6 @@ export default function Discover() {
   const { user } = useAuth();
   const {
     deck, loading, matched, setMatched,
-    profile, setProfile, profileLoading, viewProfile,
     decide, reload, unmatch, block,
   } = useDiscover();
 
@@ -56,18 +56,22 @@ export default function Discover() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState(null);
 
-  const myAvatar = user?.main_photo || user?.profile_photos?.[0] || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&h=200&q=80";
+  const myAvatar = user?.main_photo || user?.profile_photos?.[0] || memberAvatar("clara");
   const filtered = useMemo(() => deck.filter((m) => matchesFilters(m, filters)), [deck, filters]);
   const current = filtered[0];
   const activeFilterCount = Object.entries(filters).filter(([, v]) =>
     Array.isArray(v) ? v.length : v
   ).length;
 
+  const openProfile = (member) => {
+    const id = member?.user_id || member?.match_user_id;
+    if (id) navigate(`/members/${id}`);
+  };
+
   const handleProfile = () => {
     if (!matched) return;
-    const m = { user_id: matched.match_user_id, name: matched.name };
     setMatched(null);
-    viewProfile(m);
+    openProfile(matched);
   };
 
   const handleKeepExploring = () => setMatched(null);
@@ -98,56 +102,59 @@ export default function Discover() {
   const resetFilters = () => setFilters(DEFAULT_FILTERS);
 
   return (
-    <div className="px-5 safe-pt pb-4 flex flex-col">
-      <header className="flex items-center justify-between gap-3 mb-4">
-        <div>
-          <h1 className="font-display font-bold text-lg">Match</h1>
-          <p className="text-sm text-muted-foreground">Find your next travel connection</p>
-        </div>
-        <button
-          onClick={() => setFilterOpen(true)}
-          className="relative w-10 h-10 rounded-full bg-card border border-border shadow-soft flex items-center justify-center active:scale-95 transition"
-          aria-label="Filters"
-        >
-          <SlidersHorizontal className="w-5 h-5" strokeWidth={1.75} />
-          {activeFilterCount > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-[#A1846B] text-white text-[10px] font-medium flex items-center justify-center">
-              {activeFilterCount}
-            </span>
-          )}
-        </button>
-      </header>
+    <div className="page-shell flex flex-col flex-1 min-h-0 safe-pt pb-1">
+      <ScreenHeader
+        className="mb-3"
+        title="Match"
+        subtitle="Find your next travel connection"
+        extraActions={
+          <button
+            onClick={() => setFilterOpen(true)}
+            className="relative w-9 h-9 rounded-full bg-card border border-border shadow-soft flex items-center justify-center active:scale-95 transition"
+            aria-label="Filters"
+          >
+            <SlidersHorizontal className="w-4 h-4" strokeWidth={1.75} />
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-primary text-white text-[10px] font-medium flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+        }
+      />
 
       {activeFilterCount > 0 && (
         <button
           onClick={resetFilters}
-          className="self-start mb-3 flex items-center gap-1 text-xs text-[#A1846B] active:scale-95 transition"
+          className="self-start mb-3 flex items-center gap-1 text-xs text-primary active:scale-95 transition"
         >
           <X className="w-3.5 h-3.5" strokeWidth={1.75} /> Clear filters
         </button>
       )}
 
-      <div className="flex-1 flex flex-col items-center justify-center">
+      <div className="flex-1 min-h-0 flex flex-col w-full">
         {loading ? (
-          <p className="text-sm text-muted-foreground">Loading travel connections…</p>
+          <p className="text-sm text-muted-foreground text-center py-8">Loading travel connections…</p>
         ) : !current ? (
-          <EmptyState
-            icon={Plane}
-            title={activeFilterCount ? "No connections match your filters" : "You're all caught up"}
-            description={
-              activeFilterCount
-                ? "Try widening your filters to meet more women."
-                : "No more travel connections right now. Check back soon for new members."
-            }
-            actionLabel={activeFilterCount ? "Clear filters" : "Refresh"}
-            onAction={activeFilterCount ? resetFilters : reload}
-          />
+          <div className="flex-1 flex items-center justify-center">
+            <EmptyState
+              icon={Plane}
+              title={activeFilterCount ? "No connections match your filters" : "You're all caught up"}
+              description={
+                activeFilterCount
+                  ? "Try widening your filters to meet more women."
+                  : "No more travel connections right now. Check back soon for new members."
+              }
+              actionLabel={activeFilterCount ? "Clear filters" : "Refresh"}
+              onAction={activeFilterCount ? resetFilters : reload}
+            />
+          </div>
         ) : (
           <SwipeCard
             key={current.user_id}
             member={current}
             onSwipe={(dir) => decide(current, dir === "right" ? "connect" : "skip")}
-            onProfile={(m) => viewProfile(m)}
+            onProfile={openProfile}
           />
         )}
       </div>
@@ -162,13 +169,6 @@ export default function Discover() {
         onUnmatch={handleUnmatch}
         onBlock={handleBlock}
         onReport={handleReport}
-      />
-
-      <MemberProfileSheet
-        open={!!profile}
-        data={profile}
-        loading={profileLoading}
-        onClose={() => setProfile(null)}
       />
 
       <MatchFilterSheet

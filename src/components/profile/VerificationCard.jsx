@@ -53,8 +53,8 @@ export default function VerificationCard() {
 
   if (verified) {
     return (
-      <div className="mt-5 rounded-2xl bg-[#A1846B]/10 p-4 flex items-center gap-3">
-        <BadgeCheck className="w-5 h-5 text-[#A1846B] shrink-0" strokeWidth={1.5} />
+      <div className="rounded-2xl bg-primary/10 p-4 flex items-center gap-3">
+        <BadgeCheck className="w-5 h-5 text-primary shrink-0" strokeWidth={1.5} />
         <div>
           <p className="font-display font-semibold text-sm">Verified identity</p>
           <p className="text-xs text-muted-foreground">Identity and age (18+) confirmed via Veriff</p>
@@ -66,10 +66,10 @@ export default function VerificationCard() {
   const showStatus = status !== "none" && status !== "approved";
 
   return (
-    <div className="mt-5 rounded-2xl border border-border bg-card p-4">
+    <div className="rounded-2xl border border-border bg-card p-4">
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-10 h-10 rounded-full bg-[#A1846B]/10 flex items-center justify-center shrink-0">
-          <ShieldCheck className="w-5 h-5 text-[#A1846B]" strokeWidth={1.5} />
+        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+          <ShieldCheck className="w-5 h-5 text-primary" strokeWidth={1.5} />
         </div>
         <div className="flex-1">
           <p className="font-display font-semibold text-sm">Verify your identity</p>
@@ -87,7 +87,7 @@ export default function VerificationCard() {
       <button
         onClick={startVerification}
         disabled={busy}
-        className="w-full h-11 rounded-full bg-foreground text-background text-sm font-medium flex items-center justify-center gap-2 active:scale-95 transition disabled:opacity-50"
+        className="w-full h-11 rounded-full gradient-brand-button text-sm font-medium flex items-center justify-center gap-2 active:scale-95 transition disabled:opacity-50"
       >
         {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" strokeWidth={1.5} />}
         {status === "pending" ? "Continue verification" : REVIEWABLE.includes(status) ? "Try again" : "Verify identity"}

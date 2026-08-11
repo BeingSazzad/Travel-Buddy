@@ -126,9 +126,9 @@ export default function SubscriptionManagement() {
       )}
 
       {/* Cancellation info */}
-      <div className="mt-5 rounded-2xl border border-border bg-[#A1846B]/5 p-4">
+      <div className="mt-5 rounded-2xl border border-border bg-primary/5 p-4">
         <div className="flex items-start gap-2.5">
-          <Info className="w-4 h-4 text-[#A1846B] mt-0.5 shrink-0" strokeWidth={1.5} />
+          <Info className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} />
           <div>
             <p className="text-sm font-medium">Cancelling your subscription</p>
             <p className="text-xs text-muted-foreground mt-1 leading-relaxed">

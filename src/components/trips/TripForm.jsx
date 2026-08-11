@@ -4,40 +4,102 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import {
   Select, SelectTrigger, SelectContent, SelectItem, SelectValue,
 } from "@/components/ui/select";
+import { Upload, Loader2, X } from "lucide-react";
+import { Image } from "@/components/ui/image";
+import { cn } from "@/lib/utils";
+import { base44 } from "@/api/base44Client";
 import { COUNTRIES } from "@/lib/profile-options";
-import { TRAVEL_STYLES } from "@/lib/trip-options";
+import { TRAVEL_STYLES, LOOKING_FOR } from "@/lib/trip-options";
 import { imageForCity } from "@/lib/trip-utils";
 
-const EMPTY = { name: "", city: "", country: "", start_date: "", end_date: "", travel_style: "" };
+const EMPTY = {
+  name: "",
+  city: "",
+  country: "",
+  start_date: "",
+  end_date: "",
+  travel_style: "",
+  description: "",
+  looking_for: [],
+  visibility: "public",
+  cover_image: "",
+};
+
+function Chip({ active, onClick, children }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "px-3 py-1.5 rounded-full text-xs border capitalize transition",
+        active ? "bg-primary text-white border-primary" : "border-border text-foreground"
+      )}
+    >
+      {children}
+    </button>
+  );
+}
 
 export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      setForm(
-        initial
-          ? {
-              name: initial.name || "",
-              city: initial.city || "",
-              country: initial.country || "",
-              start_date: initial.start_date || "",
-              end_date: initial.end_date || "",
-              travel_style: initial.travel_style || "",
-            }
-          : EMPTY
-      );
-    }
+    if (!open) return;
+    setForm(
+      initial
+        ? {
+            name: initial.name || "",
+            city: initial.city || "",
+            country: initial.country || "",
+            start_date: initial.start_date || "",
+            end_date: initial.end_date || "",
+            travel_style: initial.travel_style || "",
+            description: initial.description || "",
+            looking_for: initial.looking_for || [],
+            visibility: initial.visibility || "public",
+            cover_image: initial.cover_image || "",
+          }
+        : EMPTY
+    );
   }, [open, initial]);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const toggleLooking = (v) =>
+    setForm((f) => ({
+      ...f,
+      looking_for: f.looking_for.includes(v)
+        ? f.looking_for.filter((x) => x !== v)
+        : [...f.looking_for, v],
+    }));
 
-  const valid = form.city.trim() && form.start_date && form.end_date && form.end_date >= form.start_date;
+  const valid =
+    form.city.trim() &&
+    form.start_date &&
+    form.end_date &&
+    form.end_date >= form.start_date;
+
+  const onCoverImage = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploadingCover(true);
+    try {
+      const res = await base44.integrations.Core.UploadFile({ file });
+      set("cover_image", res.file_url);
+    } catch {
+      alert("Photo upload failed. Try again.");
+    } finally {
+      setUploadingCover(false);
+    }
+  };
 
   const submit = async () => {
     if (!valid) return;
@@ -50,7 +112,10 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
         start_date: form.start_date,
         end_date: form.end_date,
         travel_style: form.travel_style,
-        cover_image: imageForCity(form.city),
+        description: form.description.trim(),
+        looking_for: form.looking_for,
+        visibility: form.visibility,
+        cover_image: form.cover_image || imageForCity(form.city),
       });
       onOpenChange(false);
     } finally {
@@ -60,7 +125,7 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-app rounded-2xl">
+      <DialogContent className="max-w-app rounded-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{initial ? "Edit trip" : "New trip"}</DialogTitle>
         </DialogHeader>
@@ -68,7 +133,12 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Trip name</Label>
-            <Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder={`Trip to ${form.city || "..."}`} className="h-10" />
+            <Input
+              value={form.name}
+              onChange={(e) => set("name", e.target.value)}
+              placeholder={`Trip to ${form.city || "..."}`}
+              className="h-10"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -106,6 +176,69 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
                 {TRAVEL_STYLES.map((s) => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Looking for</Label>
+            <div className="flex flex-wrap gap-1.5">
+              {LOOKING_FOR.map((o) => (
+                <Chip key={o} active={form.looking_for.includes(o)} onClick={() => toggleLooking(o)}>
+                  {o}
+                </Chip>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <Textarea
+              value={form.description}
+              onChange={(e) => set("description", e.target.value)}
+              placeholder="Tell others about your trip…"
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Cover photo</Label>
+            {form.cover_image ? (
+              <div className="relative rounded-xl overflow-hidden h-28 border border-border">
+                <Image src={form.cover_image} alt="Cover" fittingType="fill" className="w-full h-full" />
+                <button
+                  type="button"
+                  onClick={() => set("cover_image", "")}
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-background/90 flex items-center justify-center"
+                  aria-label="Remove cover"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : uploadingCover ? (
+              <div className="flex items-center justify-center h-24 rounded-xl border border-dashed border-border text-muted-foreground text-xs">
+                <Loader2 className="w-4 h-4 animate-spin mr-2" /> Uploading…
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center h-24 rounded-xl border border-dashed border-border cursor-pointer text-muted-foreground hover:bg-muted/30 transition">
+                <Upload className="w-4 h-4 mb-1" strokeWidth={1.5} />
+                <span className="text-xs">Upload cover photo</span>
+                <input type="file" accept="image/*" onChange={onCoverImage} className="hidden" />
+              </label>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-border p-3">
+            <div>
+              <p className="font-medium text-sm">
+                {form.visibility === "public" ? "Public trip" : "Hidden trip"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {form.visibility === "public" ? "Visible to the community" : "Only you can see this trip"}
+              </p>
+            </div>
+            <Switch
+              checked={form.visibility === "public"}
+              onCheckedChange={(c) => set("visibility", c ? "public" : "hidden")}
+            />
           </div>
         </div>
 

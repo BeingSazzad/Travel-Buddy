@@ -41,12 +41,12 @@ export default function ResetPassword() {
         title="Invalid reset link"
         subtitle="This password reset link is missing or invalid"
         footer={
-          <Link to="/forgot-password" className="text-primary font-medium hover:underline">
+          <Link to="/forgot-password" className="auth-link">
             Request a new link
           </Link>
         }
       >
-        <p className="text-sm text-foreground text-center">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           The link you used appears to be incomplete. Please request a new password reset email.
         </p>
       </AuthLayout>
@@ -57,7 +57,7 @@ export default function ResetPassword() {
     <AuthLayout
       icon={Lock}
       title="New password"
-      subtitle="Enter your new password below"
+      subtitle="Choose a strong password you haven't used elsewhere."
     >
       {error && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
@@ -77,7 +77,7 @@ export default function ResetPassword() {
               placeholder="••••••••"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="pl-10 h-12"
+              className="pl-10 auth-input"
               required
             />
           </div>
@@ -93,12 +93,12 @@ export default function ResetPassword() {
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pl-10 h-12"
+              className="pl-10 auth-input"
               required
             />
           </div>
         </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
+        <Button type="submit" variant="primary" className="w-full" disabled={loading}>
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

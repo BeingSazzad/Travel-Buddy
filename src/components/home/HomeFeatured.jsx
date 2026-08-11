@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { Loader2 } from "lucide-react";
+import HorizontalScroll from "@/components/common/HorizontalScroll";
 import { onRefresh } from "@/lib/refresh-bus";
 
 export default function HomeFeatured() {
@@ -26,13 +27,13 @@ export default function HomeFeatured() {
   }, [reload]);
   useEffect(() => onRefresh("/", reload), [reload]);
 
-  if (loading) return <div className="px-5 py-6"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /></div>;
+  if (loading) return <div className="app-px py-6"><Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /></div>;
   if (items.length === 0) return null;
 
   return (
-    <section className="mt-6">
-      <h2 className="font-display font-semibold text-lg px-5 mb-3">Featured</h2>
-      <div className="flex gap-3 overflow-x-auto no-scrollbar px-5 pb-2">
+    <section className="min-w-0 max-w-full">
+      <h2 className="section-header app-px mb-3 text-foreground">Featured</h2>
+      <HorizontalScroll>
         {items.map((f) => {
           const inner = (
             <div className="w-64 shrink-0 rounded-2xl overflow-hidden border border-border bg-card shadow-soft">
@@ -51,7 +52,7 @@ export default function HomeFeatured() {
             <div key={f.id}>{inner}</div>
           );
         })}
-      </div>
+      </HorizontalScroll>
     </section>
   );
 }

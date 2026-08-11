@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Plus, MapPinned, Compass, Sparkles } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -9,15 +9,18 @@ import { tripStatus, tripsOverlap } from "@/lib/trip-utils";
 import TripCard from "@/components/trips/TripCard";
 import TripForm from "@/components/trips/TripForm";
 import MatchSuggestions from "@/components/trips/MatchSuggestions";
+import ScreenHeader from "@/components/common/ScreenHeader";
 import { onRefresh } from "@/lib/refresh-bus";
 
 const STATUS_ORDER = ["active", "upcoming", "previous"];
 
 export default function Trips() {
   const { trips, loading, user, reload, create, update, remove } = useTrips();
-  const { matches: matchList, loading: matchesLoading, blockMember } = useMatches();
+  const { matches: matchList, loading: matchesLoading } = useMatches();
   useEffect(() => onRefresh("/trips", reload), [reload]);
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialTab = location.state?.tab === "nearby" ? "nearby" : "my";
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
 
@@ -44,26 +47,26 @@ export default function Trips() {
   };
 
   return (
-    <div className="px-5 safe-pt pb-6">
-      <div className="flex items-center justify-between mb-5">
-        <div>
-          <h1 className="font-display font-bold text-lg">Trips</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Plan, discover, connect</p>
-        </div>
-        <button onClick={openNew} className="w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center active:scale-95 transition">
-          <Plus className="w-5 h-5" />
-        </button>
-      </div>
+    <div className="page-shell">
+      <ScreenHeader
+        title="Trips"
+        subtitle="Plan, discover, connect"
+        extraActions={
+          <button onClick={openNew} className="w-10 h-10 rounded-full fab-primary">
+            <Plus className="w-5 h-5" />
+          </button>
+        }
+      />
 
-      <Tabs defaultValue="my">
-        <TabsList className="grid grid-cols-3 w-full bg-muted/60 p-1 rounded-2xl">
-          <TabsTrigger value="my" className="rounded-xl text-xs font-semibold">My Trips</TabsTrigger>
-          <TabsTrigger value="discover" className="rounded-xl text-xs font-semibold">Discover</TabsTrigger>
-          <TabsTrigger value="nearby" className="rounded-xl text-xs font-semibold">Women Nearby</TabsTrigger>
+      <Tabs defaultValue={initialTab} className="mt-3">
+        <TabsList className="grid grid-cols-3 w-full h-11 bg-muted/50 p-1 rounded-2xl gap-1">
+          <TabsTrigger value="my" className="rounded-xl text-xs font-semibold px-2">My Trips</TabsTrigger>
+          <TabsTrigger value="discover" className="rounded-xl text-xs font-semibold px-2">Discover</TabsTrigger>
+          <TabsTrigger value="nearby" className="rounded-xl text-xs font-semibold px-2">Trip matches</TabsTrigger>
         </TabsList>
 
         {/* My Trips */}
-        <TabsContent value="my" className="mt-5">
+        <TabsContent value="my" className="mt-6">
           {loading ? (
             <p className="text-sm text-muted-foreground">Loading…</p>
           ) : myTrips.length === 0 ? (
@@ -77,7 +80,15 @@ export default function Trips() {
                   </h2>
                   <div className="space-y-4">
                     {grouped[s].map((t) => (
-                      <TripCard key={t.id} trip={t} canEdit overlapCount={overlapFor(t)} onEdit={openEdit} onDelete={del} />
+                      <TripCard
+                        key={t.id}
+                        trip={t}
+                        canEdit
+                        overlapCount={overlapFor(t)}
+                        onEdit={openEdit}
+                        onDelete={del}
+                        onPress={() => navigate(`/trips/${t.id}`)}
+                      />
                     ))}
                   </div>
                 </div>
@@ -87,29 +98,36 @@ export default function Trips() {
         </TabsContent>
 
         {/* Discover Trips */}
-        <TabsContent value="discover" className="mt-5">
+        <TabsContent value="discover" className="mt-6">
           {otherTrips.length === 0 ? (
             <EmptyState icon={Compass} title="No trips to discover yet" description="Community trips from other women will appear here once they're planned." />
           ) : (
             <div className="space-y-4">
               {otherTrips.map((t) => {
                 const mine = myTrips.some((m) => tripsOverlap(m, t));
-                return <TripCard key={t.id} trip={t} note={mine ? "Matches your dates" : undefined} />;
+                return (
+                  <TripCard
+                    key={t.id}
+                    trip={t}
+                    note={mine ? "Matches your dates" : undefined}
+                    onPress={() => navigate(`/trips/${t.id}`)}
+                  />
+                );
               })}
             </div>
           )}
         </TabsContent>
 
-        {/* Women Nearby */}
-        <TabsContent value="nearby" className="mt-5">
+        {/* Trip matches */}
+        <TabsContent value="nearby" className="mt-6">
           {myTrips.length === 0 ? (
-            <EmptyState icon={MapPinned} title="Add a trip to find women nearby" description="We'll suggest members travelling to the same place around the same time." actionLabel="New trip" onAction={openNew} />
+            <EmptyState icon={MapPinned} title="Add a trip to see matches" description="We'll suggest women travelling to the same place around the same time. Tap a match to view their profile." actionLabel="New trip" onAction={openNew} />
           ) : matchesLoading ? (
             <p className="text-sm text-muted-foreground">Finding matches…</p>
           ) : matchList.length === 0 ? (
             <EmptyState icon={Sparkles} title="No matches yet" description="No members are travelling to your destinations on your dates right now. Try a trip with different dates." />
           ) : (
-            <MatchSuggestions matches={matchList} onBlock={blockMember} />
+            <MatchSuggestions matches={matchList} />
           )}
         </TabsContent>
       </Tabs>

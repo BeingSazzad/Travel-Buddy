@@ -46,8 +46,8 @@ export default function Dashboard() {
     <div>
       <SectionHeader title="Overview" subtitle="Live platform statistics" />
 
-      <div className="rounded-2xl border border-border bg-gradient-to-br from-[#A1846B]/10 to-[#CBB8A5]/20 p-5 mb-4">
-        <div className="flex items-center gap-2 text-[#7a5c44]">
+      <div className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 to-sand/20 p-5 mb-4">
+        <div className="flex items-center gap-2 text-brand-strong">
           <TrendingUp className="w-4 h-4" strokeWidth={1.5} />
           <span className="text-xs uppercase tracking-wide">Estimated revenue</span>
         </div>
@@ -60,7 +60,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {cards.map((c) => (
           <div key={c.label} className="rounded-2xl border border-border bg-card p-4">
-            <c.icon className="w-4 h-4 text-[#A1846B] mb-2" strokeWidth={1.5} />
+            <c.icon className="w-4 h-4 text-primary mb-2" strokeWidth={1.5} />
             <p className="font-display font-bold text-lg">{c.value.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground leading-tight mt-0.5">{c.label}</p>
             {c.sub && <p className="text-[10px] text-amber-600 mt-0.5">{c.sub}</p>}

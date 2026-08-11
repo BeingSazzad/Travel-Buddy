@@ -16,7 +16,9 @@ import Trips from '@/pages/Trips';
 import Friends from '@/pages/Friends';
 import Events from '@/pages/Events';
 import Profile from '@/pages/Profile';
+import Saved from '@/pages/Saved';
 import Category from '@/pages/Category';
+import Reviews from '@/pages/Reviews';
 import Welcome from '@/pages/Welcome';
 import Onboarding from '@/pages/Onboarding';
 import Login from '@/pages/Login';
@@ -28,6 +30,8 @@ import AccountPending from '@/pages/AccountPending';
 import ProfileSetup from '@/pages/ProfileSetup';
 import Search from '@/pages/Search';
 import CreateTrip from '@/pages/CreateTrip';
+import TripDetail from '@/pages/TripDetail';
+import DealDetail from '@/pages/DealDetail';
 import CreateEvent from '@/pages/CreateEvent';
 import EventDetail from '@/pages/EventDetail';
 import Destinations from '@/pages/Destinations';
@@ -42,8 +46,10 @@ import Deals from '@/pages/Deals';
 import SubscriptionManagement from '@/pages/SubscriptionManagement';
 import Discover from '@/pages/Discover';
 import Conversation from '@/pages/Conversation';
+import MemberProfile from '@/pages/MemberProfile';
 import Messages from '@/pages/Messages';
 import Notifications from '@/pages/Notifications';
+import ConnectionRequests from '@/pages/ConnectionRequests';
 import AdminReports from '@/pages/AdminReports';
 import AdminUsers from '@/pages/AdminUsers';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -62,10 +68,11 @@ import AdminTravelTips from '@/pages/admin/AdminTravelTips';
 import AdminSafetyTips from '@/pages/admin/AdminSafetyTips';
 import AdminFeatured from '@/pages/admin/AdminFeatured';
 import ContentManagement from '@/pages/admin/ContentManagement';
-import CommunityGuidelines from '@/pages/CommunityGuidelines';
+import ChangePassword from '@/pages/ChangePassword';
 import Terms from '@/pages/Terms';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import HelpSupport from '@/pages/HelpSupport';
+import CommunityGuidelines from '@/pages/CommunityGuidelines';
 import { ShieldAlert } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import PageTransition from "@/components/PageTransition";
@@ -81,11 +88,11 @@ function getAgeFromDob(dob) {
 }
 
 function AppScroll({ children }) {
-  return <div className="flex-1 min-h-0 h-full app-scroll">{children}</div>;
+  return <div className="flex-1 min-h-0 h-full app-scroll min-w-0 max-w-full overflow-x-hidden">{children}</div>;
 }
 
 function AppFrame({ children }) {
-  return <div className="flex-1 min-h-0 h-full overflow-hidden flex flex-col">{children}</div>;
+  return <div className="flex-1 min-h-0 h-full overflow-hidden flex flex-col min-w-0 max-w-full">{children}</div>;
 }
 
 const AuthenticatedApp = () => {
@@ -153,7 +160,7 @@ const AuthenticatedApp = () => {
         <ShieldAlert className="w-9 h-9 text-muted-foreground" strokeWidth={1.5} />
         <p className="font-display font-bold text-lg">Access restricted</p>
         <p className="text-sm text-muted-foreground max-w-xs">Seluna is only available to users aged 18 or older.</p>
-        <button onClick={() => base44.auth.logout()} className="mt-2 text-sm text-[#A1846B] underline">Log out</button>
+        <button onClick={() => base44.auth.logout()} className="mt-2 text-sm text-primary underline">Log out</button>
       </div>
     );
   }
@@ -188,6 +195,9 @@ const AuthenticatedApp = () => {
       <AppScroll>
         <Routes>
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/help" element={<HelpSupport />} />
           <Route path="*" element={<Navigate to="/community-guidelines" replace />} />
         </Routes>
       </AppScroll>
@@ -203,7 +213,7 @@ const AuthenticatedApp = () => {
         <p className="text-sm text-muted-foreground max-w-xs">
           Your Seluna account has been {user.account_status}. If you believe this is a mistake, please contact Seluna support.
         </p>
-        <button onClick={() => base44.auth.logout()} className="mt-2 text-sm text-[#A1846B] underline">Log out</button>
+        <button onClick={() => base44.auth.logout()} className="mt-2 text-sm text-primary underline">Log out</button>
       </div>
     );
   }
@@ -213,6 +223,8 @@ const AuthenticatedApp = () => {
     <AppFrame>
     <Routes>
       <Route path="/trips/new" element={<PageTransition><CreateTrip /></PageTransition>} />
+      <Route path="/trips/:id" element={<PageTransition><TripDetail /></PageTransition>} />
+      <Route path="/deals/:id" element={<PageTransition><DealDetail /></PageTransition>} />
       <Route path="/events/new" element={<PageTransition><CreateEvent /></PageTransition>} />
       <Route path="/events/:id" element={<PageTransition><EventDetail /></PageTransition>} />
       <Route path="/cafes/:name" element={<PageTransition><CafeDetail /></PageTransition>} />
@@ -220,6 +232,8 @@ const AuthenticatedApp = () => {
       <Route path="/hotels/:name" element={<PageTransition><HotelDetail /></PageTransition>} />
       <Route path="/destinations/:city" element={<PageTransition><DestinationDetail /></PageTransition>} />
       <Route path="/conversations/:id" element={<PageTransition><Conversation /></PageTransition>} />
+      <Route path="/members/:id" element={<PageTransition><MemberProfile /></PageTransition>} />
+      <Route path="/profile-setup" element={<PageTransition><ProfileSetup /></PageTransition>} />
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
@@ -227,6 +241,7 @@ const AuthenticatedApp = () => {
         <Route path="/discover" element={<Discover />} />
         <Route path="/friends" element={<Friends />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/connections" element={<ConnectionRequests />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/community-guidelines" element={<CommunityGuidelines />} />
         <Route path="/terms" element={<Terms />} />
@@ -234,11 +249,13 @@ const AuthenticatedApp = () => {
         <Route path="/help" element={<HelpSupport />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/change-password" element={<ChangePassword />} />
+        <Route path="/saved" element={<Saved />} />
         <Route path="/cafes" element={<Cafes />} />
         <Route path="/restaurants" element={<Restaurants />} />
         <Route path="/hotels" element={<Hotels />} />
         <Route path="/destinations" element={<Destinations />} />
-        <Route path="/reviews" element={<Category category="Reviews" />} />
+        <Route path="/reviews" element={<Reviews />} />
         <Route path="/deals" element={<Deals />} />
         <Route path="/subscription-management" element={<SubscriptionManagement />} />
       </Route>
@@ -265,7 +282,6 @@ const AuthenticatedApp = () => {
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/account-pending" element={<AccountPending />} />
-      <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppFrame>
@@ -288,13 +304,13 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         {showSplash && <SplashScreen />}
-        <div className="min-h-screen bg-[#F5F3F0] dark:bg-[#121111] flex justify-center">
-          <div className="app-shell gradient-app-bg flex flex-col h-dvh max-h-dvh shadow-2xl relative border-x border-border/5 overflow-hidden">
+        <div className="min-h-screen bg-background flex justify-center overflow-x-hidden">
+          <div className="app-shell gradient-app-bg flex flex-col h-dvh max-h-dvh shadow-2xl relative border-x border-border/5 overflow-hidden min-w-0">
             <div className="flex-1 min-h-0 flex flex-col h-full overflow-hidden">
             <Router>
               <ScrollToTop />
               <SavedProvider>
-                <div className="flex-1 min-h-0 h-full overflow-hidden flex flex-col">
+                <div className="flex-1 min-h-0 h-full overflow-hidden flex flex-col min-w-0 max-w-full">
                 <AuthenticatedApp />
                 </div>
               </SavedProvider>

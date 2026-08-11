@@ -9,7 +9,7 @@ function HotelStars({ stars }) {
   return (
     <span className="flex items-center gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} className={cn("w-3 h-3", i < stars ? "fill-[#A1846B] text-[#A1846B]" : "text-border")} strokeWidth={0} />
+        <Star key={i} className={cn("w-3 h-3", i < stars ? "fill-primary text-primary" : "text-border")} strokeWidth={0} />
       ))}
     </span>
   );
@@ -26,7 +26,7 @@ export default function HotelCard({ hotel }) {
     <div onClick={() => navigate(`/hotels/${encodeURIComponent(h.name)}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card interactive-card group">
       <div className="relative h-40">
         <Image src={h.image} alt={h.name} fittingType="fill" className="w-full h-full image-zoom" />
-        <div className="gradient-overlay-soft opacity-60" />
+        <div className="gradient-overlay-soft" />
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); e.preventDefault(); toggle({ type: "hotel", title: h.name, location: h.city, country: h.country, image: h.image, rating: h.memberRating }); }}
@@ -34,16 +34,16 @@ export default function HotelCard({ hotel }) {
           aria-label={saved ? "Unsave" : "Save"}
         >
           <span key={saved ? "on" : "off"} className={cn("inline-flex", saved && "save-pop")}>
-            <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
+            <Bookmark className={cn("w-4 h-4", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
           </span>
         </button>
-        <span className="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">€{h.pricePerNight}/night</span>
+        <span className="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-primary font-medium">€{h.pricePerNight}/night</span>
       </div>
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-semibold text-base leading-tight">{h.name}</h3>
           <span className="flex items-center gap-1 text-sm shrink-0">
-            <Star className="w-3.5 h-3.5 fill-[#A1846B] text-[#A1846B]" strokeWidth={0} />
+            <Star className="w-3.5 h-3.5 fill-primary text-primary" strokeWidth={0} />
             <span className="font-medium">{h.memberRating.toFixed(1)}</span>
           </span>
         </div>

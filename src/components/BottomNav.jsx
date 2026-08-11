@@ -47,7 +47,7 @@ export default function BottomNav() {
                     strokeWidth={isActive ? 2.5 : 1.75}
                   />
                 </div>
-                <span className={cn('text-[10px] font-medium tracking-tight transition-all', isActive && 'font-semibold text-[#A1846B]')}>
+                <span className={cn('text-[10px] font-medium tracking-tight transition-all', isActive && 'font-semibold text-primary')}>
                   {label}
                 </span>
               </>

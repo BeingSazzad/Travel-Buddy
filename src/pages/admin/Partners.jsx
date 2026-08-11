@@ -39,8 +39,8 @@ export default function Partners() {
         <div className="space-y-2">
           {partners.map((p) => (
             <div key={p.name} className="flex items-center gap-3 p-3 rounded-2xl border border-border bg-card">
-              <div className="w-10 h-10 rounded-xl bg-[#A1846B]/10 flex items-center justify-center">
-                <Handshake className="w-4 h-4 text-[#7a5c44]" strokeWidth={1.5} />
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Handshake className="w-4 h-4 text-brand-strong" strokeWidth={1.5} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{p.name}</p>

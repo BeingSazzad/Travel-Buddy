@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { MapPin, Plane, Compass, Flag, Ban, HeartCrack } from "lucide-react";
+import { MapPin, Plane, Compass, Flag, Ban, UserMinus } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { base44 } from "@/api/base44Client";
 import ReportSheet from "@/components/reports/ReportSheet";
@@ -14,7 +14,7 @@ function ChipRow({ label, items, tone }) {
         {items.map((it) => (
           <span
             key={it}
-            className={`text-xs px-2 py-0.5 rounded-full capitalize ${tone === "accent" ? "bg-[#A1846B]/10 text-[#A1846B]" : "bg-muted text-muted-foreground"}`}
+            className={`text-xs px-2 py-0.5 rounded-full capitalize ${tone === "accent" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
           >
             {it}
           </span>
@@ -32,9 +32,6 @@ export default function MemberProfileSheet({ open, data, loading, matchId, onClo
 
   const reportProfile = () =>
     setReportTarget({ type: "profile", id: memberId, title: p?.name || "Member", ownerId: memberId });
-
-  const reportPhoto = (ph) =>
-    setReportTarget({ type: "photo", id: ph, title: `${p?.name || "Member"} — photo`, ownerId: memberId });
 
   const doBlock = async () => {
     if (!memberId || !window.confirm(`Block ${p?.name || "this member"}? You won't see each other anymore.`)) return;
@@ -80,15 +77,8 @@ export default function MemberProfileSheet({ open, data, loading, matchId, onClo
                 {p.photos?.length > 0 && (
                   <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
                     {p.photos.map((ph, i) => (
-                      <div key={i} className="relative w-40 h-52 rounded-2xl overflow-hidden border border-border shrink-0">
+                      <div key={i} className="w-40 h-52 rounded-2xl overflow-hidden border border-border shrink-0">
                         <Image src={ph} alt={p.name} fittingType="fill" className="w-full h-full" />
-                        <button
-                          onClick={() => reportPhoto(ph)}
-                          className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-black/40 backdrop-blur flex items-center justify-center"
-                          aria-label="Report photo"
-                        >
-                          <Flag className="w-3.5 h-3.5 text-white" strokeWidth={1.5} />
-                        </button>
                       </div>
                     ))}
                   </div>
@@ -110,8 +100,8 @@ export default function MemberProfileSheet({ open, data, loading, matchId, onClo
                     <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Upcoming trips</p>
                     <div className="space-y-2">
                       {data.trips.map((t) => (
-                        <div key={t.id} className="rounded-2xl bg-[#A1846B]/5 p-3">
-                          <div className="flex items-center gap-1.5 text-[#A1846B]">
+                        <div key={t.id} className="rounded-2xl bg-primary/5 p-3">
+                          <div className="flex items-center gap-1.5 text-primary">
                             <Plane className="w-4 h-4" strokeWidth={1.5} />
                             <span className="text-sm font-medium">
                               {t.city}{t.country ? `, ${t.country}` : ""}
@@ -140,7 +130,7 @@ export default function MemberProfileSheet({ open, data, loading, matchId, onClo
                       disabled={busy}
                       className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full border border-border text-sm text-muted-foreground active:scale-95 transition disabled:opacity-50"
                     >
-                      <HeartCrack className="w-4 h-4" strokeWidth={1.5} /> Unmatch
+                      <UserMinus className="w-4 h-4" strokeWidth={2} /> Remove connection
                     </button>
                   )}
                   <button

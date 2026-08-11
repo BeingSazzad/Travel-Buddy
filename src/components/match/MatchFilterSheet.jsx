@@ -17,7 +17,7 @@ function Chip({ active, onClick, children }) {
       className={cn(
         "h-9 px-3.5 rounded-xl text-xs border font-medium capitalize transition-all active:scale-95 flex items-center justify-center",
         active
-          ? "bg-[#A1846B] text-white border-[#A1846B] shadow-sm"
+          ? "bg-primary text-white border-primary shadow-sm"
           : "bg-card border-border/80 text-foreground hover:bg-muted/50"
       )}
     >
@@ -64,7 +64,7 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
           {activeCount > 0 && (
             <button
               onClick={onReset}
-              className="text-xs font-semibold text-[#A1846B] flex items-center gap-1 hover:underline mr-6"
+              className="text-xs font-semibold text-primary flex items-center gap-1 hover:underline mr-6"
             >
               <RotateCcw className="w-3.5 h-3.5" /> Reset
             </button>
@@ -75,7 +75,7 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
           {/* Section: Location & Trip */}
           <div className="space-y-3">
             <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              <MapPin className="w-3.5 h-3.5 text-[#A1846B]" strokeWidth={2} />
+              <MapPin className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
               <span>Location & Destination</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -131,7 +131,7 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
           {/* Section: Dates */}
           <div className="space-y-3 pt-2 border-t border-border/60">
             <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              <Calendar className="w-3.5 h-3.5 text-[#A1846B]" strokeWidth={2} />
+              <Calendar className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
               <span>Travel Dates</span>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -153,7 +153,7 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
           {/* Section: Interests (Progressive Disclosure) */}
           <div className="space-y-3 pt-2 border-t border-border/60">
             <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              <Sparkles className="w-3.5 h-3.5 text-[#A1846B]" strokeWidth={2} />
+              <Sparkles className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
               <span>Interests</span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -167,7 +167,7 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
               <button
                 type="button"
                 onClick={() => setShowMoreInterests(!showMoreInterests)}
-                className="text-xs font-semibold text-[#A1846B] flex items-center gap-1 mt-1 hover:underline"
+                className="text-xs font-semibold text-primary flex items-center gap-1 mt-1 hover:underline"
               >
                 {showMoreInterests ? (
                   <>Show less <ChevronUp className="w-3.5 h-3.5" /></>
@@ -192,7 +192,7 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
               <button
                 type="button"
                 onClick={() => setShowMoreLanguages(!showMoreLanguages)}
-                className="text-xs font-semibold text-[#A1846B] flex items-center gap-1 mt-1 hover:underline"
+                className="text-xs font-semibold text-primary flex items-center gap-1 mt-1 hover:underline"
               >
                 {showMoreLanguages ? (
                   <>Show less <ChevronUp className="w-3.5 h-3.5" /></>
@@ -209,7 +209,7 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
           <Button variant="outline" className="flex-1 h-12 rounded-2xl font-semibold" onClick={onReset}>
             Reset All
           </Button>
-          <Button className="flex-1 h-12 rounded-2xl bg-[#A1846B] hover:bg-[#8a6a52] text-white font-bold shadow-md" onClick={() => onOpenChange(false)}>
+          <Button className="flex-1 h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold shadow-md" onClick={() => onOpenChange(false)}>
             {activeCount > 0 ? `Apply Filters (${activeCount})` : "Show Results"}
           </Button>
         </SheetFooter>

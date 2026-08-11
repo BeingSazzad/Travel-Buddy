@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { EVENT_CATEGORIES, defaultEventImage, capitalize, fmtEventDate } from "@/lib/event-options";
 import { COUNTRIES, LANGUAGES } from "@/lib/profile-options";
 import EventCard from "@/components/events/EventCard";
+import { findMockEvent } from "@/lib/mock-events";
 
 const TOTAL = 6;
 const EMPTY = {
@@ -30,7 +31,7 @@ function Chip({ active, onClick, children }) {
       onClick={onClick}
       className={cn(
         "px-3.5 py-2 rounded-full text-sm border capitalize transition",
-        active ? "bg-[#A1846B] text-white border-[#A1846B]" : "border-border text-foreground"
+        active ? "bg-primary text-white border-primary" : "border-border text-foreground"
       )}
     >
       {children}
@@ -60,7 +61,31 @@ export default function CreateEvent() {
           external_link: e.external_link || "", age_min: e.age_min || "", age_max: e.age_max || "",
           languages: e.languages || [], agreed_rules: true,
         });
-      } catch (err) { /* ignore */ }
+      } catch {
+        const mock = findMockEvent(editId);
+        if (mock) {
+          setData({
+            title: mock.title || "",
+            category: mock.category || "",
+            description: mock.description || "",
+            date: mock.date || "",
+            start_time: mock.time || "",
+            end_time: mock.end_time || "",
+            city: mock.city || "",
+            country: mock.country || "",
+            location: mock.location || "",
+            image: mock.image || "",
+            max_attendees: mock.max_attendees || 10,
+            visibility: mock.visibility || "public",
+            pricing: mock.pricing || "free",
+            external_link: mock.external_link || "",
+            age_min: mock.age_min || "",
+            age_max: mock.age_max || "",
+            languages: mock.languages || [],
+            agreed_rules: true,
+          });
+        }
+      }
     })();
   }, [editId]);
 
@@ -153,7 +178,7 @@ export default function CreateEvent() {
 
       <div className="px-5 mb-5 flex gap-1.5">
         {Array.from({ length: TOTAL }).map((_, i) => (
-          <div key={i} className={cn("h-1 flex-1 rounded-full", i < step ? "bg-[#A1846B]" : "bg-border")} />
+          <div key={i} className={cn("h-1 flex-1 rounded-full", i < step ? "bg-primary" : "bg-border")} />
         ))}
       </div>
 
@@ -309,7 +334,7 @@ export default function CreateEvent() {
             <h2 className="font-display font-bold text-lg">Community & safety</h2>
             <p className="text-sm text-muted-foreground mb-5">Please agree before publishing.</p>
             <div className="rounded-2xl border border-border bg-card p-4 space-y-3 text-sm">
-              <div className="flex items-center gap-2 text-[#A1846B]"><ShieldCheck className="w-4 h-4" /><span className="font-medium">Seluna event guidelines</span></div>
+              <div className="flex items-center gap-2 text-primary"><ShieldCheck className="w-4 h-4" /><span className="font-medium">Seluna event guidelines</span></div>
               <ul className="space-y-2 text-muted-foreground list-disc pl-5">
                 <li>This event is friendship and travel-focused — no dating, romantic, or commercial soliciting.</li>
                 <li>Meet in public spaces; never share private home addresses.</li>
@@ -319,7 +344,7 @@ export default function CreateEvent() {
               </ul>
             </div>
             <label className="flex items-start gap-3 mt-4 cursor-pointer">
-              <input type="checkbox" checked={data.agreed_rules} onChange={(e) => set("agreed_rules", e.target.checked)} className="mt-1 w-5 h-5 accent-[#A1846B]" />
+              <input type="checkbox" checked={data.agreed_rules} onChange={(e) => set("agreed_rules", e.target.checked)} className="mt-1 w-5 h-5 accent-primary" />
               <span className="text-sm">I have read and agree to the Seluna community and safety rules.</span>
             </label>
           </>
@@ -329,7 +354,7 @@ export default function CreateEvent() {
           <>
             <h2 className="font-display font-bold text-lg">Preview</h2>
             <p className="text-sm text-muted-foreground mb-5">This is how members will see your event.</p>
-            <EventCard event={previewEvent} joined={false} onRsvp={() => {}} />
+            <EventCard event={previewEvent} />
             <div className="rounded-2xl border border-border bg-card p-4 mt-5 space-y-2 text-sm">
               <Row label="Date">{fmtEventDate(data.date)}{data.start_time ? ` · ${data.start_time}` : ""}{data.end_time ? `–${data.end_time}` : ""}</Row>
               <Row label="Location">{[data.location, data.city, data.country].filter(Boolean).join(", ")}</Row>
@@ -347,9 +372,9 @@ export default function CreateEvent() {
       <div className="sticky bottom-0 px-5 py-4 bg-background/90 backdrop-blur border-t border-border flex gap-3">
         <Button variant="outline" className="flex-1" onClick={back}>{step === 1 ? "Cancel" : "Back"}</Button>
         {step < TOTAL ? (
-          <Button className="flex-1 bg-foreground text-background" onClick={next} disabled={!valid}>Next</Button>
+          <Button className="flex-1" onClick={next} disabled={!valid}>Next</Button>
         ) : (
-          <Button className="flex-1 bg-foreground text-background" onClick={finish} disabled={creating}>{creating ? "Saving…" : editId ? "Save changes" : "Publish event"}</Button>
+          <Button className="flex-1" onClick={finish} disabled={creating}>{creating ? "Saving…" : editId ? "Save changes" : "Publish event"}</Button>
         )}
       </div>
     </div>

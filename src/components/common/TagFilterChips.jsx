@@ -4,7 +4,7 @@ export default function TagFilterChips({
   items,
   active,
   onToggle,
-  activeClass = "bg-[#A1846B] text-white border-[#A1846B]",
+  activeClass = "bg-primary text-white border-primary",
   inactiveClass = "border-border text-foreground bg-background/60",
 }) {
   return (

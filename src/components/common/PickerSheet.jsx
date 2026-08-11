@@ -23,7 +23,7 @@ export default function PickerSheet({ open, onOpenChange, title, options, value,
                 }}
                 className={cn(
                   "w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm text-left transition-colors",
-                  active ? "bg-[#A1846B]/10 text-[#A1846B] font-medium" : "text-foreground"
+                  active ? "bg-primary/10 text-primary font-medium" : "text-foreground"
                 )}
               >
                 {o.label}

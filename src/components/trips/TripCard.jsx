@@ -1,13 +1,14 @@
 import React from "react";
-import { MapPin, Users, Pencil, Trash2, Calendar, Sparkles } from "lucide-react";
+import { MapPin, Users, Calendar, Sparkles } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { tripStatus, formatDates, imageForCity } from "@/lib/trip-utils";
+import TripActionsMenu from "@/components/trips/TripActionsMenu";
 
 const STATUS_CONFIG = {
   upcoming: {
     label: "Upcoming",
-    className: "bg-black/50 backdrop-blur-md text-[#F5C99A] border border-[#A1846B]/40",
+    className: "bg-black/50 backdrop-blur-md text-brand-gold border border-primary/40",
   },
   active: {
     label: "Active Now",
@@ -25,90 +26,95 @@ export default function TripCard({
   canEdit = false,
   onEdit = () => {},
   onDelete = () => {},
+  onPress,
   note = "",
 }) {
   const status = tripStatus(trip);
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.upcoming;
 
-  // Use reliable image URL fallback if cover_image is missing or empty
-  const hasValidCover = trip.cover_image && typeof trip.cover_image === "string" && trip.cover_image.startsWith("http");
+  const hasValidCover =
+    trip.cover_image &&
+    typeof trip.cover_image === "string" &&
+    (trip.cover_image.startsWith("http") || trip.cover_image.startsWith("blob:"));
   const imageUrl = hasValidCover ? trip.cover_image : imageForCity(trip.city);
 
+  const interactive = Boolean(onPress);
+
   return (
-    <div className="rounded-[24px] overflow-hidden border border-border/80 shadow-soft bg-card interactive-card group hover:border-[#A1846B]/40 transition-all duration-300">
-      {/* Cover Image Container */}
-      <div className="h-44 relative overflow-hidden">
-        <Image
-          src={imageUrl}
-          alt={trip.name}
-          fittingType="fill"
-          className="w-full h-full object-cover image-zoom"
-        />
-        <div className="gradient-overlay-soft opacity-70" />
+    <div
+      role={interactive ? "button" : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      onClick={onPress}
+      onKeyDown={interactive ? (e) => e.key === "Enter" && onPress() : undefined}
+      className={cn(
+        "relative h-[232px] rounded-[24px] overflow-hidden border border-border/60 shadow-soft group transition-all duration-300",
+        interactive && "interactive-card cursor-pointer tap-feedback hover:border-primary/40"
+      )}
+    >
+      <Image
+        src={imageUrl}
+        alt={trip.name}
+        fittingType="fill"
+        className="absolute inset-0 w-full h-full object-cover image-zoom"
+      />
 
-        {/* Status Pill */}
-        <span
-          className={cn(
-            "absolute top-3 right-3 text-[11px] font-semibold px-3 py-1 rounded-full shadow-md flex items-center gap-1",
-            config.className
-          )}
-        >
-          {status === "active" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
-          {config.label}
-        </span>
+      <div className="gradient-overlay" />
 
-        {/* Edit & Delete Floating Buttons */}
-        {canEdit && (
-          <div className="absolute top-3 left-3 flex gap-2">
-            <button
-              onClick={(e) => { e.stopPropagation(); onEdit(trip); }}
-              className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-white tap-feedback hover:bg-black/70 transition"
-              aria-label="Edit trip"
-            >
-              <Pencil className="w-3.5 h-3.5" strokeWidth={1.75} />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); onDelete(trip); }}
-              className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center text-rose-400 tap-feedback hover:bg-black/70 transition"
-              aria-label="Delete trip"
-            >
-              <Trash2 className="w-3.5 h-3.5" strokeWidth={1.75} />
-            </button>
-          </div>
+      {/* Status pill */}
+      <span
+        className={cn(
+          "absolute top-3 right-3 z-20 text-[11px] font-semibold px-3 py-1 rounded-full shadow-md flex items-center gap-1",
+          config.className
         )}
-      </div>
+      >
+        {status === "active" && (
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        )}
+        {config.label}
+      </span>
 
-      {/* Card Details */}
-      <div className="p-4 space-y-3">
+      {canEdit && (
+        <div className="absolute top-3 left-3 z-20">
+          <TripActionsMenu overlay onEdit={() => onEdit(trip)} onDelete={() => onDelete(trip)} />
+        </div>
+      )}
+
+      <div className="absolute bottom-0 inset-x-0 z-20 p-4 flex flex-col gap-2.5">
         <div>
-          <h3 className="font-display font-bold text-base text-foreground leading-snug group-hover:text-[#A1846B] transition-colors">
+          <h3
+            className="font-display font-bold text-base text-white leading-snug drop-shadow-[0_1px_6px_rgba(0,0,0,0.65)] group-hover:text-brand-gold transition-colors"
+          >
             {trip.name}
           </h3>
-          <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground font-medium">
-            <MapPin className="w-3.5 h-3.5 text-[#A1846B] shrink-0" strokeWidth={1.75} />
-            <span className="truncate">{trip.city}{trip.country ? `, ${trip.country}` : ""}</span>
+          <div className="flex items-center gap-1.5 mt-1 text-xs text-white/85 font-medium">
+            <MapPin className="w-3.5 h-3.5 text-brand-gold shrink-0" strokeWidth={1.75} />
+            <span className="truncate drop-shadow-[0_1px_4px_rgba(0,0,0,0.55)]">
+              {trip.city}{trip.country ? `, ${trip.country}` : ""}
+            </span>
           </div>
         </div>
 
-        {/* Dates & Travel Style */}
-        <div className="flex items-center justify-between pt-1 border-t border-border/60">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
-            <Calendar className="w-3.5 h-3.5 text-[#A1846B]/80" strokeWidth={1.5} />
-            <span>{formatDates(trip)}</span>
+        <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/15">
+          <div className="flex items-center gap-1.5 text-xs text-white/80 font-medium min-w-0">
+            <Calendar className="w-3.5 h-3.5 text-brand-gold shrink-0" strokeWidth={1.5} />
+            <span className="truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
+              {formatDates(trip)}
+            </span>
           </div>
 
           {trip.travel_style && (
-            <span className="text-[11px] font-semibold text-[#A1846B] capitalize px-2.5 py-0.5 rounded-full bg-[#A1846B]/12 border border-[#A1846B]/20">
+            <span
+              className="shrink-0 text-[11px] font-semibold capitalize px-2.5 py-0.5 rounded-full bg-white/12 border border-white/25 text-white backdrop-blur-sm"
+            >
               {trip.travel_style}
             </span>
           )}
         </div>
 
-        {/* Overlapping Companions Banner */}
         {overlapCount != null && (
-          <div className="rounded-xl bg-[#A1846B]/8 border border-[#A1846B]/15 p-2.5 flex items-center gap-2 text-xs font-medium text-foreground">
-            <Users className="w-4 h-4 text-[#A1846B] shrink-0" strokeWidth={1.75} />
-            <span className="flex-1 text-xs">
+          <div className="flex items-center gap-1.5 text-xs text-white/75 font-medium">
+            <Users className="w-3.5 h-3.5 text-brand-gold shrink-0" strokeWidth={1.75} />
+            <span className="truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
               {overlapCount > 0
                 ? `${overlapCount} ${overlapCount === 1 ? "woman" : "women"} travelling on same dates`
                 : "No overlapping trips yet"}
@@ -117,9 +123,9 @@ export default function TripCard({
         )}
 
         {note && (
-          <div className="flex items-center gap-1.5 text-xs text-[#A1846B] font-semibold">
-            <Sparkles className="w-3.5 h-3.5" strokeWidth={1.75} />
-            <span>{note}</span>
+          <div className="flex items-center gap-1.5 text-xs text-brand-gold font-semibold">
+            <Sparkles className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} />
+            <span className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">{note}</span>
           </div>
         )}
       </div>

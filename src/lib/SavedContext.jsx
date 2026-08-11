@@ -2,6 +2,10 @@ import React, { createContext, useContext, useCallback, useEffect, useState } fr
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 
+import { useDemoFallbacks } from '@/lib/demo-fallbacks';
+import { MOCK_SAVED_ITEMS } from '@/lib/mock-saved';
+import { savedItemKey } from '@/lib/saved-item-key';
+
 const SavedContext = createContext(null);
 
 export function SavedProvider({ children }) {
@@ -13,7 +17,11 @@ export function SavedProvider({ children }) {
     try {
       setLoading(true);
       const list = await base44.entities.SavedItem.list("-created_date", 200);
-      setItems(list);
+      if (list.length === 0 && useDemoFallbacks) {
+        setItems(MOCK_SAVED_ITEMS);
+      } else {
+        setItems(list);
+      }
     } catch (e) {
       setItems([]);
     } finally {
@@ -39,7 +47,8 @@ export function SavedProvider({ children }) {
 
   const toggle = useCallback(
     async (item) => {
-      const itemKey = `${item.type}:${item.title}`;
+      const itemKey = savedItemKey(item);
+      if (!itemKey) return;
       const existing = items.find((i) => i.item_key === itemKey);
       try {
         if (existing) {
@@ -60,14 +69,18 @@ export function SavedProvider({ children }) {
             interests: item.interests || [],
           });
         }
-      } catch (e) {
-        /* ignore */
+      } catch {
+        /* offline */
       }
     },
     [items]
   );
 
   const remove = useCallback(async (id) => {
+    if (String(id).startsWith('mock_saved_')) {
+      setItems((prev) => prev.filter((i) => i.id !== id));
+      return;
+    }
     try {
       await base44.entities.SavedItem.delete(id);
     } catch (e) {

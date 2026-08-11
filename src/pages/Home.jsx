@@ -1,91 +1,107 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
-import { useAuth } from "@/lib/AuthContext";
 import HomeHeader from "@/components/home/HomeHeader";
 import CategoryGrid from "@/components/home/CategoryGrid";
 import SectionRow from "@/components/home/SectionRow";
 import ContentCard from "@/components/home/ContentCard";
+import HomeDealCard from "@/components/home/HomeDealCard";
+import RecentlyReviewedSection from "@/components/home/RecentlyReviewedSection";
+import HorizontalScroll from "@/components/common/HorizontalScroll";
 import HomeFeatured from "@/components/home/HomeFeatured";
+import EventList from "@/components/events/EventList";
+import { MOCK_EVENTS } from "@/lib/mock-events";
 import { SECTIONS } from "@/lib/home-data";
+import { resolveEventId } from "@/lib/mock-events";
 
-function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
+function SectionHeading({ title, actionLabel, onAction }) {
+  return (
+    <div className="flex items-center justify-between app-px mb-3">
+      <h2 className="section-header text-foreground">{title}</h2>
+      {onAction && (
+        <button
+          type="button"
+          onClick={onAction}
+          className="text-xs font-semibold text-primary tap-feedback hover:underline underline-offset-2 transition-all shrink-0"
+        >
+          {actionLabel}
+        </button>
+      )}
+    </div>
+  );
 }
 
 export default function Home() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-
-  const handleSeeAll = (title) => {
-    if (title.includes("Recommended")) navigate("/destinations");
-    else if (title.includes("Trending")) navigate("/destinations");
-    else if (title.includes("Popular events")) navigate("/events");
-    else if (title.includes("Women travelling")) navigate("/discover");
-    else if (title.includes("Exclusive deals")) navigate("/deals");
-    else if (title.includes("reviewed places")) navigate("/cafes");
-    else navigate("/search");
-  };
 
   const handleCardClick = (item) => {
-    if (item.type === "destination") navigate(`/destinations/${encodeURIComponent(item.location || item.title)}`);
-    else if (item.type === "event") navigate("/events");
-    else if (item.type === "trip") navigate("/trips");
-    else if (item.type === "member") navigate("/discover");
+    if (item.type === "destination") {
+      const city = item.city || item.location;
+      navigate(`/destinations/${encodeURIComponent(city)}`);
+    } else if (item.type === "event") {
+      const eventId = resolveEventId(item);
+      navigate(eventId ? `/events/${eventId}` : "/events");
+    } else if (item.type === "trip") navigate(item.tripId ? `/trips/${item.tripId}` : "/trips");
+    else if (item.type === "member") navigate(`/members/${item.memberId || "mock_1"}`);
     else if (item.type === "cafe") navigate(`/cafes/${encodeURIComponent(item.title)}`);
     else if (item.type === "hotel") navigate(`/hotels/${encodeURIComponent(item.title)}`);
     else if (item.type === "restaurant") navigate(`/restaurants/${encodeURIComponent(item.title)}`);
-    else if (item.type === "deal") navigate("/deals");
+    else if (item.type === "deal") navigate(item.dealId ? `/deals/${item.dealId}` : "/deals");
     else navigate("/search");
   };
 
+  const dealsSection = SECTIONS.find((s) => s.title === "Exclusive deals");
+  const genericSections = SECTIONS.filter(
+    (s) => s.title !== "Popular events" && s.title !== "Exclusive deals" && s.title !== "Recently reviewed places"
+  );
+
   return (
-    <div className="pb-6 gradient-top-bg">
-      <HomeHeader />
+    <div className="pb-8 min-w-0 max-w-full overflow-x-hidden">
+      {/* Single hero wash — header + explore share one background */}
+      <div className="home-hero-zone">
+        <HomeHeader />
 
-      {/* Welcome Greeting */}
-      <section className="app-px mt-3 mb-2">
-        <p className="text-xs text-muted-foreground font-medium">
-          {getGreeting()}, {user?.first_name || "traveler"} 👋
-        </p>
-        <h2 className="font-display font-bold text-lg mt-0.5 tracking-tight text-foreground">
-          Where are you going next?
-        </h2>
-      </section>
+        <section className="pt-5 pb-6">
+          <SectionHeading title="Explore" />
+          <CategoryGrid />
+        </section>
+      </div>
 
-      {/* Search */}
-      <section className="app-px mt-4">
-          <button
-          onClick={() => navigate("/search")}
-          className="w-full flex items-center gap-2 bg-card border border-border/80 rounded-2xl px-4 py-3 shadow-soft text-left interactive-card tap-feedback focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A1846B]/30"
-        >
-          <Search className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
-          <span className="flex-1 text-sm text-muted-foreground">Search destinations, events, members…</span>
-        </button>
-      </section>
+      <div className="home-feed space-y-8">
+        <HomeFeatured />
 
-      {/* Categories */}
-      <section className="mt-6">
-        <h2 className="font-display font-semibold text-base app-px mb-3">Explore</h2>
-        <CategoryGrid />
-      </section>
+        <section className="min-w-0 max-w-full">
+          <SectionHeading title="Upcoming events" actionLabel="View all" onAction={() => navigate("/events")} />
+          <div className="app-px">
+            <EventList events={MOCK_EVENTS.slice(0, 3)} />
+          </div>
+        </section>
 
-      {/* Admin-arranged featured content */}
-      <HomeFeatured />
+        {genericSections.map((s) => (
+          <SectionRow
+            key={s.title}
+            title={s.title}
+            items={s.items}
+            onSeeAll={() => navigate(s.seeAllPath)}
+            renderCard={(item) => <ContentCard item={item} onClick={() => handleCardClick(item)} />}
+          />
+        ))}
 
-      {/* Horizontal content sections */}
-      {SECTIONS.map((s) => (
-        <SectionRow
-          key={s.title}
-          title={s.title}
-          items={s.items}
-          onSeeAll={() => handleSeeAll(s.title)}
-          renderCard={(item) => <ContentCard item={item} onClick={() => handleCardClick(item)} />}
-        />
-      ))}
+        {dealsSection && (
+          <section className="min-w-0 max-w-full">
+            <SectionHeading title="Exclusive deals" actionLabel="See all" onAction={() => navigate(dealsSection.seeAllPath)} />
+            <HorizontalScroll>
+              {dealsSection.items.map((item, i) => (
+                <HomeDealCard key={item.dealId || i} item={item} onClick={() => handleCardClick(item)} />
+              ))}
+            </HorizontalScroll>
+          </section>
+        )}
+
+        <section className="min-w-0 max-w-full">
+          <SectionHeading title="Recently reviewed places" actionLabel="See all" onAction={() => navigate("/reviews")} />
+          <RecentlyReviewedSection onItemClick={handleCardClick} />
+        </section>
+      </div>
     </div>
   );
 }

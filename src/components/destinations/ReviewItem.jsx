@@ -10,7 +10,7 @@ export default function ReviewItem({ review }) {
           <p className="text-sm font-medium truncate">{review.name}</p>
           <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className={`w-3 h-3 ${i < review.rating ? "fill-[#A1846B] text-[#A1846B]" : "text-border"}`} strokeWidth={0} />
+              <Star key={i} className={`w-3 h-3 ${i < review.rating ? "fill-primary text-primary" : "text-border"}`} strokeWidth={0} />
             ))}
           </span>
         </div>

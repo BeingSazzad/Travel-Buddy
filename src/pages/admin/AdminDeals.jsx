@@ -105,7 +105,7 @@ export default function AdminDeals() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{d.title}</p>
                 <p className="text-xs text-muted-foreground">{d.partner} · {d.city}</p>
-                <p className="text-xs text-[#A1846B] mt-0.5">{d.discount} · expires {d.expiration_date}</p>
+                <p className="text-xs text-primary mt-0.5">{d.discount} · expires {d.expiration_date}</p>
               </div>
               <button onClick={() => remove(d.id)} className="text-destructive self-start"><Trash2 className="w-4 h-4" strokeWidth={1.5} /></button>
             </div>

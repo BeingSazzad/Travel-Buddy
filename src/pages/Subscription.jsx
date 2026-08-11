@@ -124,9 +124,9 @@ export default function Subscription() {
       <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
         <div className="w-full max-w-app text-center">
           <div className="flex justify-center mb-5">
-            <Moon className="w-6 h-6 text-[#A1846B]" strokeWidth={1.5} />
+            <Moon className="w-6 h-6 text-primary" strokeWidth={1.5} />
           </div>
-          <h1 className="font-display font-semibold text-3xl tracking-[0.08em] text-[#A1846B] mb-4">SELUNA</h1>
+          <h1 className="font-display font-semibold text-3xl tracking-[0.08em] text-primary mb-4">SELUNA</h1>
           <div className="bg-card rounded-2xl shadow-premium border border-border p-8">
             <div className="flex justify-center mb-4">
               <div className="w-14 h-14 rounded-full bg-success/20 flex items-center justify-center">
@@ -163,8 +163,8 @@ export default function Subscription() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-app">
         <div className="flex flex-col items-center mb-8">
-          <Moon className="w-6 h-6 text-[#A1846B] mb-1" strokeWidth={1.5} />
-          <h1 className="font-display font-semibold text-3xl tracking-[0.08em] text-[#A1846B]">SELUNA</h1>
+          <Moon className="w-6 h-6 text-primary mb-1" strokeWidth={1.5} />
+          <h1 className="font-display font-semibold text-3xl tracking-[0.08em] text-primary">SELUNA</h1>
         </div>
 
         <div className="bg-card rounded-2xl shadow-premium border border-border p-7">
@@ -188,7 +188,7 @@ export default function Subscription() {
                   type="button"
                   onClick={() => setSelected(plan.id)}
                   className={`w-full flex items-center justify-between rounded-2xl border p-4 text-left transition ${
-                    active ? "border-[#A1846B] bg-[#A1846B]/5 ring-1 ring-[#A1846B]/30" : "border-border"
+                    active ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border"
                   }`}
                 >
                   <div>
@@ -208,7 +208,7 @@ export default function Subscription() {
                       <span className="text-xs font-body font-normal text-muted-foreground">{plan.period}</span>
                     </span>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      active ? "border-[#A1846B] bg-[#A1846B]" : "border-border"
+                      active ? "border-primary bg-primary" : "border-border"
                     }`}>
                       {active && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                     </div>
@@ -255,7 +255,7 @@ export default function Subscription() {
           <Button
             variant="outline"
             size="md"
-            className="w-full mt-3 border-dashed border-[#A1846B]/40 text-[#A1846B] hover:bg-[#A1846B]/5"
+            className="w-full mt-3 border-dashed border-primary/40 text-primary hover:bg-primary/5"
             onClick={async () => {
               try {
                 await base44.auth.updateMe({ subscription_status: "active" });

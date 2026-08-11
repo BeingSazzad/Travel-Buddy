@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { MapPin, Plane, X, UserPlus, User, Compass } from "lucide-react";
+import { MapPin, Plane, X, User, Compass } from "lucide-react";
+import { ConnectIconButton } from "@/components/common/ConnectIconButton";
 import { Image } from "@/components/ui/image";
 
 function ChipRow({ label, items, tone }) {
@@ -12,7 +13,7 @@ function ChipRow({ label, items, tone }) {
         {items.map((it) => (
           <span
             key={it}
-            className={`text-xs px-2 py-0.5 rounded-full capitalize ${tone === "accent" ? "bg-[#A1846B]/10 text-[#A1846B]" : "bg-muted text-muted-foreground"}`}
+            className={`text-xs px-2 py-0.5 rounded-full capitalize ${tone === "accent" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
           >
             {it}
           </span>
@@ -60,13 +61,13 @@ export default function MatchCard({ member, onDecide, onProfile }) {
           <div className="gradient-overlay-card" />
           <motion.div
             style={{ opacity: skipOpacity }}
-            className="absolute top-4 left-4 z-20 border-4 border-[#B0897A] text-[#B0897A] font-display text-2xl font-bold rounded-xl px-3 py-1 -rotate-12"
+            className="absolute top-4 left-4 z-20 border-4 border-brand-rose text-brand-rose font-display text-2xl font-bold rounded-xl px-3 py-1 -rotate-12"
           >
             SKIP
           </motion.div>
           <motion.div
             style={{ opacity: connectOpacity }}
-            className="absolute top-4 right-4 z-20 border-4 border-[#A1846B] text-[#A1846B] font-display text-2xl font-bold rounded-xl px-3 py-1 rotate-12"
+            className="absolute top-4 right-4 z-20 border-4 border-primary text-primary font-display text-2xl font-bold rounded-xl px-3 py-1 rotate-12"
           >
             CONNECT
           </motion.div>
@@ -89,8 +90,8 @@ export default function MatchCard({ member, onDecide, onProfile }) {
           <ChipRow label="Travel style" items={member.travel_style} />
 
           {member.trip && (
-            <div className="rounded-2xl bg-[#A1846B]/5 p-3 space-y-2">
-              <div className="flex items-center gap-1.5 text-[#A1846B]">
+            <div className="rounded-2xl bg-primary/5 p-3 space-y-2">
+              <div className="flex items-center gap-1.5 text-primary">
                 <Plane className="w-4 h-4" strokeWidth={1.5} />
                 <span className="text-sm font-medium">Upcoming trip</span>
               </div>
@@ -123,17 +124,16 @@ export default function MatchCard({ member, onDecide, onProfile }) {
         <button
           onClick={() => onProfile(member)}
           aria-label="View profile"
-          className="w-14 h-14 rounded-full bg-card border-2 border-[#A1846B] text-[#A1846B] shadow-soft flex items-center justify-center hover:scale-105 transition active:scale-95"
+          className="w-14 h-14 rounded-full bg-card border-2 border-primary text-primary shadow-soft flex items-center justify-center hover:scale-105 transition active:scale-95"
         >
           <User className="w-5 h-5" strokeWidth={2} />
         </button>
-        <button
+        <ConnectIconButton
+          size="xl"
           onClick={() => trigger("right")}
           aria-label="Connect"
-          className="w-16 h-16 rounded-full bg-[#A1846B] text-white shadow-soft flex items-center justify-center hover:scale-105 transition active:scale-95"
-        >
-          <UserPlus className="w-7 h-7" strokeWidth={2} />
-        </button>
+          className="hover:scale-105 shadow-soft"
+        />
       </div>
     </div>
   );

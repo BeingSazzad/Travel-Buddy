@@ -16,8 +16,8 @@ export default function EmptyState({
   return (
     <div className={cn("rounded-2xl border border-dashed border-border p-8 text-center", className)}>
       {Icon && (
-        <div className="w-14 h-14 rounded-full bg-[#A1846B]/10 flex items-center justify-center mx-auto mb-3">
-          <Icon className="w-6 h-6 text-[#A1846B]" strokeWidth={1.5} />
+        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+          <Icon className="w-6 h-6 text-primary" strokeWidth={1.5} />
         </div>
       )}
       <p className="font-display font-semibold text-base">{title}</p>
@@ -27,7 +27,7 @@ export default function EmptyState({
       {actionLabel && onAction && (
         <button
           onClick={onAction}
-          className="mt-4 px-4 py-2 rounded-full bg-foreground text-background text-sm font-medium active:scale-95 transition"
+          className="mt-4 px-4 py-2 rounded-full text-sm font-medium active:scale-95 transition gradient-brand-button"
         >
           {actionLabel}
         </button>

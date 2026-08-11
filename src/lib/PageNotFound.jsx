@@ -1,11 +1,12 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Compass, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function PageNotFound({}) {
+export default function PageNotFound() {
     const location = useLocation();
+    const navigate = useNavigate();
     const pageName = location.pathname.substring(1);
 
     const { data: authData, isFetched } = useQuery({
@@ -23,8 +24,8 @@ export default function PageNotFound({}) {
     return (
         <div className="min-h-dvh flex items-center justify-center p-6 bg-background">
             <div className="max-w-app w-full text-center">
-                <div className="w-16 h-16 rounded-full bg-[#A1846B]/10 flex items-center justify-center mx-auto mb-5">
-                    <Compass className="w-7 h-7 text-[#A1846B]" strokeWidth={1.5} />
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+                    <Compass className="w-7 h-7 text-primary" strokeWidth={1.5} />
                 </div>
                 <h1 className="font-display font-semibold text-5xl text-foreground">404</h1>
                 <div className="h-0.5 w-12 bg-border mx-auto my-4" />
@@ -42,7 +43,7 @@ export default function PageNotFound({}) {
                     </div>
                 )}
 
-                <Button onClick={() => (window.location.href = '/')} className="mt-6 h-11 px-5">
+                <Button onClick={() => navigate('/')} className="mt-6 h-11 px-5">
                     <ArrowLeft className="w-4 h-4 mr-1.5" strokeWidth={1.5} />
                     Go home
                 </Button>

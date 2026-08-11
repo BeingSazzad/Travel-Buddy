@@ -38,8 +38,8 @@ export default function ContentManagement() {
       <div className="space-y-2">
         {links.map((l) => (
           <Link key={l.label} to={l.to} className="flex items-center gap-3 p-3 rounded-2xl border border-border bg-card active:scale-[0.99] transition">
-            <div className="w-9 h-9 rounded-xl bg-[#A1846B]/10 flex items-center justify-center">
-              <l.icon className="w-4 h-4 text-[#7a5c44]" strokeWidth={1.5} />
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <l.icon className="w-4 h-4 text-brand-strong" strokeWidth={1.5} />
             </div>
             <span className="flex-1 text-sm font-medium">{l.label}</span>
             {typeof l.count === "number" && <span className="text-xs text-muted-foreground">{l.count}</span>}

@@ -9,16 +9,21 @@ import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import ReportSheet from "@/components/reports/ReportSheet";
+import { fallbackCafe } from "@/lib/images";
+import { useCafes } from "@/lib/useContent";
 
 export default function CafeDetail() {
   const { name } = useParams();
   const navigate = useNavigate();
   const { isSaved, toggle } = useSaved();
+  const { items: cafes, loading } = useCafes();
   const cafe = useMemo(() => {
-    const found = cafes.find((c) => c.name.toLowerCase() === name?.toLowerCase());
+    const decoded = decodeURIComponent(name || "");
+    const found = cafes.find((c) => c.name.toLowerCase() === decoded.toLowerCase());
     if (found) return found;
     if (!name) return null;
     const cafeName = decodeURIComponent(name);
+    const fb = fallbackCafe(cafeName);
     return {
       name: cafeName,
       city: "Travel Spot",
@@ -32,11 +37,8 @@ export default function CafeDetail() {
       phone: "+1 555-0192",
       website: "https://selunatribe.app",
       description: `A cozy, female-friendly cafe spot serving specialty coffee, fresh pastries, and wifi.`,
-      image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80",
-      gallery: [
-        "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80",
-        "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80"
-      ],
+      image: fb.image,
+      gallery: fb.gallery,
       tags: { wifi: true, power: true, quiet: true }
     };
   }, [cafes, name]);
@@ -49,12 +51,12 @@ export default function CafeDetail() {
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-3">
         <p className="font-display font-semibold">Café not found</p>
-        <button onClick={() => navigate("/cafes")} className="text-sm text-[#A1846B] underline">Back to cafés</button>
+        <button onClick={() => navigate("/cafes")} className="text-sm text-primary underline">Back to cafés</button>
       </div>
     );
 
   const saved = isSaved(itemKey);
-  const facilities = Object.entries(cafe.tags).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]);
+  const facilities = Object.entries(cafe.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${cafe.address}, ${cafe.city}`)}`;
 
   const onShare = async () => {
@@ -72,7 +74,7 @@ export default function CafeDetail() {
           <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={onShare} className="w-9 h-9 rounded-full flex items-center justify-center"><Share2 className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={() => toggle({ type: "cafe", title: cafe.name, location: cafe.city, country: cafe.country, image: cafe.image, rating: cafe.rating })} className="w-9 h-9 rounded-full flex items-center justify-center">
-            <Bookmark className={cn("w-5 h-5", saved ? "fill-[#A1846B] text-[#A1846B]" : "text-foreground")} strokeWidth={1.5} />
+            <Bookmark className={cn("w-5 h-5", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
           </button>
         </div>
       </header>
@@ -81,9 +83,9 @@ export default function CafeDetail() {
         {/* Gallery */}
         <div className="relative h-64">
           <Image src={cafe.gallery[0]} alt={cafe.name} fittingType="fill" className="w-full h-full" />
-          <span className="absolute top-3 left-3 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-[#7a5c44] font-medium">{PRICE_LABELS[cafe.price]}</span>
+          <span className="absolute top-3 left-3 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-primary font-medium">{PRICE_LABELS[cafe.price]}</span>
         </div>
-        <div className="flex gap-2 px-5 -mt-6 relative">
+        <div className="flex gap-2 app-px -mt-6 relative">
           {cafe.gallery.map((g, i) => (
             <div key={i} className="w-20 h-20 rounded-xl overflow-hidden border-2 border-background shadow-card">
               <Image src={g} alt="" fittingType="fill" className="w-full h-full" />
@@ -91,13 +93,13 @@ export default function CafeDetail() {
           ))}
         </div>
 
-        <div className="px-5 mt-4">
+        <div className="detail-body">
           <h1 className="font-display font-bold text-lg">{cafe.name}</h1>
           <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground"><MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {cafe.city}, {cafe.country} · {cafe.distance} km</div>
 
           <div className="flex items-center gap-2 mt-3">
-            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#A1846B]/10 text-[#7a5c44]">
-              <Star className="w-3.5 h-3.5 fill-[#A1846B] text-[#A1846B]" strokeWidth={0} />
+            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary">
+              <Star className="w-3.5 h-3.5 fill-primary text-primary" strokeWidth={0} />
               <span className="font-semibold text-sm">{cafe.rating.toFixed(1)}</span>
               <span className="text-xs text-muted-foreground">Seluna rating</span>
             </span>
@@ -108,10 +110,11 @@ export default function CafeDetail() {
 
           {/* Info */}
           <div className="mt-5 space-y-2">
-            <div className="flex items-start gap-2 text-sm"><MapPin className="w-4 h-4 text-[#A1846B] mt-0.5" strokeWidth={1.5} /><span>{cafe.address}</span></div>
-            <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-[#A1846B] mt-0.5" strokeWidth={1.5} /><span>{cafe.hours}</span></div>
-            <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-[#A1846B] mt-0.5" strokeWidth={1.5} /><span>{cafe.phone}</span></div>
-            <a href={cafe.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-[#A1846B]"><Globe className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">{cafe.website.replace("https://", "")}</span></a>
+            <div className="flex items-start gap-2 text-sm"><MapPin className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{cafe.address}</span></div>
+            <EventMap compact query={cafe.address} label={[cafe.address, cafe.city].filter(Boolean).join(", ")} />
+            <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{cafe.hours}</span></div>
+            <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{cafe.phone}</span></div>
+            <a href={cafe.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">{cafe.website.replace("https://", "")}</span></a>
           </div>
 
           {/* Facilities */}
@@ -120,12 +123,6 @@ export default function CafeDetail() {
             <div className="flex flex-wrap gap-2">
               {facilities.map((f) => <span key={f} className="text-xs px-2.5 py-1 rounded-full border border-border">{f}</span>)}
             </div>
-          </section>
-
-          {/* Map */}
-          <section className="mt-5">
-            <h2 className="font-display font-semibold text-base mb-2">Location</h2>
-            <EventMap query={cafe.address} />
           </section>
 
           <ReviewSection itemKey={itemKey} itemType="cafe" itemTitle={cafe.name} />
@@ -137,14 +134,12 @@ export default function CafeDetail() {
         </div>
       </div>
 
-      {/* Action bar */}
-      <div className="sticky bottom-0 px-5 pt-3 safe-pb bg-background/95 backdrop-blur border-t border-border flex gap-2">
-        <Button variant="outline" className="flex-1" onClick={() => toggle({ type: "cafe", title: cafe.name, location: cafe.city, country: cafe.country, image: cafe.image, rating: cafe.rating })}>
-          <Bookmark className={cn("w-4 h-4", saved ? "fill-[#A1846B] text-[#A1846B]" : "")} strokeWidth={1.5} /> {saved ? "Saved" : "Save"}
-        </Button>
-        <Button variant="outline" className="flex-1" onClick={onShare}><Share2 className="w-4 h-4" strokeWidth={1.5} /> Share</Button>
-        <a href={directionsUrl} target="_blank" rel="noreferrer" className="flex-1">
-          <Button className="w-full bg-foreground text-background"><Navigation className="w-4 h-4" strokeWidth={1.5} /> Directions</Button>
+      {/* Action bar — Directions only; save/share live in header */}
+      <div className="sticky bottom-0 app-px pt-3 safe-pb bg-background/95 backdrop-blur border-t border-border">
+        <a href={directionsUrl} target="_blank" rel="noreferrer">
+          <Button className="w-full bg-primary text-primary-foreground">
+            <Navigation className="w-4 h-4" strokeWidth={1.5} /> Directions
+          </Button>
         </a>
       </div>
     </div>

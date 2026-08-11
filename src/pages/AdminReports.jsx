@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { REPORT_REASONS } from "@/components/reports/ReportSheet";
+import { REPORT_REASON_LABELS } from "@/components/reports/ReportSheet";
 import { SectionHeader, ListState } from "@/components/admin/AdminUI";
 
 const TYPE_LABEL = {
   profile: "Profile", message: "Message", event: "Event",
   review: "Review", photo: "Photo", place: "Place",
 };
-const REASON_LABEL = Object.fromEntries(REPORT_REASONS.map((r) => [r.value, r.label]));
+const REASON_LABEL = REPORT_REASON_LABELS;
 const STATUS_STYLE = {
-  pending: "bg-[#A1846B]/10 text-[#7a5c44]",
+  pending: "bg-primary/10 text-brand-strong",
   reviewing: "bg-amber-100 text-amber-700",
   resolved: "bg-green-100 text-green-700",
   dismissed: "bg-muted text-muted-foreground",

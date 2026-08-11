@@ -27,7 +27,7 @@ export default function ReviewItem({ review, isAdmin, voted, voting, onVote, onR
           <p className="text-sm font-medium truncate">{review.author_name}</p>
           <span className="flex items-center gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className={cn("w-3 h-3", i < review.rating ? "fill-[#A1846B] text-[#A1846B]" : "text-border")} strokeWidth={0} />
+              <Star key={i} className={cn("w-3 h-3", i < review.rating ? "fill-primary text-primary" : "text-border")} strokeWidth={0} />
             ))}
           </span>
         </div>
@@ -54,10 +54,10 @@ export default function ReviewItem({ review, isAdmin, voted, voting, onVote, onR
           disabled={voting}
           className={cn(
             "flex items-center gap-1 px-2.5 py-1 rounded-full text-xs border transition",
-            voted ? "bg-[#A1846B]/10 border-[#A1846B] text-[#7a5c44]" : "border-border text-muted-foreground"
+            voted ? "bg-primary/10 border-primary text-brand-strong" : "border-border text-muted-foreground"
           )}
         >
-          <ThumbsUp className={cn("w-3.5 h-3.5", voted && "fill-[#A1846B] text-[#A1846B]")} strokeWidth={1.5} />
+          <ThumbsUp className={cn("w-3.5 h-3.5", voted && "fill-primary text-primary")} strokeWidth={1.5} />
           Helpful {review.helpful_count > 0 && <span className="font-medium">{review.helpful_count}</span>}
         </button>
 

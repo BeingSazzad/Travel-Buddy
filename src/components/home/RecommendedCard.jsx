@@ -1,13 +1,13 @@
 import { MapPin, Users } from 'lucide-react';
 import { Image } from '@/components/ui/image';
-import { unsplash } from '@/lib/images';
+import { HERO } from "@/lib/images";
 
 export default function RecommendedCard() {
   return (
     <div className="rounded-2xl overflow-hidden border border-border bg-card shadow-soft">
       <div className="h-52 relative">
         <Image
-          src={unsplash('1530103862676-de8c9debad1d', 800)}
+          src={HERO.featured}
           alt="Friends together"
           fittingType="fill"
           className="absolute inset-0 w-full h-full object-cover"

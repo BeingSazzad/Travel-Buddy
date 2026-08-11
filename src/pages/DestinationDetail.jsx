@@ -11,7 +11,8 @@ import ReportSheet from "@/components/reports/ReportSheet";
 import EventCard from "@/components/events/EventCard";
 import { contentFor } from "@/lib/destination-content";
 import { useDestinations } from "@/lib/useContent";
-import { FALLBACK_AVATAR_URL } from "@/lib/images";
+import { eventsForCity } from "@/lib/mock-events";
+import { fallbackDestination, FALLBACK_AVATAR_URL } from "@/lib/images";
 
 const AV = FALLBACK_AVATAR_URL;
 const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
@@ -20,7 +21,7 @@ function Section({ icon: Icon, title, children }) {
   return (
     <section className="mt-6">
       <h2 className="font-display font-semibold text-base mb-2 flex items-center gap-1.5">
-        <Icon className="w-4 h-4 text-[#A1846B]" strokeWidth={1.5} /> {title}
+        <Icon className="w-4 h-4 text-primary" strokeWidth={1.5} /> {title}
       </h2>
       {children}
     </section>
@@ -38,11 +39,12 @@ export default function DestinationDetail() {
     if (found) return found;
     if (!city) return null;
     const cityName = decodeURIComponent(city);
+    const fb = fallbackDestination(cityName);
     return {
       city: cityName,
       country: "Explore",
       continent: "Global",
-      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=80",
+      image: fb.image,
       description: `Explore top cafes, local restaurants, hotels, and fellow women travel buddies visiting ${cityName}.`,
       weather: "Sunny",
       tags: { solo: true },
@@ -59,7 +61,14 @@ export default function DestinationDetail() {
   useEffect(() => {
     if (!dest) return;
     base44.entities.Trip.filter({ city: dest.city }).then(setTrips).catch(() => {});
-    base44.entities.Event.filter({ city: dest.city }).then(setEvents).catch(() => {});
+    base44.entities.Event.filter({ city: dest.city })
+      .then((list) => {
+        const mocks = eventsForCity(dest.city);
+        const ids = new Set((list || []).map((e) => e.id));
+        const merged = [...(list || []), ...mocks.filter((m) => !ids.has(m.id))];
+        setEvents(merged.length ? merged : mocks);
+      })
+      .catch(() => setEvents(eventsForCity(dest.city)));
   }, [dest?.city]);
 
   useEffect(() => {
@@ -67,7 +76,7 @@ export default function DestinationDetail() {
     (async () => {
       const p = {};
       for (const id of ids) {
-        try { const r = await base44.functions.invoke("member-profile", { user_id: id }); p[id] = r.data?.profile; } catch (e) {}
+        try { const r = await base44.functions.invoke("member-profile", { user_id: id }); p[id] = r.data?.profile; } catch {}
       }
       setProfiles(p);
     })();
@@ -102,7 +111,7 @@ export default function DestinationDetail() {
     return (
       <div className="h-screen flex flex-col items-center justify-center gap-3">
         <p className="font-display font-semibold">Destination not found</p>
-        <button onClick={() => navigate("/destinations")} className="text-sm text-[#A1846B] underline">Back to destinations</button>
+        <button onClick={() => navigate("/destinations")} className="text-sm text-primary underline">Back to destinations</button>
       </div>
     );
 
@@ -132,24 +141,17 @@ export default function DestinationDetail() {
           </div>
         </div>
 
-        <div className="px-5">
+        <div className="app-px">
           <p className="text-sm text-muted-foreground leading-relaxed mt-4">{dest.description}</p>
 
-          {/* Weather (curated; no live integration connected) */}
-          <Section icon={Sun} title="Weather">
-            <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-3">
-              <Sun className="w-6 h-6 text-[#A1846B]" strokeWidth={1.5} />
-              <div>
-                <p className="font-medium text-sm">{dest.weather} climate</p>
-                <p className="text-xs text-muted-foreground">Typical conditions for {dest.city}. Connect a weather service for live forecasts.</p>
-              </div>
-            </div>
-          </Section>
-
           {/* Map */}
-          <Section icon={MapPin} title="On the map">
-            <EventMap query={`${dest.city}, ${dest.country}`} />
-          </Section>
+          <div className="mt-5">
+            <EventMap
+              compact
+              query={`${dest.city}, ${dest.country}`}
+              label={`${dest.city}, ${dest.country}`}
+            />
+          </div>
 
           {/* Travel tips */}
           <Section icon={Sparkles} title="Travel tips">
@@ -192,13 +194,13 @@ export default function DestinationDetail() {
 
           {/* Venues */}
           <Section icon={Sparkles} title="Cafés">
-            <div className="grid grid-cols-1 gap-2">{content.cafes.map((v) => <VenueRow key={v.name} venue={v} />)}</div>
+            <div className="grid grid-cols-1 gap-2">{content.cafes.map((v) => <VenueRow key={v.name} venue={v} venueType="cafe" />)}</div>
           </Section>
           <Section icon={Sparkles} title="Restaurants">
-            <div className="grid grid-cols-1 gap-2">{content.restaurants.map((v) => <VenueRow key={v.name} venue={v} />)}</div>
+            <div className="grid grid-cols-1 gap-2">{content.restaurants.map((v) => <VenueRow key={v.name} venue={v} venueType="restaurant" />)}</div>
           </Section>
           <Section icon={BedDouble} title="Hotels">
-            <div className="grid grid-cols-1 gap-2">{content.hotels.map((v) => <VenueRow key={v.name} venue={v} />)}</div>
+            <div className="grid grid-cols-1 gap-2">{content.hotels.map((v) => <VenueRow key={v.name} venue={v} venueType="hotel" />)}</div>
           </Section>
 
           {/* Events (live) */}
@@ -206,13 +208,17 @@ export default function DestinationDetail() {
             {events.length === 0 ? (
               <p className="text-sm text-muted-foreground">No events listed yet for {dest.city}.</p>
             ) : (
-              <div className="space-y-4">{events.slice(0, 3).map((e) => <EventCard key={e.id} event={e} joined={false} onRsvp={() => {}} />)}</div>
+              <div className="space-y-4">
+                {events.slice(0, 3).map((e) => (
+                  <EventCard key={e.id} event={e} />
+                ))}
+              </div>
             )}
           </Section>
 
           {/* Deals */}
           <Section icon={Sparkles} title="Deals">
-            <div className="grid grid-cols-1 gap-2">{content.deals.map((v) => <VenueRow key={v.name} venue={v} />)}</div>
+            <div className="grid grid-cols-1 gap-2">{content.deals.map((v) => <VenueRow key={v.name} venue={v} venueType="deal" />)}</div>
           </Section>
 
           {/* Reviews */}
@@ -227,8 +233,8 @@ export default function DestinationDetail() {
       </div>
 
       {/* CTA */}
-      <div className="sticky bottom-0 px-5 pt-4 safe-pb bg-background/95 backdrop-blur border-t border-border">
-        <Button className="w-full h-12 bg-foreground text-background" onClick={() => navigate(`/trips/new?city=${encodeURIComponent(dest.city)}`)}>
+      <div className="sticky bottom-0 app-px pt-4 safe-pb bg-background/95 backdrop-blur border-t border-border">
+        <Button className="w-full h-12" onClick={() => navigate(`/trips/new?city=${encodeURIComponent(dest.city)}`)}>
           Create trip to {dest.city}
         </Button>
       </div>

@@ -21,10 +21,7 @@ export default function ContentCard({ item, onClick }) {
 
       {item.type !== "member" && (
         <div className="absolute top-3 right-3 z-20">
-          <SaveButton
-            item={item}
-            className="bg-black/35 backdrop-blur-md border border-white/15 hover:bg-black/50 text-white rounded-full p-1 tap-feedback"
-          />
+          <SaveButton item={item} variant="overlay" />
         </div>
       )}
 
@@ -35,17 +32,17 @@ export default function ContentCard({ item, onClick }) {
       )}
 
       <div className="absolute bottom-0 inset-x-0 p-4 z-20 flex flex-col justify-end">
-        <h3 className="font-display font-semibold text-sm text-white leading-tight drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
+        <h3 className="font-display font-semibold text-sm text-white leading-tight drop-shadow-[0_1px_4px_rgba(0,0,0,0.65)]">
           {item.title}
         </h3>
 
         <div className="flex items-center gap-1 mt-1.5 text-[10px] text-white/85">
-          <MapPin className="w-3 h-3 shrink-0 text-[#F5C99A]" strokeWidth={1.5} />
-          <span className="truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">{item.location}</span>
+          <MapPin className="w-3 h-3 shrink-0 text-brand-gold" strokeWidth={1.5} />
+          <span className="truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.65)]">{item.location}</span>
         </div>
 
         {item.info && (
-          <p className="text-[10px] text-[#F5C99A] font-semibold mt-1 tracking-wide uppercase drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+          <p className="text-[10px] text-brand-gold font-semibold mt-1 tracking-wide uppercase drop-shadow-[0_1px_3px_rgba(0,0,0,0.65)]">
             {item.info}
           </p>
         )}

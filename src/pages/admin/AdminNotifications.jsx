@@ -29,7 +29,7 @@ export default function AdminNotifications() {
     <div>
       <SectionHeader title="Notifications" subtitle="Broadcast an announcement to all members" />
       <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
-        <div className="flex items-center gap-2 text-[#7a5c44]">
+        <div className="flex items-center gap-2 text-brand-strong">
           <Megaphone className="w-4 h-4" strokeWidth={1.5} />
           <span className="text-xs uppercase tracking-wide">Broadcast</span>
         </div>
