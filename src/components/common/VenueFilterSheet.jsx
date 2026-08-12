@@ -16,6 +16,8 @@ export default function VenueFilterSheet({
   open,
   onOpenChange,
   title = "Filters",
+  description = "Narrow results by amenities, price & rating",
+  tagLabel = "Amenities",
   tagItems,
   tagActive,
   onTagToggle,
@@ -30,9 +32,7 @@ export default function VenueFilterSheet({
           <div>
             <SheetTitle className="font-display text-lg font-bold text-left">{title}</SheetTitle>
             <p className="text-xs text-muted-foreground text-left mt-0.5">
-              {activeCount > 0
-                ? `${activeCount} active`
-                : "Narrow results by amenities, price & rating"}
+              {activeCount > 0 ? `${activeCount} active` : description}
             </p>
           </div>
           {activeCount > 0 && onReset && (
@@ -50,7 +50,7 @@ export default function VenueFilterSheet({
           {tagItems?.length > 0 && (
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                Amenities
+                {tagLabel}
               </p>
               <TagFilterChips items={tagItems} active={tagActive} onToggle={onTagToggle} />
             </div>
@@ -95,28 +95,32 @@ export function VenueListToolbar({
   onFilterOpen,
   activeFilterCount = 0,
 }) {
+  const showSort = Boolean(onSortChange && sortOptions?.length);
+
   return (
     <div className="flex items-center justify-between gap-3 mb-3">
       <p className="text-xs text-muted-foreground shrink-0">{resultLabel}</p>
 
       <div className="flex items-center gap-1.5 min-w-0">
-        <div className="flex items-center rounded-full border border-border/60 bg-card/50 p-0.5 shrink-0">
-          {sortOptions.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => onSortChange(opt.value)}
-              className={cn(
-                "px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors",
-                sort === opt.value
-                  ? "bg-primary text-white shadow-sm"
-                  : "text-muted-foreground"
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        {showSort && (
+          <div className="flex items-center rounded-full border border-border/60 bg-card/50 p-0.5 shrink-0">
+            {sortOptions.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => onSortChange(opt.value)}
+                className={cn(
+                  "px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors",
+                  sort === opt.value
+                    ? "bg-primary text-white shadow-sm"
+                    : "text-muted-foreground"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <button
           type="button"

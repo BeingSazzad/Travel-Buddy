@@ -8,18 +8,13 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select, SelectTrigger, SelectContent, SelectItem, SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Moon, Loader2, LogOut, ArrowRight, ArrowLeft, Check, Save, Lock, ChevronRight } from "lucide-react";
-import NotificationSettingsPanel, { NOTIFICATION_CATEGORIES } from "@/components/profile/NotificationSettingsPanel";
-import BlockedMembersPanel from "@/components/profile/BlockedMembersPanel";
+import { Moon, Loader2, LogOut, ArrowRight, ArrowLeft, Save } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import {
   COUNTRIES, LANGUAGES, INTERESTS, TRAVEL_STYLES,
 } from "@/lib/profile-options";
 import InterestPicker from "@/components/profile/InterestPicker";
 import PhotoManager from "@/components/profile/PhotoManager";
-import VerificationCard from "@/components/profile/VerificationCard";
 import ScrollPage, { ScrollPageHeader, ScrollPageBody } from "@/components/common/ScrollPage";
 
 function getAge(dob) {
@@ -32,25 +27,7 @@ function getAge(dob) {
   return age;
 }
 
-function ToggleRow({ id, label, description, checked, onCheck }) {
-  return (
-    <div className="flex items-start justify-between gap-4 py-3 border-b border-border/80 last:border-0">
-      <div className="flex-1">
-        <Label htmlFor={id} className="text-xs font-medium text-foreground">{label}</Label>
-        {description && <p className="text-[11px] text-muted-foreground mt-0.5">{description}</p>}
-      </div>
-      <Switch id={id} checked={checked} onCheckedChange={onCheck} />
-    </div>
-  );
-}
-
-const LOCATION_OPTIONS = [
-  { value: "exact_city", label: "Show exact city" },
-  { value: "approximate", label: "Show approximate location only" },
-  { value: "hidden", label: "Hide current location" },
-];
-
-const STEPS = ["About you", "Your travel", "Privacy", "Photos"];
+const INTRO_STEPS = ["Name", "Photos", "Interests"];
 
 export default function ProfileSetup() {
   const { user, logout, checkUserAuth, patchUser } = useAuth();
@@ -72,16 +49,6 @@ export default function ProfileSetup() {
   const [interests, setInterests] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [mainPhoto, setMainPhoto] = useState(null);
-  const [locationVisibility, setLocationVisibility] = useState("approximate");
-  const [showAge, setShowAge] = useState(true);
-  const [showUpcomingTrips, setShowUpcomingTrips] = useState(true);
-  const [allowMatches, setAllowMatches] = useState(true);
-  const [allowInvitations, setAllowInvitations] = useState(true);
-  const [allowNotifications, setAllowNotifications] = useState(true);
-  const [notifPrefs, setNotifPrefs] = useState(() =>
-    Object.fromEntries(NOTIFICATION_CATEGORIES.map((c) => [c.key, true]))
-  );
-  const [ageConfirm, setAgeConfirm] = useState(false);
 
   // Pre-populate when user data is available
   useEffect(() => {
@@ -97,66 +64,54 @@ export default function ProfileSetup() {
     setInterests(user.interests || []);
     setPhotos(user.profile_photos || []);
     setMainPhoto(user.main_photo || null);
-    setLocationVisibility(user.location_visibility || "approximate");
-    setShowAge(user.show_age !== false);
-    setShowUpcomingTrips(user.show_upcoming_trips !== false);
-    setAllowMatches(user.allow_match_suggestions !== false);
-    setAllowInvitations(user.allow_event_invitations !== false);
-    setAllowNotifications(user.allow_notifications !== false);
-    setNotifPrefs(Object.fromEntries(NOTIFICATION_CATEGORIES.map((c) => [c.key, user[c.key] !== false])));
-    setAgeConfirm(!!user.date_of_birth);
   }, [user]);
 
   const age = dob ? getAge(dob) : null;
 
-  const validateAll = () => {
-    if (!profileName.trim()) return "Enter your profile name";
-    if (!dob) return "Enter your date of birth";
-    if (age < 18) return "Seluna is only available to users aged 18 or older.";
-    if (!ageConfirm) return "Please confirm that you are at least 18 years old";
-    if (!city.trim()) return "Enter your current city";
-    if (!country) return "Select your country";
-    if (!nationality) return "Select your nationality";
-    if (languages.length === 0) return "Select at least one language";
-    if (!bio.trim()) return "Write a short biography";
-    if (travelStyle.length === 0) return "Select at least one travel style";
-    if (interests.length === 0) return "Select at least one interest";
-    if (photos.length < 2) return "Upload at least 2 photos";
-    return null;
-  };
-
-  const goNext = () => {
+  const finishBasics = async ({ skip = false } = {}) => {
     setError("");
-    if (step === 0) {
-      if (!profileName.trim()) return setError("Enter your profile name");
-      if (!dob) return setError("Enter your date of birth");
-      if (age < 18) return setError("Seluna is only available to users aged 18 or older.");
-      if (!ageConfirm) return setError("Please confirm that you are at least 18 years old");
-      if (!city.trim()) return setError("Enter your current city");
-      if (!country) return setError("Select your country");
-      if (!nationality) return setError("Select your nationality");
-      if (languages.length === 0) return setError("Select at least one language");
-      if (!bio.trim()) return setError("Write a short biography");
-      setStep(1);
-    } else if (step === 1) {
-      if (travelStyle.length === 0) return setError("Select at least one travel style");
-      if (interests.length === 0) return setError("Select at least one interest");
-      setStep(2);
-    } else if (step === 2) {
-      setStep(3);
+    setSaving(true);
+    try {
+      const finalMain = mainPhoto || photos[0] || null;
+      const payload = {
+        profile_name: profileName.trim() || user?.first_name || "Member",
+        date_of_birth: dob || undefined,
+        current_city: city.trim() || undefined,
+        country: country || undefined,
+        nationality: nationality || undefined,
+        languages_spoken: languages,
+        biography: bio.trim() || undefined,
+        travel_style: travelStyle,
+        interests,
+        profile_photos: photos,
+        main_photo: finalMain,
+        location_visibility: "approximate",
+        show_age: true,
+        show_upcoming_trips: true,
+        allow_match_suggestions: true,
+        allow_event_invitations: true,
+        allow_notifications: true,
+        profile_completed: true,
+        profile_basics_skipped: skip,
+      };
+      try {
+        await base44.auth.updateMe(payload);
+      } catch (apiErr) {
+        console.warn("API updateMe failed during profile setup, applying locally", apiErr);
+      }
+      patchUser(payload);
+      navigate(user?.subscription_status === "active" || user?.subscription_status === "cancelled_active" ? "/" : "/subscription", {
+        replace: true,
+      });
+    } catch (err) {
+      setError(err?.message || "Could not save your profile");
+    } finally {
+      setSaving(false);
     }
   };
 
   const saveProfile = async () => {
     setError("");
-    if (!isEditMode) {
-      const validationError = validateAll();
-      if (validationError) {
-        setError(validationError);
-        return;
-      }
-    }
-
     const finalMain = mainPhoto || photos[0];
     setSaving(true);
     try {
@@ -172,13 +127,6 @@ export default function ProfileSetup() {
         interests,
         profile_photos: photos,
         main_photo: finalMain,
-        location_visibility: locationVisibility,
-        show_age: showAge,
-        show_upcoming_trips: showUpcomingTrips,
-        allow_match_suggestions: allowMatches,
-        allow_event_invitations: allowInvitations,
-        allow_notifications: allowNotifications,
-        ...notifPrefs,
         profile_completed: true,
       };
       try {
@@ -330,77 +278,15 @@ export default function ProfileSetup() {
 
             <div className="space-y-2">
               <Label className="text-xs font-medium">Travel style</Label>
+              <p className="text-[11px] text-muted-foreground">Tap chips to select — change anytime here.</p>
               <InterestPicker options={TRAVEL_STYLES} selected={travelStyle} onToggle={setTravelStyle} />
             </div>
 
             <div className="space-y-2">
               <Label className="text-xs font-medium">Interests</Label>
+              <p className="text-[11px] text-muted-foreground">Choose from the list below.</p>
               <InterestPicker options={INTERESTS} selected={interests} onToggle={setInterests} />
             </div>
-          </div>
-
-          {/* Section 4: Privacy */}
-          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-4">
-            <h2 className="font-display font-semibold text-sm text-foreground">Privacy</h2>
-
-            <div className="space-y-2">
-              <Label className="text-xs font-medium">Location visibility</Label>
-              <RadioGroup value={locationVisibility} onValueChange={setLocationVisibility} className="gap-2">
-                {LOCATION_OPTIONS.map((o) => (
-                  <label
-                    key={o.value}
-                    className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition ${locationVisibility === o.value ? "border-primary bg-primary/5" : "border-border/80"}`}
-                  >
-                    <RadioGroupItem value={o.value} />
-                    <span className="text-xs">{o.label}</span>
-                  </label>
-                ))}
-              </RadioGroup>
-            </div>
-
-            <div className="space-y-1 pt-2 border-t border-border/60">
-              <ToggleRow id="showAge" label="Show my age" description="Display your age on your profile" checked={showAge} onCheck={setShowAge} />
-              <ToggleRow id="showTrips" label="Show upcoming trips" description="Let others see your planned trips" checked={showUpcomingTrips} onCheck={setShowUpcomingTrips} />
-              <ToggleRow id="matches" label="Allow match suggestions" description="Receive suggested travel companions" checked={allowMatches} onCheck={setAllowMatches} />
-              <ToggleRow id="invitations" label="Allow event invitations" description="Other members can invite you to events" checked={allowInvitations} onCheck={setAllowInvitations} />
-            </div>
-          </div>
-
-          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-3">
-            <h2 className="font-display font-semibold text-sm text-foreground">Notifications</h2>
-            <p className="text-xs text-muted-foreground">Choose what you want to be notified about.</p>
-            <NotificationSettingsPanel
-              master={allowNotifications}
-              onMasterChange={setAllowNotifications}
-              prefs={notifPrefs}
-              onPrefChange={(key, val) => setNotifPrefs((p) => ({ ...p, [key]: val }))}
-            />
-          </div>
-
-          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-3">
-            <h2 className="font-display font-semibold text-sm text-foreground">Blocked members</h2>
-            <BlockedMembersPanel embedded />
-          </div>
-
-          <div className="bg-card rounded-2xl border border-border/80 shadow-soft p-5 space-y-3">
-            <h2 className="font-display font-semibold text-sm text-foreground">Account & security</h2>
-            {user?.email && (
-              <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-            )}
-            <button
-              type="button"
-              onClick={() => navigate("/change-password")}
-              className="w-full flex items-center gap-3 py-2 rounded-xl text-left active:bg-muted/40 transition"
-            >
-              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <Lock className="w-4 h-4 text-primary" strokeWidth={1.75} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium">Change password</p>
-                <p className="text-[11px] text-muted-foreground">Update your sign-in password</p>
-              </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" strokeWidth={1.5} />
-            </button>
           </div>
 
           {/* Save Button */}
@@ -418,189 +304,144 @@ export default function ProfileSetup() {
   }
 
   /* ─────────────────────────────────────────────────────────────
-     FIRST-TIME ONBOARDING SETUP MODE: 4-Step Guided Stepper
+     POST-SIGNUP BASICS: Photos + Interests — fully skippable
+     (Marketing onboarding stays before signup, after splash)
    ───────────────────────────────────────────────────────────── */
   return (
-    <ScrollPage>
-      <ScrollPageBody className="px-0 pb-8">
-        <div className="max-w-app mx-auto px-5 py-8">
-        {/* Brand Header */}
-        <div className="flex flex-col items-center mb-6">
-          <Moon className="w-6 h-6 text-primary mb-1" strokeWidth={1.5} />
-          <h1 className="font-display font-semibold text-2xl tracking-[0.08em] text-primary">SELUNA</h1>
+    <div className="min-h-screen gradient-app-bg font-body flex flex-col">
+      <div className="w-full max-w-md mx-auto flex-1 flex flex-col px-5 pt-4 pb-8 safe-pt safe-pb">
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-2">
+            <Moon className="w-5 h-5 text-primary" strokeWidth={1.5} />
+            <span className="font-display font-bold text-sm tracking-[0.12em]">SELUNA</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => finishBasics({ skip: true })}
+            disabled={saving}
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            Skip
+          </button>
         </div>
 
-        {/* Stepper */}
-        <div className="flex items-center justify-between mb-6">
-          {STEPS.map((label, i) => (
-            <div key={label} className="flex-1 flex items-center">
-              <div className="flex flex-col items-center flex-1">
-                <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition ${
-                    i < step
-                      ? "bg-primary text-white"
-                      : i === step
-                        ? "bg-primary text-white ring-4 ring-primary/20"
-                        : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {i < step ? <Check className="w-3.5 h-3.5" /> : i + 1}
-                </div>
-                <span className={`text-[10px] mt-1 ${i === step ? "text-foreground font-medium" : "text-muted-foreground"}`}>
-                  {label}
-                </span>
-              </div>
-              {i < STEPS.length - 1 && (
-                <div className={`h-0.5 flex-1 -mt-4 rounded ${i < step ? "bg-primary" : "bg-muted"}`} />
-              )}
-            </div>
+        <header className="mb-6 text-left">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
+            {step + 1} / {INTRO_STEPS.length}
+          </p>
+          <h1 className="text-[1.65rem] font-display font-bold tracking-tight text-foreground leading-tight">
+            {step === 0 && "What should we call you?"}
+            {step === 1 && "Add a few photos"}
+            {step === 2 && "What are you into?"}
+          </h1>
+          <p className="text-sm text-muted-foreground leading-relaxed mt-2.5 max-w-[34ch]">
+            {step === 0 && "A first name is enough. Skip anything and edit later in Profile."}
+            {step === 1 && "A clear face photo helps women recognise you. You can skip and add later."}
+            {step === 2 && "Pick a few interests — or skip and edit anytime in Profile."}
+          </p>
+        </header>
+
+        <div className="flex items-center gap-1.5 mb-6">
+          {INTRO_STEPS.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1 rounded-full transition-all ${i === step ? "w-7 bg-primary" : i < step ? "w-4 bg-primary/40" : "w-4 bg-border"}`}
+            />
           ))}
         </div>
 
-        <div className="bg-card rounded-2xl shadow-premium border border-border p-6">
-          <h2 className="font-display font-bold text-lg text-foreground mb-1">{STEPS[step]}</h2>
-
+        <div className="flex-1">
           {step === 0 && (
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="profileName">Profile name</Label>
-                <Input id="profileName" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="h-11 rounded-2xl" placeholder="How others will see you" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="dob">Date of birth{age !== null && age >= 0 ? ` · ${age} years old` : ""}</Label>
-                <Input id="dob" type="date" value={dob} onChange={(e) => setDob(e.target.value)} className="h-11 rounded-2xl" />
-              </div>
-
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input type="checkbox" checked={ageConfirm} onChange={(e) => setAgeConfirm(e.target.checked)} className="mt-0.5 w-4 h-4 shrink-0 accent-primary" />
-                <span className="text-xs text-muted-foreground leading-snug">I confirm that I am at least 18 years old and that the information I provide is accurate.</span>
-              </label>
-
-              <div className="space-y-2">
-                <Label htmlFor="city">Current city</Label>
-                <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} className="h-11 rounded-2xl" placeholder="Where you live now" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Country</Label>
-                  <Select value={country} onValueChange={setCountry}>
-                    <SelectTrigger className="h-11 rounded-2xl"><SelectValue placeholder="Select" /></SelectTrigger>
-                    <SelectContent>
-                      {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Nationality</Label>
-                  <Select value={nationality} onValueChange={setNationality}>
-                    <SelectTrigger className="h-11 rounded-2xl"><SelectValue placeholder="Select" /></SelectTrigger>
-                    <SelectContent>
-                      {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Languages spoken</Label>
-                <InterestPicker options={LANGUAGES} selected={languages} onToggle={setLanguages} />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="bio">Short biography</Label>
-                <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} className="rounded-2xl" placeholder="Tell the community a little about yourself..." />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="introName" className="text-xs font-semibold text-foreground/85">
+                Display name
+              </Label>
+              <Input
+                id="introName"
+                value={profileName}
+                onChange={(e) => setProfileName(e.target.value)}
+                className="auth-input"
+                placeholder="Clara"
+                autoFocus
+              />
             </div>
           )}
 
           {step === 1 && (
-            <div className="space-y-5 mt-4">
+            <PhotoManager
+              photos={photos}
+              mainPhoto={mainPhoto}
+              onChange={({ photos: next, mainPhoto: main }) => {
+                setPhotos(next);
+                setMainPhoto(main);
+              }}
+            />
+          )}
+
+          {step === 2 && (
+            <div className="space-y-5">
               <div className="space-y-2">
-                <Label>Travel style</Label>
+                <Label className="text-xs font-semibold text-foreground/85">Travel style</Label>
                 <InterestPicker options={TRAVEL_STYLES} selected={travelStyle} onToggle={setTravelStyle} />
               </div>
               <div className="space-y-2">
-                <Label>Interests</Label>
+                <Label className="text-xs font-semibold text-foreground/85">Interests</Label>
                 <InterestPicker options={INTERESTS} selected={interests} onToggle={setInterests} />
               </div>
             </div>
           )}
 
-          {step === 2 && (
-            <div className="mt-4 space-y-5">
-              <div className="space-y-2">
-                <Label>Location visibility</Label>
-                <RadioGroup value={locationVisibility} onValueChange={setLocationVisibility} className="gap-2">
-                  {LOCATION_OPTIONS.map((o) => (
-                    <label
-                      key={o.value}
-                      className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer transition ${locationVisibility === o.value ? "border-primary bg-primary/5" : "border-border"}`}
-                    >
-                      <RadioGroupItem value={o.value} />
-                      <span className="text-xs">{o.label}</span>
-                    </label>
-                  ))}
-                </RadioGroup>
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  Location is only used for destination matching, nearby events and relevant recommendations. Your exact home address is never shown.
-                </p>
-              </div>
-
-              <div className="space-y-1">
-                <ToggleRow id="showAge" label="Show my age" description="Display your age on your profile" checked={showAge} onCheck={setShowAge} />
-                <ToggleRow id="showTrips" label="Show upcoming trips" description="Let others see your planned trips" checked={showUpcomingTrips} onCheck={setShowUpcomingTrips} />
-                <ToggleRow id="matches" label="Allow match suggestions" description="Receive suggested travel companions" checked={allowMatches} onCheck={setAllowMatches} />
-                <ToggleRow id="invitations" label="Allow event invitations" description="Other members can invite you to events" checked={allowInvitations} onCheck={setAllowInvitations} />
-                <ToggleRow id="notifications" label="Allow notifications" description="Receive app notifications" checked={allowNotifications} onCheck={setAllowNotifications} />
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="mt-4 space-y-4">
-              <PhotoManager
-                photos={photos}
-                mainPhoto={mainPhoto}
-                onChange={({ photos, mainPhoto }) => { setPhotos(photos); setMainPhoto(mainPhoto); }}
-              />
-              <VerificationCard />
-            </div>
-          )}
-
           {error && (
-            <div className="mt-4 p-3 rounded-2xl bg-destructive/10 text-destructive text-xs font-medium leading-relaxed">{error}</div>
+            <div className="mt-4 p-3 rounded-2xl bg-destructive/10 text-destructive text-xs font-medium">
+              {error}
+            </div>
+          )}
+        </div>
+
+        <div className="mt-8 space-y-3">
+          {step < 2 ? (
+            <Button
+              type="button"
+              variant="primary"
+              className="w-full"
+              onClick={() => setStep(step + 1)}
+            >
+              Continue <ArrowRight className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="primary"
+              className="w-full"
+              disabled={saving}
+              onClick={() => finishBasics({ skip: false })}
+            >
+              {saving ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving…</>
+              ) : (
+                "Continue"
+              )}
+            </Button>
           )}
 
-          {/* Stepper Nav */}
-          <div className="flex items-center gap-3 mt-6">
-            {step > 0 && (
-              <Button variant="outline" size="md" onClick={() => { setError(""); setStep(step - 1); }} disabled={saving}>
-                <ArrowLeft className="w-4 h-4" /> Back
-              </Button>
-            )}
-            {step < 3 ? (
-              <Button variant="primary" className="flex-1" onClick={goNext}>
-                Continue <ArrowRight className="w-4 h-4" />
-              </Button>
-            ) : (
-              <Button variant="primary" className="flex-1" onClick={saveProfile} disabled={saving}>
-                {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                {saving ? "Saving..." : "Complete profile"}
-              </Button>
-            )}
-          </div>
+          <button
+            type="button"
+            onClick={() => (step < 2 ? setStep(step + 1) : finishBasics({ skip: true }))}
+            disabled={saving}
+            className="w-full text-center text-sm text-muted-foreground hover:text-foreground py-1"
+          >
+            {step < 2 ? "Skip" : "Skip for now"}
+          </button>
         </div>
 
         <button
+          type="button"
           onClick={() => logout()}
           className="w-full text-center text-xs text-muted-foreground mt-6 hover:text-foreground"
         >
           <LogOut className="w-3.5 h-3.5 inline mr-1.5" />Log out
         </button>
-        </div>
-      </ScrollPageBody>
-    </ScrollPage>
+      </div>
+    </div>
   );
 }

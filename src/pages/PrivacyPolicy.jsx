@@ -42,7 +42,7 @@ export default function PrivacyPolicy() {
         >
           <ArrowLeft className="w-5 h-5 text-foreground" strokeWidth={1.75} />
         </button>
-        <h1 className="font-display font-bold text-lg">Privacy Policy</h1>
+        <h1 className="page-title">Privacy Policy</h1>
       </ScrollPageHeader>
 
       <ScrollPageBody className="space-y-5">
@@ -50,22 +50,22 @@ export default function PrivacyPolicy() {
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
             <Lock className="w-6 h-6 text-primary" strokeWidth={1.5} />
           </div>
-          <p className="font-display font-bold text-base">Seluna Privacy Policy</p>
-          <p className="text-xs text-muted-foreground mt-1">Your privacy & safety are our highest priorities</p>
+          <p className="font-display font-bold text-lg">Seluna Privacy Policy</p>
+          <p className="text-sm text-muted-foreground mt-1">Your privacy & safety are our highest priorities</p>
         </div>
 
         <div className="space-y-4">
           {SECTIONS.map((s) => (
             <div key={s.title} className="rounded-2xl border border-border/80 bg-card p-4 shadow-soft">
-              <h2 className="font-semibold text-sm text-foreground mb-1.5">{s.title}</h2>
-              <p className="text-xs text-muted-foreground leading-relaxed">{s.body}</p>
+              <h2 className="row-title text-foreground mb-1.5">{s.title}</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
             </div>
           ))}
         </div>
 
         <div className="rounded-2xl bg-primary/5 border border-primary/15 p-4 flex gap-3 mt-6">
           <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" strokeWidth={1.5} />
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Have questions about how your data is handled? Contact our Privacy Team through Help & Support in your profile settings.
           </p>
         </div>

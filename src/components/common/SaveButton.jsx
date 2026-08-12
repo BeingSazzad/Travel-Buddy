@@ -24,7 +24,9 @@ export default function SaveButton({ item, className, variant = "surface" }) {
           ? saved
             ? "bg-primary/90 backdrop-blur-md border border-brand-gold/45 shadow-md"
             : "bg-black/50 backdrop-blur-md border border-white/30 shadow-md active:bg-black/65"
-          : "bg-card border border-border/80 shadow-soft active:bg-muted/40",
+          : variant === "ghost"
+            ? "bg-transparent border-0 shadow-none"
+            : "bg-card border border-border/80 shadow-soft active:bg-muted/40",
         className
       )}
       aria-label={saved ? "Unsave" : "Save"}

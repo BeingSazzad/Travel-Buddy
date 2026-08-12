@@ -85,7 +85,7 @@ export default function CommunityGuidelines() {
         >
           <ArrowLeft className="w-5 h-5" strokeWidth={1.75} />
         </button>
-        <h1 className="font-display font-semibold text-lg">Community Guidelines</h1>
+        <h1 className="page-title">Community Guidelines</h1>
       </ScrollPageHeader>
 
       <ScrollPageBody className={showAcceptFlow ? "pb-4" : undefined}>
@@ -109,7 +109,7 @@ export default function CommunityGuidelines() {
         <div className="space-y-3">
           {SECTIONS.map((s, i) => (
             <div key={s.title} className="rounded-2xl border border-border bg-card p-4">
-              <p className="font-medium text-sm flex items-center gap-2">
+              <p className="row-title flex items-center gap-2">
                 <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center font-medium">
                   {i + 1}
                 </span>
@@ -122,7 +122,7 @@ export default function CommunityGuidelines() {
 
         <div className="rounded-2xl bg-primary/5 border border-primary/15 p-4 mt-5 flex gap-3">
           <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" strokeWidth={1.5} />
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             Breaking these guidelines can result in content removal, loss of access to social features,
             or permanent account removal. Use the Report option wherever you see it — our team reviews
             every report.
@@ -147,7 +147,7 @@ export default function CommunityGuidelines() {
               "I accept the guidelines"
             )}
           </Button>
-          <p className="text-center text-xs text-muted-foreground mt-2">
+          <p className="text-center text-sm text-muted-foreground mt-2">
             Accept once to unlock social features in Seluna.
           </p>
         </div>

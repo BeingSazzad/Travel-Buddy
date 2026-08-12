@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import SplashScreen from "@/components/common/SplashScreen";
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -20,8 +19,10 @@ import Saved from '@/pages/Saved';
 import Category from '@/pages/Category';
 import Reviews from '@/pages/Reviews';
 import Welcome from '@/pages/Welcome';
+import Splash from '@/pages/Splash';
 import Onboarding from '@/pages/Onboarding';
 import Login from '@/pages/Login';
+import { getUnauthEntryPath, hasCompletedOnboarding } from '@/lib/launch-flow';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
@@ -69,12 +70,15 @@ import AdminSafetyTips from '@/pages/admin/AdminSafetyTips';
 import AdminFeatured from '@/pages/admin/AdminFeatured';
 import ContentManagement from '@/pages/admin/ContentManagement';
 import ChangePassword from '@/pages/ChangePassword';
+import PrivacySettings from '@/pages/PrivacySettings';
+import NotificationSettings from '@/pages/NotificationSettings';
+import BlockedMembers from '@/pages/BlockedMembers';
+import DeleteAccount from '@/pages/DeleteAccount';
 import Terms from '@/pages/Terms';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import HelpSupport from '@/pages/HelpSupport';
 import CommunityGuidelines from '@/pages/CommunityGuidelines';
 import { ShieldAlert } from "lucide-react";
-import { base44 } from "@/api/base44Client";
 import PageTransition from "@/components/PageTransition";
 // Add page imports here
 
@@ -96,7 +100,7 @@ function AppFrame({ children }) {
 }
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, user, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, user, logout } = useAuth();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -112,13 +116,17 @@ const AuthenticatedApp = () => {
     return <UserNotRegisteredError />;
   }
 
-  // Not authenticated: show the welcome + onboarding flow, then login/register
+  // Cold start: Splash → Onboarding → Welcome / Sign up / Sign in
   if (!isAuthenticated) {
     return (
       <AppScroll>
         <Routes>
+        <Route path="/splash" element={<Splash />} />
+        <Route
+          path="/onboarding"
+          element={hasCompletedOnboarding() ? <Navigate to="/welcome" replace /> : <Onboarding />}
+        />
         <Route path="/welcome" element={<Welcome />} />
-        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -127,7 +135,7 @@ const AuthenticatedApp = () => {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/help" element={<HelpSupport />} />
         <Route path="/community-guidelines" element={<CommunityGuidelines />} />
-        <Route path="*" element={<Navigate to="/welcome" replace />} />
+        <Route path="*" element={<Navigate to={getUnauthEntryPath()} replace />} />
         </Routes>
       </AppScroll>
     );
@@ -160,30 +168,30 @@ const AuthenticatedApp = () => {
         <ShieldAlert className="w-9 h-9 text-muted-foreground" strokeWidth={1.5} />
         <p className="font-display font-bold text-lg">Access restricted</p>
         <p className="text-sm text-muted-foreground max-w-xs">Seluna is only available to users aged 18 or older.</p>
-        <button onClick={() => base44.auth.logout()} className="mt-2 text-sm text-primary underline">Log out</button>
+        <button onClick={() => logout()} className="mt-2 text-sm text-primary underline">Log out</button>
       </div>
     );
   }
 
-  // Step 2: subscription must be active (or cancelled but still within the billing period)
-  if (!bypassPayment && !subscriptionOk) {
-    return (
-      <AppScroll>
-        <Routes>
-          <Route path="/subscription" element={<Subscription />} />
-          <Route path="*" element={<Navigate to="/subscription" replace />} />
-        </Routes>
-      </AppScroll>
-    );
-  }
-
-  // Step 3: profile must be completed before using the app
+  // Step 2: light profile basics (photos / interests) — skippable, right after signup
   if (!isAdmin && !user?.profile_completed) {
     return (
       <AppScroll>
         <Routes>
           <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="*" element={<Navigate to="/profile-setup" replace />} />
+        </Routes>
+      </AppScroll>
+    );
+  }
+
+  // Step 3: subscription must be active (or cancelled but still within the billing period)
+  if (!bypassPayment && !subscriptionOk) {
+    return (
+      <AppScroll>
+        <Routes>
+          <Route path="/subscription" element={<Subscription />} />
+          <Route path="*" element={<Navigate to="/subscription" replace />} />
         </Routes>
       </AppScroll>
     );
@@ -213,7 +221,7 @@ const AuthenticatedApp = () => {
         <p className="text-sm text-muted-foreground max-w-xs">
           Your Seluna account has been {user.account_status}. If you believe this is a mistake, please contact Seluna support.
         </p>
-        <button onClick={() => base44.auth.logout()} className="mt-2 text-sm text-primary underline">Log out</button>
+        <button onClick={() => logout()} className="mt-2 text-sm text-primary underline">Log out</button>
       </div>
     );
   }
@@ -222,6 +230,14 @@ const AuthenticatedApp = () => {
   return (
     <AppFrame>
     <Routes>
+      <Route path="/splash" element={<Navigate to="/" replace />} />
+      <Route path="/onboarding" element={<Navigate to="/" replace />} />
+      <Route path="/welcome" element={<Navigate to="/" replace />} />
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/register" element={<Navigate to="/profile-setup" replace />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
       <Route path="/trips/new" element={<PageTransition><CreateTrip /></PageTransition>} />
       <Route path="/trips/:id" element={<PageTransition><TripDetail /></PageTransition>} />
       <Route path="/deals/:id" element={<PageTransition><DealDetail /></PageTransition>} />
@@ -249,6 +265,10 @@ const AuthenticatedApp = () => {
         <Route path="/help" element={<HelpSupport />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/privacy" element={<PrivacySettings />} />
+        <Route path="/profile/notifications" element={<NotificationSettings />} />
+        <Route path="/profile/blocked" element={<BlockedMembers />} />
+        <Route path="/profile/delete" element={<DeleteAccount />} />
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/cafes" element={<Cafes />} />
@@ -278,8 +298,6 @@ const AuthenticatedApp = () => {
         <Route path="/admin/notifications" element={<AdminNotifications />} />
         <Route path="/admin/content" element={<ContentManagement />} />
       </Route>
-      <Route path="/welcome" element={<Welcome />} />
-      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/account-pending" element={<AccountPending />} />
       <Route path="*" element={<PageNotFound />} />
@@ -290,20 +308,10 @@ const AuthenticatedApp = () => {
 
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        {showSplash && <SplashScreen />}
         <div className="min-h-screen bg-background flex justify-center overflow-x-hidden">
           <div className="app-shell gradient-app-bg flex flex-col h-dvh max-h-dvh shadow-2xl relative border-x border-border/5 overflow-hidden min-w-0">
             <div className="flex-1 min-h-0 flex flex-col h-full overflow-hidden">

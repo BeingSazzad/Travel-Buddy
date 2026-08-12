@@ -64,7 +64,7 @@ export default function ChangePassword() {
         >
           <ArrowLeft className="w-5 h-5 text-foreground" strokeWidth={1.75} />
         </button>
-        <h1 className="font-display font-bold text-lg">Change password</h1>
+        <h1 className="page-title">Change password</h1>
       </ScrollPageHeader>
 
       <ScrollPageBody>
@@ -125,7 +125,7 @@ export default function ChangePassword() {
               />
             </div>
 
-            {error && <p className="text-xs text-destructive">{error}</p>}
+            {error && <p className="text-sm text-destructive">{error}</p>}
 
             <Button type="submit" className="w-full h-11 rounded-2xl" disabled={saving}>
               {saving ? (

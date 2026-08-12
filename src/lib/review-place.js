@@ -79,6 +79,51 @@ export const FALLBACK_REVIEWS = FALLBACK_RECENT_PLACES.map((p, i) => ({
   item_key: `${p.type}:${p.title}`,
   rating: p.rating,
   text: p.reviewSnippet,
-  author_name: "Community member",
+  author_name: i % 2 === 0 ? "Ava Laurent" : "Isabella Chen",
+  created_date: new Date(Date.now() - (i + 1) * 86400000 * 3).toISOString(),
   photos: p.image ? [p.image] : [],
 }));
+
+const REVIEW_SNIPPETS = {
+  cafe: [
+    "Lovely morning stop — easy to linger with a laptop and a good flat white.",
+    "Quiet enough to chat, and the staff were kind.",
+  ],
+  restaurant: [
+    "Came here after a long walk. Food was excellent and I felt comfortable dining as a pair.",
+    "Would come back for the wine list alone.",
+  ],
+  hotel: [
+    "Felt safe, well located, and easy to rest after a full day out.",
+    "Beautiful stay — would book again with another Seluna member.",
+  ],
+  destination: [
+    "Worth the trip. Easy to meet other women travelling the same week.",
+    "Loved the pace here — cafés, walks, and a few events nearby.",
+  ],
+};
+
+/** Demo reviews for a venue page when the Review API is empty */
+export function demoReviewsForVenue({ itemKey, itemType, itemTitle }) {
+  const matching = FALLBACK_REVIEWS.filter((r) => r.item_key === itemKey);
+  if (matching.length) return matching;
+
+  const authors = [
+    { name: "Ava Laurent", id: "mock_2" },
+    { name: "Isabella Chen", id: "mock_4" },
+  ];
+  const texts = REVIEW_SNIPPETS[itemType] || REVIEW_SNIPPETS.destination;
+  return authors.map((a, i) => ({
+    id: `demo_rv_${itemKey}_${i}`,
+    item_type: itemType,
+    item_title: itemTitle,
+    item_key: itemKey,
+    rating: i === 0 ? 5 : 4,
+    text: texts[i] || texts[0],
+    author_name: a.name,
+    created_by_id: a.id,
+    created_date: new Date(Date.now() - (i + 2) * 86400000 * 4).toISOString(),
+    helpful_count: 2 - i,
+    photos: [],
+  }));
+}

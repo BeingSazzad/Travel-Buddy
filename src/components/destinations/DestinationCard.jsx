@@ -1,42 +1,82 @@
 import React from "react";
-import { MapPin, Users, Coffee, UtensilsCrossed, Building2, CalendarHeart, Tag } from "lucide-react";
-import { Image } from "@/components/ui/image";
 import { useNavigate } from "react-router-dom";
+import { Image } from "@/components/ui/image";
+import SaveButton from "@/components/common/SaveButton";
+import { cn } from "@/lib/utils";
 
-function Stat({ icon: Icon, value }) {
-  return (
-    <span className="flex items-center gap-1 text-white/90">
-      <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
-      <span className="text-xs font-medium">{value}</span>
-    </span>
-  );
+function saveItem(destination) {
+  return {
+    type: "destination",
+    title: destination.city,
+    location: destination.city,
+    country: destination.country,
+    image: destination.image,
+  };
 }
 
-export default function DestinationCard({ destination, large = false }) {
-  const { city, country, image, description, stats } = destination;
+function metaLine(destination) {
+  const members = destination.stats?.members;
+  const events = destination.stats?.events;
+  const parts = [];
+  if (members) parts.push(`${members} women`);
+  if (events) parts.push(`${events} events`);
+  return parts.join(" · ");
+}
+
+export default function DestinationCard({ destination, variant = "list" }) {
   const navigate = useNavigate();
+  const featured = variant === "featured";
+  const meta = metaLine(destination);
+
   return (
     <div
-      onClick={() => navigate(`/destinations/${encodeURIComponent(city)}`)}
-      className={`relative rounded-3xl overflow-hidden border border-border shadow-soft bg-card interactive-card group ${large ? "h-72" : "h-64"}`}
+      role="button"
+      tabIndex={0}
+      aria-label={`${destination.city}, ${destination.country}`}
+      onClick={() => navigate(`/destinations/${encodeURIComponent(destination.city)}`)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate(`/destinations/${encodeURIComponent(destination.city)}`);
+        }
+      }}
+      className={cn(
+        "relative overflow-hidden border border-border/10 shadow-soft interactive-card group text-left cursor-pointer",
+        featured
+          ? "w-[11.25rem] h-[14rem] shrink-0 rounded-[24px]"
+          : "w-full h-48 rounded-3xl"
+      )}
     >
-      <Image src={image} alt={city} fittingType="fill" className="w-full h-full image-zoom" />
-      <div className="gradient-overlay-soft" />
-      <div className="absolute bottom-0 left-0 right-0 p-5">
-        <div className="flex items-center gap-1 text-white/80 text-xs mb-1">
-          <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
-          <span>{city}, {country}</span>
-        </div>
-        <h3 className={`font-display font-semibold text-white ${large ? "text-2xl" : "text-xl"}`}>{city}</h3>
-        <p className="text-xs text-white/80 mt-1 line-clamp-2 max-w-[90%]">{description}</p>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-3">
-          <Stat icon={Users} value={stats.members} />
-          <Stat icon={Coffee} value={stats.cafes} />
-          <Stat icon={UtensilsCrossed} value={stats.restaurants} />
-          <Stat icon={Building2} value={stats.hotels} />
-          <Stat icon={CalendarHeart} value={stats.events} />
-          <Stat icon={Tag} value={stats.deals} />
-        </div>
+      <Image
+        src={destination.image}
+        alt={destination.city}
+        fittingType="fill"
+        className="absolute inset-0 w-full h-full object-cover image-zoom"
+      />
+      <div className={featured ? "gradient-overlay" : "gradient-overlay-soft"} />
+
+      <div
+        className="absolute top-3 right-3 z-20"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <SaveButton item={saveItem(destination)} variant="overlay" />
+      </div>
+
+      <div className={cn("absolute bottom-0 inset-x-0 z-20", featured ? "p-3.5" : "p-4")}>
+        <h3
+          className={cn(
+            "font-display font-semibold text-white leading-tight drop-shadow-[0_1px_4px_rgba(0,0,0,0.65)]",
+            featured ? "text-lg" : "text-xl"
+          )}
+        >
+          {destination.city}
+        </h3>
+        <p className="text-[11px] text-white/85 truncate mt-0.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.65)]">
+          {destination.country}
+        </p>
+        {!featured && meta && (
+          <p className="text-[11px] text-white/75 mt-1.5 truncate">{meta}</p>
+        )}
       </div>
     </div>
   );

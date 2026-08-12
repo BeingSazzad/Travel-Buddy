@@ -2,16 +2,10 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Users,
-  SlidersHorizontal,
   User,
   ChevronRight,
   X,
   LogOut,
-  CalendarHeart,
-  Bookmark,
-  HelpCircle,
-  HeartHandshake,
-  Map,
 } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useAuth } from "@/lib/AuthContext";
@@ -26,21 +20,6 @@ export default function HomeDrawer({ open, onOpenChange }) {
   const displayName = user?.first_name
     ? `${user.first_name}${user.last_name ? ` ${user.last_name.charAt(0)}.` : ""}`
     : "Your profile";
-
-  const ACCOUNT_NAV = [
-    { label: "Settings", icon: SlidersHorizontal, onClick: () => navigate("/profile#settings") },
-  ];
-
-  const LIBRARY_NAV = [
-    { label: "My trips", icon: Map, to: "/trips" },
-    { label: "My events", icon: CalendarHeart, to: "/events" },
-    { label: "Saved", icon: Bookmark, to: "/saved" },
-  ];
-
-  const SUPPORT_NAV = [
-    { label: "Help & support", icon: HelpCircle, to: "/help" },
-    { label: "Community guidelines", icon: HeartHandshake, to: "/community-guidelines" },
-  ];
 
   const close = () => onOpenChange(false);
   const go = (path) => {
@@ -120,46 +99,13 @@ export default function HomeDrawer({ open, onOpenChange }) {
         </div>
 
         <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-2">
-          <SectionLabel>Account</SectionLabel>
-          {ACCOUNT_NAV.map((item) => (
-            <NavRow
-              key={item.label}
-              icon={item.icon}
-              label={item.label}
-              onClick={() => {
-                close();
-                item.onClick();
-              }}
-            />
-          ))}
-
-          <SectionLabel className="pt-3">Social</SectionLabel>
+          <SectionLabel>Social</SectionLabel>
           <NavRow
             icon={Users}
             label="Friends"
             badge={requests.length}
             onClick={() => go("/friends")}
           />
-
-          <SectionLabel className="pt-3">Your library</SectionLabel>
-          {LIBRARY_NAV.map((item) => (
-            <NavRow
-              key={item.to}
-              icon={item.icon}
-              label={item.label}
-              onClick={() => go(item.to)}
-            />
-          ))}
-
-          <SectionLabel className="pt-3">Support</SectionLabel>
-          {SUPPORT_NAV.map((item) => (
-            <NavRow
-              key={item.to}
-              icon={item.icon}
-              label={item.label}
-              onClick={() => go(item.to)}
-            />
-          ))}
         </div>
 
         <div className="shrink-0 px-2 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))] border-t border-border/50">

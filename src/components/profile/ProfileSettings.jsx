@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -25,8 +25,6 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "@/lib/AuthContext";
-
-import DeleteAccountSheet from "@/components/profile/DeleteAccountSheet";
 
 
 
@@ -103,8 +101,6 @@ export default function ProfileSettings() {
   const { user } = useAuth();
 
   const navigate = useNavigate();
-
-  const [sheet, setSheet] = useState(null);
 
   const isVerified = user?.identity_verified && user?.age_verified;
   const subStatus = user?.subscription_status || "none";
@@ -193,13 +189,11 @@ export default function ProfileSettings() {
 
       <SettingsGroup>
 
-        <SettingsRow icon={Trash2} label="Delete account" onClick={() => setSheet("delete")} danger />
+        <SettingsRow icon={Trash2} label="Delete account" onClick={() => navigate("/profile/delete")} danger />
 
       </SettingsGroup>
 
 
-
-      {sheet === "delete" && <DeleteAccountSheet onClose={() => setSheet(null)} />}
 
     </div>
 

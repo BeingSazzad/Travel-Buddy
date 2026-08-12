@@ -79,6 +79,44 @@ export const MOCK_EVENTS = [
     image: eventImageFor({ city: "Zermatt", category: "hiking" }),
     visibility: "public",
   },
+  {
+    id: "event_mock_5",
+    title: "Canal-side coffee",
+    name: "Canal-side coffee",
+    city: "Copenhagen",
+    country: "Denmark",
+    location: "Nyhavn",
+    date: "2026-08-16",
+    time: "10:30 AM",
+    category: "coffee",
+    description: "Slow Saturday coffee with other women in town — then a walk along the harbour.",
+    attendees_count: 7,
+    max_attendees: 10,
+    host_id: "mock_2",
+    host_name: findMockMember("mock_2").name,
+    host_avatar: memberAvatar("mock_2"),
+    image: eventImageFor({ city: "Copenhagen", category: "cafes" }),
+    visibility: "public",
+  },
+  {
+    id: "event_mock_6",
+    title: "Ubud temple morning",
+    name: "Ubud temple morning",
+    city: "Bali",
+    country: "Indonesia",
+    location: "Tirta Empul",
+    date: "2026-08-21",
+    time: "08:00 AM",
+    category: "sightseeing",
+    description: "Visit a water temple together, then brunch in Ubud. Sarongs provided.",
+    attendees_count: 9,
+    max_attendees: 12,
+    host_id: "mock_1",
+    host_name: findMockMember("mock_1").name,
+    host_avatar: memberAvatar("mock_1"),
+    image: eventImageFor({ city: "Bali", category: "culture" }),
+    visibility: "public",
+  },
 ];
 
 /** Home / search title → mock event id */
@@ -96,10 +134,54 @@ export function findMockEvent(id) {
   return MOCK_EVENTS.find((e) => e.id === id) || null;
 }
 
-export function eventsForCity(city) {
+export function eventsForCity(city, country) {
   if (!city) return [];
   const key = city.toLowerCase();
-  return MOCK_EVENTS.filter((e) => (e.city || "").toLowerCase() === key);
+  const existing = MOCK_EVENTS.filter((e) => (e.city || "").toLowerCase() === key);
+  if (existing.length) return existing;
+
+  const hostA = findMockMember("mock_2");
+  const hostB = findMockMember("mock_4");
+  return [
+    {
+      id: `event_demo_${key}_cafe`,
+      title: `Café morning in ${city}`,
+      name: `Café morning in ${city}`,
+      city,
+      country: country || "",
+      location: `${city} centre`,
+      date: "2026-08-18",
+      time: "10:00 AM",
+      category: "coffee",
+      description: `Meet other women travelling through ${city} for coffee and a slow morning walk.`,
+      attendees_count: 6,
+      max_attendees: 10,
+      host_id: hostA.user_id,
+      host_name: hostA.name,
+      host_avatar: memberAvatar(hostA.user_id),
+      image: eventImageFor({ city, category: "cafes" }),
+      visibility: "public",
+    },
+    {
+      id: `event_demo_${key}_dinner`,
+      title: `Dinner with fellow travellers`,
+      name: `Dinner with fellow travellers`,
+      city,
+      country: country || "",
+      location: `${city}`,
+      date: "2026-08-22",
+      time: "07:00 PM",
+      category: "dinner",
+      description: `A small group dinner for women visiting ${city} — good food and easy conversation.`,
+      attendees_count: 8,
+      max_attendees: 12,
+      host_id: hostB.user_id,
+      host_name: hostB.name,
+      host_avatar: memberAvatar(hostB.user_id),
+      image: eventImageFor({ city, category: "dinner" }),
+      visibility: "public",
+    },
+  ];
 }
 
 export function resolveEventId(item) {

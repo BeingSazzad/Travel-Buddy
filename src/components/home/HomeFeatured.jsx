@@ -5,6 +5,8 @@ import { Image } from "@/components/ui/image";
 import { Loader2 } from "lucide-react";
 import HorizontalScroll from "@/components/common/HorizontalScroll";
 import { onRefresh } from "@/lib/refresh-bus";
+import { DEMO_FEATURED } from "@/lib/home-data";
+import { useDemoFallbacks } from "@/lib/demo-fallbacks";
 
 export default function HomeFeatured() {
   const [items, setItems] = useState([]);
@@ -14,9 +16,10 @@ export default function HomeFeatured() {
     setLoading(true);
     try {
       const list = await base44.entities.FeaturedContent.list("sort_order", 50);
-      setItems((list || []).filter((i) => i.active));
+      const active = (list || []).filter((i) => i.active);
+      setItems(active.length ? active : useDemoFallbacks ? DEMO_FEATURED : []);
     } catch {
-      setItems([]);
+      setItems(useDemoFallbacks ? DEMO_FEATURED : []);
     } finally {
       setLoading(false);
     }

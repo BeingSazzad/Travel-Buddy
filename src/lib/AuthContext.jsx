@@ -8,8 +8,8 @@ import { DEMO_USER } from "@/lib/demo-user";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(DEMO_USER);
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(false);
   const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(false);
   const [authError, setAuthError] = useState(null);
@@ -121,25 +121,66 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = (shouldRedirect = true) => {
+    if (typeof window !== "undefined" && window.localStorage) {
+      window.localStorage.removeItem("base44_access_token");
+      window.localStorage.removeItem("token");
+    }
+    try {
+      // Clear SDK session without redirecting to hosted Base44 login
+      base44.auth.logout();
+    } catch {
+      /* ignore */
+    }
     setUser(null);
     setIsAuthenticated(false);
-    
-    if (shouldRedirect) {
-      // Use the SDK's logout method which handles token cleanup and redirect
-      base44.auth.logout(window.location.href);
-    } else {
-      // Just remove the token without redirect
-      base44.auth.logout();
+    setAuthError(null);
+    setAuthChecked(true);
+
+    if (shouldRedirect && typeof window !== "undefined") {
+      try {
+        sessionStorage.removeItem("seluna_splash_session");
+      } catch {
+        /* ignore */
+      }
+      window.location.assign("/");
     }
   };
 
   const navigateToLogin = () => {
-    // Use the SDK's redirectToLogin method
-    base44.auth.redirectToLogin(window.location.href);
+    if (typeof window !== "undefined") {
+      window.location.assign("/login");
+    }
   };
 
   const loginAsDemo = () => {
     setUser(DEMO_USER);
+    setIsAuthenticated(true);
+    setAuthChecked(true);
+    setAuthError(null);
+  };
+
+  /** Fresh member after signup — empty profile, not the Clara demo. */
+  const loginAsNewMember = (partial = {}) => {
+    const now = new Date().toISOString();
+    setUser({
+      id: `user_${Date.now()}`,
+      email: partial.email || "new@seluna.app",
+      role: "user",
+      first_name: partial.first_name || "New",
+      last_name: partial.last_name || "Member",
+      profile_name: "",
+      profile_photos: [],
+      main_photo: null,
+      interests: [],
+      travel_style: [],
+      profile_completed: false,
+      is_email_verified: true,
+      accepted_terms_at: now,
+      accepted_privacy_at: now,
+      accepted_community_guidelines_at: now,
+      subscription_status: "pending",
+      ...partial,
+    });
     setIsAuthenticated(true);
     setAuthChecked(true);
     setAuthError(null);
@@ -163,6 +204,7 @@ export const AuthProvider = ({ children }) => {
       checkUserAuth,
       checkAppState,
       loginAsDemo,
+      loginAsNewMember,
       patchUser,
     }}>
       {children}

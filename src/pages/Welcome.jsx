@@ -43,8 +43,8 @@ export default function Welcome() {
         <div className="w-full mt-8 flex flex-col gap-3 max-w-sm mx-auto">
           <button
             type="button"
-            onClick={() => navigate("/onboarding")}
-            className="w-full py-3.5 rounded-2xl gradient-brand-accent text-white font-semibold text-sm shadow-md tap-feedback"
+            onClick={() => navigate("/register")}
+            className="w-full py-3.5 rounded-2xl gradient-brand-button text-white font-semibold text-sm tap-feedback"
           >
             Create account
           </button>

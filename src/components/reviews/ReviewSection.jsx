@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import ReviewItem from "@/components/reviews/ReviewItem";
 import ReviewForm from "@/components/reviews/ReviewForm";
+import { useDemoFallbacks } from "@/lib/demo-fallbacks";
+import { demoReviewsForVenue } from "@/lib/review-place";
 
 export default function ReviewSection({ itemKey, itemType, itemTitle }) {
   const [reviews, setReviews] = useState([]);
@@ -17,9 +19,9 @@ export default function ReviewSection({ itemKey, itemType, itemTitle }) {
         base44.entities.Review.filter({ item_key: itemKey }, "-created_date"),
         base44.auth.me().catch(() => null),
       ]);
-      setReviews(list);
+      setReviews(list?.length ? list : useDemoFallbacks ? demoReviewsForVenue({ itemKey, itemType, itemTitle }) : []);
       setUser(me);
-      if (me && list.length) {
+      if (me && list?.length) {
         const votes = {};
         await Promise.all(list.map(async (rv) => {
           try {
@@ -29,7 +31,8 @@ export default function ReviewSection({ itemKey, itemType, itemTitle }) {
         }));
         setVoted(votes);
       }
-    } catch (e) {
+    } catch {
+      setReviews(useDemoFallbacks ? demoReviewsForVenue({ itemKey, itemType, itemTitle }) : []);
     } finally {
       setLoading(false);
     }

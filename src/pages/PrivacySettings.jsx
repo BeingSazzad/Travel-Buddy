@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import ProfileSheet from "@/components/profile/ProfileSheet";
+import SettingsPage from "@/components/profile/SettingsPage";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
 
@@ -18,15 +19,16 @@ function Toggle({ id, label, desc, checked, onCheck }) {
   return (
     <div className="flex items-start justify-between gap-4 py-3 border-b border-border last:border-0">
       <div className="flex-1">
-        <Label className="text-sm font-medium">{label}</Label>
-        {desc && <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>}
+        <Label htmlFor={id} className="text-sm font-medium">{label}</Label>
+        {desc && <p className="text-sm text-muted-foreground mt-0.5 leading-normal">{desc}</p>}
       </div>
       <Switch id={id} checked={checked} onCheckedChange={onCheck} />
     </div>
   );
 }
 
-export default function PrivacySheet({ onClose }) {
+export default function PrivacySettings() {
+  const navigate = useNavigate();
   const { user, checkUserAuth, patchUser } = useAuth();
   const [loc, setLoc] = useState(user?.location_visibility || "approximate");
   const [showAge, setShowAge] = useState(user?.show_age !== false);
@@ -46,26 +48,33 @@ export default function PrivacySheet({ onClose }) {
     };
     try {
       await base44.auth.updateMe(payload);
-      await checkUserAuth();
-      onClose();
+      try {
+        await checkUserAuth();
+      } catch {
+        patchUser(payload);
+      }
+      navigate("/profile");
     } catch {
       patchUser(payload);
-      onClose();
+      navigate("/profile");
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <ProfileSheet title="Privacy" onClose={onClose}>
-      <div className="space-y-4">
+    <SettingsPage title="Privacy">
+      <p className="text-sm text-muted-foreground mb-5 leading-relaxed">
+        Control what other members can see about you.
+      </p>
+      <div className="space-y-5">
         <div className="space-y-2">
           <Label>Location visibility</Label>
           <RadioGroup value={loc} onValueChange={setLoc} className="gap-2">
             {LOC.map((o) => (
               <label
                 key={o.value}
-                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer ${loc === o.value ? "border-primary bg-primary/5" : "border-border"}`}
+                className={`flex items-center gap-3 p-3 rounded-2xl border cursor-pointer ${loc === o.value ? "border-primary bg-primary/5" : "border-border"}`}
               >
                 <RadioGroupItem value={o.value} />
                 <span className="text-sm">{o.label}</span>
@@ -79,10 +88,10 @@ export default function PrivacySheet({ onClose }) {
           <Toggle id="matches" label="Allow match suggestions" desc="Receive suggested travel companions" checked={allowMatches} onCheck={setAllowMatches} />
           <Toggle id="invitations" label="Allow event invitations" desc="Other members can invite you to events" checked={allowInvitations} onCheck={setAllowInvitations} />
         </div>
-        <Button className="w-full h-11" onClick={save} disabled={saving}>
+        <Button className="w-full h-11 rounded-2xl" onClick={save} disabled={saving}>
           {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Save changes
         </Button>
       </div>
-    </ProfileSheet>
+    </SettingsPage>
   );
 }

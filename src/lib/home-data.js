@@ -23,25 +23,52 @@ export const CATEGORIES = [
   { label: "Deals", icon: Tag, to: "/deals" },
 ];
 
+export const DEMO_FEATURED = [
+  {
+    id: "feat_lisbon",
+    title: "Lisbon in late summer",
+    subtitle: "Pastel hills, café terraces, and golden hour on the Tagus.",
+    image: CITY_IMAGES.lisbon,
+    link: "/destinations/Lisbon",
+    active: true,
+  },
+  {
+    id: "feat_bali",
+    title: "Ubud wellness week",
+    subtitle: "Jungle mornings and slow travel in Bali.",
+    image: CITY_IMAGES.bali,
+    link: "/destinations/Bali",
+    active: true,
+  },
+  {
+    id: "feat_paris",
+    title: "Paris café crawl",
+    subtitle: "Art, pastries, and walks at golden hour.",
+    image: CITY_IMAGES.paris,
+    link: "/destinations/Paris",
+    active: true,
+  },
+];
+
 export const SECTIONS = [
   {
     title: "Recommended for you",
     seeAllPath: "/destinations",
     items: [
-      { type: "trip", tripId: "trip_mock_5", image: CITY_IMAGES.copenhagen, title: "Girls' weekend in Copenhagen", location: "Copenhagen", info: "18 attending", badge: "Featured" },
-      { type: "destination", city: "Bali", image: CITY_IMAGES.bali, title: "Bali wellness retreat", location: "Ubud", info: "★ 4.9" },
-      { type: "destination", city: "Paris", image: CITY_IMAGES.paris, title: "Paris art & cafés", location: "Paris", info: "★ 4.8" },
-      { type: "destination", city: "Lisbon", image: CITY_IMAGES.lisbon, title: "Lisbon coastal escape", location: "Lisbon", info: "★ 4.7" },
+      { type: "destination", city: "Paris", image: CITY_IMAGES.paris, title: "Paris", location: "France", info: "★ 4.8" },
+      { type: "destination", city: "Lisbon", image: CITY_IMAGES.lisbon, title: "Lisbon", location: "Portugal", info: "★ 4.7" },
+      { type: "destination", city: "Copenhagen", image: CITY_IMAGES.copenhagen, title: "Copenhagen", location: "Denmark", info: "★ 4.8" },
+      { type: "destination", city: "Tokyo", image: CITY_IMAGES.tokyo, title: "Tokyo", location: "Japan", info: "★ 4.9" },
     ],
   },
   {
     title: "Trending destinations",
     seeAllPath: "/destinations",
     items: [
-      { type: "destination", city: "Lisbon", image: CITY_IMAGES.lisbon, title: "Lisbon", location: "Portugal", info: "Trending", badge: "🔥" },
       { type: "destination", city: "Bali", image: CITY_IMAGES.bali, title: "Bali", location: "Indonesia", info: "★ 4.9" },
-      { type: "destination", city: "Marrakech", image: CITY_IMAGES.marrakech, title: "Marrakech", location: "Morocco", info: "Hot" },
-      { type: "destination", city: "Copenhagen", image: CITY_IMAGES.copenhagen, title: "Copenhagen", location: "Denmark", info: "Popular" },
+      { type: "destination", city: "Marrakech", image: CITY_IMAGES.marrakech, title: "Marrakech", location: "Morocco", info: "★ 4.6" },
+      { type: "destination", city: "Tulum", image: CITY_IMAGES.tulum, title: "Tulum", location: "Mexico", info: "★ 4.7" },
+      { type: "destination", city: "Cape Town", image: CITY_IMAGES.capetown, title: "Cape Town", location: "South Africa", info: "★ 4.8" },
     ],
   },
   {

@@ -14,10 +14,10 @@ export function useRecentReviews(limit = 8) {
         const list = await base44.entities.Review.list('-created_date', limit);
         if (!cancelled) {
           if (list?.length) setReviews(list);
-          else if (useDemoFallbacks) setReviews([]);
+          else if (useDemoFallbacks) setReviews(FALLBACK_REVIEWS);
         }
       } catch {
-        if (!cancelled) setReviews([]);
+        if (!cancelled) setReviews(useDemoFallbacks ? FALLBACK_REVIEWS : []);
       } finally {
         if (!cancelled) setLoading(false);
       }

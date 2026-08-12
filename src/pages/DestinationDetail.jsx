@@ -12,6 +12,9 @@ import EventCard from "@/components/events/EventCard";
 import { contentFor } from "@/lib/destination-content";
 import { useDestinations } from "@/lib/useContent";
 import { eventsForCity } from "@/lib/mock-events";
+import { demoVisitorsForCity, memberIdForTripCreator } from "@/lib/mock-trips";
+import { findMockMember } from "@/lib/member-profile";
+import { DEMO_USER, isSameAppUser } from "@/lib/demo-user";
 import { fallbackDestination, FALLBACK_AVATAR_URL } from "@/lib/images";
 
 const AV = FALLBACK_AVATAR_URL;
@@ -60,15 +63,22 @@ export default function DestinationDetail() {
 
   useEffect(() => {
     if (!dest) return;
-    base44.entities.Trip.filter({ city: dest.city }).then(setTrips).catch(() => {});
+    const mockTrips = demoVisitorsForCity(dest.city);
+    base44.entities.Trip.filter({ city: dest.city })
+      .then((list) => {
+        const ids = new Set((list || []).map((t) => t.id));
+        const merged = [...(list || []), ...mockTrips.filter((m) => !ids.has(m.id))];
+        setTrips(merged.length ? merged : mockTrips);
+      })
+      .catch(() => setTrips(mockTrips));
     base44.entities.Event.filter({ city: dest.city })
       .then((list) => {
-        const mocks = eventsForCity(dest.city);
+        const mocks = eventsForCity(dest.city, dest.country);
         const ids = new Set((list || []).map((e) => e.id));
         const merged = [...(list || []), ...mocks.filter((m) => !ids.has(m.id))];
         setEvents(merged.length ? merged : mocks);
       })
-      .catch(() => setEvents(eventsForCity(dest.city)));
+      .catch(() => setEvents(eventsForCity(dest.city, dest.country)));
   }, [dest?.city]);
 
   useEffect(() => {
@@ -76,7 +86,21 @@ export default function DestinationDetail() {
     (async () => {
       const p = {};
       for (const id of ids) {
-        try { const r = await base44.functions.invoke("member-profile", { user_id: id }); p[id] = r.data?.profile; } catch {}
+        if (isSameAppUser(id, DEMO_USER.id) || id === "demo_user") {
+          p[id] = { name: DEMO_USER.profile_name, avatar: DEMO_USER.main_photo };
+          continue;
+        }
+        const mock = findMockMember(memberIdForTripCreator(id));
+        if (mock) {
+          p[id] = mock;
+          continue;
+        }
+        try {
+          const r = await base44.functions.invoke("member-profile", { user_id: id });
+          p[id] = r.data?.profile;
+        } catch {
+          /* skip */
+        }
       }
       setProfiles(p);
     })();
@@ -185,12 +209,14 @@ export default function DestinationDetail() {
           </Section>
 
           {/* Women */}
-          <Section icon={Users} title={`Women here (${Math.max(currently.length, stats.members)})`}>
-            <MemberStack list={currently} />
+          <Section icon={Users} title={`Women here (${currently.length || soon.length || stats.members})`}>
+            <MemberStack list={currently.length ? currently : soon} />
           </Section>
-          <Section icon={Users} title="Travelling soon">
-            <MemberStack list={soon} />
-          </Section>
+          {currently.length > 0 && soon.length > 0 && (
+            <Section icon={Users} title="Travelling soon">
+              <MemberStack list={soon} />
+            </Section>
+          )}
 
           {/* Venues */}
           <Section icon={Sparkles} title="Cafés">

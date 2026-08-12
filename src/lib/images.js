@@ -53,9 +53,9 @@ export const CITY_IMAGES = {
 export const HERO = {
   welcome: unsplash("1529156069898-49953e39b3ac", 1200),
   profileCover: unsplash("1473496169704-955ba7cf9663", 1200),
-  onboardMeet: unsplash("1469474968028-56645f2e2e1f", 900),
-  onboardEvents: unsplash("1529156069898-49953e39b3ac", 900),
-  onboardPlaces: unsplash("1533105079780-92b9be482077", 900),
+  onboardMeet: unsplash("1529156069898-49953e39b3ac", 1200, 1800),
+  onboardEvents: unsplash("1543269865-cbf224953034", 1200, 1800),
+  onboardPlaces: unsplash("1555881400-74d7acaacd8b", 1200, 1800),
   featured: unsplash("1513622470522-26c3c8a854bc", 800),
 };
 

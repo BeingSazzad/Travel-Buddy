@@ -1,4 +1,4 @@
-import { findMockMember } from "@/lib/member-profile";
+import { findMockMember, MOCK_MEMBERS, DEMO_FRIEND_MEMBER_IDS } from "@/lib/member-profile";
 import { DEMO_USER_DISPLAY_NAME } from "@/lib/demo-user";
 import { imageForCity } from "@/lib/trip-utils";
 
@@ -104,4 +104,50 @@ export function getMockTrips(userId = "demo_user") {
 
 export function findMockTrip(id, userId = "demo_user") {
   return getMockTrips(userId).find((t) => t.id === id);
+}
+
+export function mockTripsForCity(city, userId = "demo_user") {
+  const key = (city || "").toLowerCase();
+  if (!key) return [];
+  return getMockTrips(userId).filter((t) => {
+    const c = (t.city || "").toLowerCase();
+    if (c === key) return true;
+    if (key === "bali" && c === "ubud") return true;
+    if (key === "ubud" && c === "bali") return true;
+    return false;
+  });
+}
+
+/** Always return visitors for a destination page — trips first, then member itineraries, then friends planning a visit */
+export function demoVisitorsForCity(city, userId = "demo_user") {
+  const trips = mockTripsForCity(city, userId);
+  if (trips.length) return trips;
+
+  const key = (city || "").toLowerCase();
+  const fromProfiles = MOCK_MEMBERS.filter((m) => {
+    const c = (m.trip?.city || "").toLowerCase();
+    return c === key || (key === "bali" && c === "ubud") || (key === "ubud" && c === "bali");
+  }).map((m) => ({
+    id: `visit_${m.user_id}`,
+    created_by_id: m.user_id,
+    start_date: m.trip.start_date,
+    end_date: m.trip.end_date,
+    city: m.trip.city,
+    country: m.trip.country,
+  }));
+  if (fromProfiles.length) return fromProfiles;
+
+  return DEMO_FRIEND_MEMBER_IDS.slice(0, 2).map((id, i) => {
+    const start = new Date();
+    start.setDate(start.getDate() + 10 + i * 4);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    return {
+      id: `visit_plan_${id}_${key}`,
+      created_by_id: id,
+      start_date: start.toISOString().slice(0, 10),
+      end_date: end.toISOString().slice(0, 10),
+      city,
+    };
+  });
 }

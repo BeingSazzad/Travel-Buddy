@@ -15,8 +15,8 @@ export const DEMO_USER = {
   languages_spoken: ["English", "Danish"],
   biography:
     "Product designer who travels for food markets, design museums, and slow mornings with good coffee. Lisbon in August, then Ubud for a reset.",
-  travel_style: ["city breaks", "wellness", "food"],
-  interests: ["cafes", "culture", "photography", "hiking"],
+  travel_style: ["city breaks", "wellness"],
+  interests: ["cafes", "culture", "photography", "hiking", "food", "yoga"],
   profile_photos: memberPhotos("clara"),
   main_photo: memberAvatar("clara"),
   location_visibility: "approximate",

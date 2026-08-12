@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Globe, Camera, BadgeCheck, Pencil } from "lucide-react";
+import { MapPin, Globe, BadgeCheck, Pencil } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,14 +33,6 @@ export default function ProfileHeader() {
           alt={name}
           className="w-24 h-24 rounded-full object-cover border-4 border-card shadow-premium"
         />
-        <button
-          type="button"
-          onClick={() => navigate("/profile-setup")}
-          className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-card border border-border shadow-soft flex items-center justify-center active:scale-95 transition"
-          aria-label="Change photo"
-        >
-          <Camera className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-        </button>
       </div>
 
       <h2 className="font-display font-bold text-lg mt-3 flex items-center justify-center gap-1.5">

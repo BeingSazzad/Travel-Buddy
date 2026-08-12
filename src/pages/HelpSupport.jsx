@@ -38,7 +38,7 @@ export default function HelpSupport() {
         >
           <ArrowLeft className="w-5 h-5 text-foreground" strokeWidth={1.75} />
         </button>
-        <h1 className="font-display font-bold text-lg">Help & Support</h1>
+        <h1 className="page-title">Help & Support</h1>
       </ScrollPageHeader>
 
       <ScrollPageBody className="space-y-6">
@@ -46,50 +46,78 @@ export default function HelpSupport() {
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
             <HelpCircle className="w-6 h-6 text-primary" strokeWidth={1.5} />
           </div>
-          <p className="font-display font-bold text-base">How can we help you?</p>
-          <p className="text-xs text-muted-foreground mt-1">Frequently asked questions & member support</p>
+          <p className="font-display font-bold text-lg">How can we help you?</p>
+          <p className="text-sm text-muted-foreground mt-1">Frequently asked questions & member support</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={() => navigate("/community-guidelines")}
-            className="flex flex-col items-start p-4 rounded-2xl border border-border bg-card shadow-soft text-left active:scale-[0.98] transition"
-          >
-            <ShieldAlert className="w-5 h-5 text-primary mb-2" strokeWidth={1.5} />
-            <p className="font-semibold text-xs text-foreground">Community Rules</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Read safety guidelines</p>
-          </button>
           <a
             href="mailto:support@seluna.app"
             className="flex flex-col items-start p-4 rounded-2xl border border-border bg-card shadow-soft text-left active:scale-[0.98] transition"
           >
             <Mail className="w-5 h-5 text-primary mb-2" strokeWidth={1.5} />
-            <p className="font-semibold text-xs text-foreground">Email Support</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Contact support team</p>
+            <p className="font-semibold text-sm text-foreground">Email Support</p>
+            <p className="text-sm text-muted-foreground mt-0.5">We reply within 24 hours</p>
           </a>
+          <button
+            type="button"
+            onClick={() => navigate("/community-guidelines")}
+            className="flex flex-col items-start p-4 rounded-2xl border border-border bg-card shadow-soft text-left active:scale-[0.98] transition"
+          >
+            <ShieldAlert className="w-5 h-5 text-primary mb-2" strokeWidth={1.5} />
+            <p className="font-semibold text-sm text-foreground">Safety</p>
+            <p className="text-sm text-muted-foreground mt-0.5">Community guidelines</p>
+          </button>
         </div>
 
         <div>
-          <h2 className="font-display font-semibold text-sm mb-3">Frequently Asked Questions</h2>
+          <h2 className="section-header mb-3">Frequently Asked Questions</h2>
           <div className="space-y-3">
             {FAQ.map((f, i) => (
               <div key={i} className="rounded-2xl border border-border/80 bg-card p-4 shadow-soft">
-                <p className="font-semibold text-xs text-foreground mb-1">{f.q}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">{f.a}</p>
+                <p className="row-title text-foreground mb-1">{f.q}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{f.a}</p>
               </div>
             ))}
           </div>
         </div>
 
         <div className="rounded-2xl bg-primary/10 p-4 text-center">
-          <p className="font-semibold text-xs text-brand-strong">Still need assistance?</p>
-          <p className="text-[11px] text-muted-foreground mt-1">Our support team responds within 24 hours.</p>
+          <p className="font-semibold text-sm text-brand-strong">Still need assistance?</p>
+          <p className="text-sm text-muted-foreground mt-1">Our support team responds within 24 hours.</p>
           <a
             href="mailto:support@seluna.app"
-            className="inline-block mt-3 px-4 py-2 rounded-full bg-primary text-white text-xs font-semibold shadow-soft active:scale-95 transition"
+            className="inline-block mt-3 px-4 py-2 rounded-full bg-primary text-white text-sm font-semibold shadow-soft active:scale-95 transition"
           >
             Contact Support
           </a>
+        </div>
+
+        <div>
+          <h2 className="section-header mb-3">Legal</h2>
+          <div className="bg-card border border-border/80 shadow-soft rounded-2xl overflow-hidden divide-y divide-border/60">
+            <button
+              type="button"
+              onClick={() => navigate("/community-guidelines")}
+              className="w-full text-left px-4 py-3.5 row-title"
+            >
+              Community Guidelines
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/terms")}
+              className="w-full text-left px-4 py-3.5 row-title"
+            >
+              Terms & Conditions
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/privacy")}
+              className="w-full text-left px-4 py-3.5 row-title"
+            >
+              Privacy Policy
+            </button>
+          </div>
         </div>
       </ScrollPageBody>
     </ScrollPage>

@@ -102,6 +102,26 @@ export const MOCK_MEMBERS = [
       end_date: "2026-08-28",
     },
   },
+  {
+    user_id: "mock_6",
+    name: "Nina Costa",
+    first_name: "Nina",
+    age: 31,
+    current_city: "Barcelona",
+    country: "Spain",
+    bio: "City walker who likes late dinners and long evenings by the water. Prefer a smaller circle.",
+    main_photo: memberAvatar("mock_6"),
+    avatar: memberAvatar("mock_6"),
+    profile_photos: memberPhotos("mock_6"),
+    languages: ["English", "Spanish", "Catalan"],
+    interests: ["Food", "Nightlife", "Culture"],
+    trip: {
+      city: "Barcelona",
+      country: "Spain",
+      start_date: "2026-07-02",
+      end_date: "2026-07-08",
+    },
+  },
 ];
 
 /** Mutual matches — friends list, messaging, "Remove friend" */
@@ -110,9 +130,16 @@ export const DEMO_FRIEND_MEMBER_IDS = ["mock_2", "mock_4"];
 /** They liked you — connection requests, not in discover deck */
 export const DEMO_INCOMING_REQUEST_IDS = ["mock_3", "mock_5"];
 
-/** Match deck — not friends, no pending incoming request */
+/** Blocked from messages / discover — Settings → Blocked */
+export const DEMO_BLOCKED_MEMBER_IDS = ["mock_6"];
+
+/** Match deck — not friends, no pending incoming request, not blocked */
 export function getDiscoverDeckMembers() {
-  const excluded = new Set([...DEMO_FRIEND_MEMBER_IDS, ...DEMO_INCOMING_REQUEST_IDS]);
+  const excluded = new Set([
+    ...DEMO_FRIEND_MEMBER_IDS,
+    ...DEMO_INCOMING_REQUEST_IDS,
+    ...DEMO_BLOCKED_MEMBER_IDS,
+  ]);
   return MOCK_MEMBERS.filter((m) => !excluded.has(m.user_id));
 }
 
@@ -172,6 +199,20 @@ export function getMockFriends() {
       img: m.avatar,
       convId: getMockConversationId(m.user_id),
       memberId: m.user_id,
+    };
+  }).filter(Boolean);
+}
+
+export function getMockBlockedMembers() {
+  return DEMO_BLOCKED_MEMBER_IDS.map((id) => {
+    const m = findMockMember(id);
+    if (!m) return null;
+    return {
+      id: `mock_block_${id}`,
+      blocked_user_id: id,
+      reason: "block",
+      created_by_id: "mock-user-123",
+      profile: m,
     };
   }).filter(Boolean);
 }

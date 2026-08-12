@@ -137,6 +137,27 @@ img { -webkit-user-drag: none; }
     hsl(0 0% 0% / 0.15) 100%
   );
 }
+/* Onboarding full-bleed — status-bar fade + deep bottom scrim for type */
+.gradient-overlay-onboarding {
+  @apply absolute inset-0 pointer-events-none;
+  background:
+    linear-gradient(
+      180deg,
+      hsl(var(--brand-espresso) / 0.42) 0%,
+      hsl(var(--brand-espresso) / 0.12) 14%,
+      transparent 32%,
+      hsl(var(--brand-espresso) / 0.45) 52%,
+      hsl(var(--brand-espresso) / 0.82) 68%,
+      hsl(0 0% 0% / 0.92) 86%,
+      hsl(0 0% 0% / 0.97) 100%
+    );
+}
+.onboard-inset {
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 1.25rem));
+  padding-left: max(1.5rem, calc(env(safe-area-inset-left) + 1.25rem));
+  padding-right: max(1.5rem, calc(env(safe-area-inset-right) + 1.25rem));
+}
 .gradient-brand {
   background: linear-gradient(135deg, hsl(var(--brand-espresso)) 0%, hsl(var(--brand-walnut)) 48%, hsl(var(--brand-caramel)) 100%);
 }
@@ -144,37 +165,83 @@ img { -webkit-user-drag: none; }
   background: linear-gradient(90deg, hsl(var(--brand-espresso)) 0%, hsl(var(--brand-walnut)) 50%, hsl(var(--brand-caramel)) 100%);
 }
 .gradient-brand-accent {
-  background: linear-gradient(
-    155deg,
-    hsl(var(--brand-sand)) 0%,
-    hsl(25 30% 44%) 100%
-  );
-}
-/* Primary CTA buttons — smooth bronze, not harsh white */
-.gradient-brand-button {
-  background: linear-gradient(
-    165deg,
-    hsl(25 28% 50%) 0%,
-    hsl(25 32% 40%) 100%
-  );
+  background:
+    linear-gradient(180deg, hsl(0 0% 100% / 0.16) 0%, transparent 42%),
+    linear-gradient(
+      152deg,
+      hsl(32 42% 58%) 0%,
+      hsl(var(--brand-sand)) 38%,
+      hsl(25 32% 40%) 100%
+    );
   color: hsl(0 0% 100%);
-  border: 1px solid hsl(var(--brand-gold) / 0.22);
-  box-shadow: 0 2px 12px -3px hsl(25 35% 18% / 0.35);
+  box-shadow:
+    0 1px 0 hsl(0 0% 100% / 0.2) inset,
+    0 3px 10px -3px hsl(25 40% 18% / 0.4);
+}
+/* Primary CTA — champagne highlight → sand mid → deep bronze */
+.gradient-brand-button {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, hsl(0 0% 100% / 0.22) 0%, hsl(0 0% 100% / 0.06) 28%, transparent 55%),
+    radial-gradient(ellipse 90% 70% at 12% 0%, hsl(40 70% 78% / 0.55) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 80% at 100% 100%, hsl(20 45% 22% / 0.35) 0%, transparent 50%),
+    linear-gradient(
+      155deg,
+      hsl(36 48% 62%) 0%,
+      hsl(30 40% 52%) 28%,
+      hsl(var(--brand-sand)) 52%,
+      hsl(25 34% 38%) 78%,
+      hsl(var(--brand-walnut)) 100%
+    );
+  background-size: 100% 100%;
+  color: hsl(0 0% 100%);
+  border: 1px solid hsl(38 50% 68% / 0.4);
+  text-shadow: 0 1px 1px hsl(25 40% 12% / 0.28);
+  box-shadow:
+    0 1px 0 hsl(0 0% 100% / 0.28) inset,
+    0 -1px 0 hsl(25 40% 12% / 0.12) inset,
+    0 6px 18px -6px hsl(25 42% 16% / 0.5),
+    0 2px 6px -2px hsl(25 35% 20% / 0.28);
+  transition:
+    filter 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 .gradient-brand-button:hover {
-  filter: brightness(1.06);
+  filter: brightness(1.08) saturate(1.06);
+  box-shadow:
+    0 1px 0 hsl(0 0% 100% / 0.32) inset,
+    0 -1px 0 hsl(25 40% 12% / 0.1) inset,
+    0 8px 22px -6px hsl(25 42% 16% / 0.55),
+    0 3px 8px -2px hsl(25 35% 20% / 0.32);
 }
 .gradient-brand-button:active {
-  filter: brightness(0.96);
+  filter: brightness(0.94) saturate(1.02);
+  box-shadow:
+    0 1px 0 hsl(0 0% 100% / 0.14) inset,
+    0 2px 8px -4px hsl(25 42% 16% / 0.45);
 }
 .dark .gradient-brand-button {
-  background: linear-gradient(
-    165deg,
-    hsl(25 28% 54%) 0%,
-    hsl(25 32% 42%) 100%
-  );
-  border-color: hsl(var(--brand-gold) / 0.2);
-  box-shadow: 0 2px 14px -3px hsl(0 0% 0% / 0.45);
+  background:
+    linear-gradient(180deg, hsl(0 0% 100% / 0.14) 0%, transparent 40%),
+    radial-gradient(ellipse 90% 70% at 14% 0%, hsl(38 55% 62% / 0.4) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 70% at 100% 110%, hsl(20 40% 12% / 0.55) 0%, transparent 48%),
+    linear-gradient(
+      155deg,
+      hsl(32 38% 48%) 0%,
+      hsl(28 36% 42%) 32%,
+      hsl(25 32% 34%) 62%,
+      hsl(var(--brand-walnut)) 100%
+    );
+  border-color: hsl(38 45% 58% / 0.32);
+  box-shadow:
+    0 1px 0 hsl(0 0% 100% / 0.14) inset,
+    0 -1px 0 hsl(0 0% 0% / 0.25) inset,
+    0 8px 22px -6px hsl(0 0% 0% / 0.55);
+}
+.dark .gradient-brand-button:hover {
+  filter: brightness(1.1) saturate(1.05);
 }
 .gradient-brand-soft {
   background: linear-gradient(135deg, hsl(var(--brand-sand) / 0.14) 0%, hsl(var(--brand-gold) / 0.22) 100%);
@@ -277,7 +344,14 @@ img { -webkit-user-drag: none; }
 }
 /* Circular primary action (add / send on main tabs) */
 .fab-primary {
-  @apply gradient-brand-button shadow-sm flex items-center justify-center active:scale-95 transition;
+  @apply gradient-brand-button flex items-center justify-center text-white active:scale-95 transition duration-200;
+  box-shadow:
+    0 1px 0 hsl(0 0% 100% / 0.3) inset,
+    0 8px 20px -6px hsl(25 45% 18% / 0.55),
+    0 2px 6px -2px hsl(25 40% 20% / 0.35);
+}
+.fab-primary:hover {
+  filter: brightness(1.1) saturate(1.05);
 }
 
 /* Auth screens */
@@ -289,7 +363,7 @@ img { -webkit-user-drag: none; }
   text-decoration: underline;
 }
 .auth-input {
-  @apply h-12 rounded-2xl border-border/80 bg-background/80 focus-visible:ring-[hsl(var(--brand-sand)/0.35)];
+  @apply h-12 rounded-2xl border-border/70 bg-background/90 focus-visible:ring-[hsl(var(--brand-sand)/0.4)] focus-visible:border-primary/40;
 }
 
 .nav-pill-active {

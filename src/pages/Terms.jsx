@@ -46,7 +46,7 @@ export default function Terms() {
         >
           <ArrowLeft className="w-5 h-5 text-foreground" strokeWidth={1.75} />
         </button>
-        <h1 className="font-display font-bold text-lg">Terms & Conditions</h1>
+        <h1 className="page-title">Terms & Conditions</h1>
       </ScrollPageHeader>
 
       <ScrollPageBody className="space-y-5">
@@ -54,22 +54,22 @@ export default function Terms() {
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
             <FileText className="w-6 h-6 text-primary" strokeWidth={1.5} />
           </div>
-          <p className="font-display font-bold text-base">Seluna Terms of Service</p>
-          <p className="text-xs text-muted-foreground mt-1">Last updated: August 2026</p>
+          <p className="font-display font-bold text-lg">Seluna Terms of Service</p>
+          <p className="text-sm text-muted-foreground mt-1">Last updated: August 2026</p>
         </div>
 
         <div className="space-y-4">
           {SECTIONS.map((s) => (
             <div key={s.title} className="rounded-2xl border border-border/80 bg-card p-4 shadow-soft">
-              <h2 className="font-semibold text-sm text-foreground mb-1.5">{s.title}</h2>
-              <p className="text-xs text-muted-foreground leading-relaxed">{s.body}</p>
+              <h2 className="row-title text-foreground mb-1.5">{s.title}</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
             </div>
           ))}
         </div>
 
         <div className="rounded-2xl bg-primary/5 border border-primary/15 p-4 flex gap-3 mt-6">
           <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" strokeWidth={1.5} />
-          <p className="text-xs text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             If you have any questions regarding our Terms & Conditions, please contact Seluna Support through the Help section in your profile settings.
           </p>
         </div>

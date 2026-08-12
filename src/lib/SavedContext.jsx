@@ -22,8 +22,8 @@ export function SavedProvider({ children }) {
       } else {
         setItems(list);
       }
-    } catch (e) {
-      setItems([]);
+    } catch {
+      setItems(useDemoFallbacks ? MOCK_SAVED_ITEMS : []);
     } finally {
       setLoading(false);
     }

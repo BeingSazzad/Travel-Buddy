@@ -1,26 +1,25 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { HERO } from '@/lib/images';
-import OnboardingSlide from '@/components/onboarding/OnboardingSlide';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { HERO } from "@/lib/images";
+import { markOnboardingDone } from "@/lib/launch-flow";
 
 const slides = [
   {
     image: HERO.onboardMeet,
-    title: 'Meet women travelling to the same destination',
-    description: 'Find women heading to the same city or trip. Match, chat and plan your journey together before you even land.',
+    title: "Meet women travelling the same way",
+    description: "Find companions heading to your city. Match, chat and plan before you even land.",
   },
   {
     image: HERO.onboardEvents,
-    title: 'Join events and make real connections',
-    description: 'From sunset yoga to wine nights and travel mixers — join meetups that turn strangers into friends.',
+    title: "Join events that feel like real life",
+    description: "Yoga mornings, wine nights, travel mixers — meetups that turn strangers into friends.",
   },
   {
     image: HERO.onboardPlaces,
-    title: 'Discover trusted places recommended by women',
-    description: 'Cafés, hotels and hidden gems vetted by women like you. Reviews you can trust, for places you’ll love.',
+    title: "Places women actually trust",
+    description: "Cafés, stays and hidden gems recommended by members like you — not anonymous reviews.",
   },
 ];
 
@@ -28,61 +27,102 @@ export default function Onboarding() {
   const [i, setI] = useState(0);
   const navigate = useNavigate();
   const isLast = i === slides.length - 1;
+  const slide = slides[i];
 
-  const next = () => (isLast ? navigate('/register') : setI(i + 1));
-  const back = () => setI(i - 1);
-  const skip = () => navigate('/register');
+  const finish = (to = "/welcome") => {
+    markOnboardingDone();
+    navigate(to, { replace: true });
+  };
+
+  const next = () => (isLast ? finish("/register") : setI((n) => n + 1));
+  const skip = () => finish("/welcome");
 
   return (
-    <div className="flex flex-col min-h-screen bg-background gradient-top-bg">
-      <div className="flex justify-end app-px safe-pt">
-        <button onClick={skip} className="text-sm font-medium text-muted-foreground hover:text-foreground">
-          Skip
-        </button>
-      </div>
+    <div className="relative min-h-screen min-h-dvh flex flex-col font-body overflow-hidden bg-[hsl(var(--brand-espresso))]">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={i}
+          className="absolute inset-0"
+          initial={{ opacity: 0, scale: 1.04 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <img
+            src={slide.image}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="gradient-overlay-onboarding" />
+        </motion.div>
+      </AnimatePresence>
 
-      <div className="flex-1 px-5 pt-6">
+      <div className="relative z-10 flex-1 flex flex-col justify-end onboard-inset">
         <AnimatePresence mode="wait">
           <motion.div
-            key={i}
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -30 }}
-            transition={{ duration: 0.3 }}
+            key={`copy-${i}`}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            className="text-left mb-8"
           >
-            <OnboardingSlide {...slides[i]} />
+            <h2 className="font-display font-bold text-[1.7rem] text-white leading-[1.2] tracking-tight max-w-[18ch] drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)]">
+              {slide.title}
+            </h2>
+            <p className="text-[15px] text-white/90 mt-3 leading-relaxed max-w-[34ch] drop-shadow-[0_1px_6px_rgba(0,0,0,0.4)]">
+              {slide.description}
+            </p>
           </motion.div>
         </AnimatePresence>
-      </div>
 
-      <div className="flex justify-center gap-2 pb-5">
-        {slides.map((_, idx) => (
-          <span
-            key={idx}
-            className={cn(
-              'h-1.5 rounded-full transition-all duration-300',
-              idx === i ? 'w-6 bg-[hsl(var(--brand-sand))]' : 'w-1.5 bg-foreground/20'
-            )}
-          />
-        ))}
-      </div>
+        <div className="flex items-center justify-center gap-2 mb-7" aria-label="Onboarding progress">
+          {slides.map((_, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => setI(idx)}
+              className={cn(
+                "rounded-full transition-all duration-300 tap-feedback",
+                idx === i ? "w-2 h-2 bg-brand-gold" : "w-2 h-2 bg-white/40"
+              )}
+              aria-label={`Go to slide ${idx + 1}`}
+              aria-current={idx === i ? "step" : undefined}
+            />
+          ))}
+        </div>
 
-      <div className="px-5 pb-10 flex gap-3">
-        {i > 0 && (
-          <button
-            onClick={back}
-            className="h-12 px-6 rounded-2xl border border-border text-sm font-semibold text-foreground active:scale-[0.97] transition-transform flex items-center justify-center"
-          >
-            Back
-          </button>
-        )}
-        <button
-          onClick={next}
-          className="flex-1 h-12 rounded-2xl gradient-brand-accent text-white text-base font-bold shadow-sm flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
-        >
-          {isLast ? 'Get started' : 'Continue'}
-          <ArrowRight className="w-5 h-5" />
-        </button>
+        <div className="flex items-center justify-between min-h-12">
+          {!isLast ? (
+            <>
+              <button
+                type="button"
+                onClick={skip}
+                className="text-[15px] font-semibold text-white/80 hover:text-white tap-feedback px-1 py-2"
+              >
+                Skip
+              </button>
+              <button
+                type="button"
+                onClick={next}
+                className="text-[15px] font-semibold text-white hover:text-brand-gold tap-feedback px-1 py-2"
+              >
+                Next
+              </button>
+            </>
+          ) : (
+            <>
+              <span aria-hidden="true" />
+              <button
+                type="button"
+                onClick={() => finish("/register")}
+                className="h-11 px-7 rounded-full gradient-brand-button text-[15px] font-bold tap-feedback"
+              >
+                Get started
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
