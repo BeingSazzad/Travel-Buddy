@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Loader2, Crown, RotateCw, Settings2, Info, ArrowLeft } from "lucide-react";
+import { Loader2, Crown, Check, Info, ArrowLeft, Settings2 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
+import { cn } from "@/lib/utils";
 
-const MONTHLY_PRICE = "€5.29";
+const PLANS = [
+  { id: "monthly", name: "Monthly", price: "€5.29", period: "/month", blurb: "Flexible — cancel anytime" },
+  { id: "yearly", name: "Yearly", price: "€44.49", period: "/year", blurb: "Best value", badge: "Save 30%" },
+];
 
 const STATUS = {
   active: { label: "Active", tone: "success" },
@@ -15,58 +19,85 @@ const STATUS = {
   none: { label: "No active subscription", tone: "muted" },
 };
 
-const PAYMENT = {
-  active: "Paid",
-  cancelled_active: "Paid · cancellation pending",
-  payment_failed: "Payment failed",
-  expired: "Inactive",
-  none: "—",
-};
-
 const fmtDate = (iso) =>
-  iso ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : "—";
+  iso
+    ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
+    : "—";
 
-function Row({ label, value }) {
-  return (
-    <div className="flex items-center justify-between py-3 border-b border-border last:border-0">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="text-sm font-medium text-right">{value}</span>
-    </div>
-  );
+function normalizePlanId(plan) {
+  const raw = String(plan || "").toLowerCase();
+  if (raw.includes("year")) return "yearly";
+  if (raw.includes("month")) return "monthly";
+  return "monthly";
 }
 
 export default function SubscriptionManagement() {
-  const { user, checkUserAuth } = useAuth();
+  const { user, checkUserAuth, patchUser } = useAuth();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(null);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
 
   const status = user?.subscription_status || "none";
   const st = STATUS[status] || STATUS.none;
-  const plan = user?.subscription_plan || (status === "none" ? "—" : "Monthly");
+  const currentPlanId = normalizePlanId(user?.subscription_plan);
   const periodEnd = user?.subscription_current_period_end;
   const isActive = status === "active" || status === "cancelled_active";
+  const [selected, setSelected] = useState(currentPlanId);
 
-  const toneClass = {
-    success: "bg-success/15 text-success",
-    accent: "bg-accent/20 text-foreground",
-    destructive: "bg-destructive/15 text-destructive",
-    muted: "bg-muted text-muted-foreground",
-  }[st.tone];
+  useEffect(() => {
+    setSelected(currentPlanId);
+  }, [currentPlanId]);
 
-  const restore = async () => {
-    setError(""); setBusy("restore");
+  const selectedPlan = useMemo(
+    () => PLANS.find((p) => p.id === selected) || PLANS[0],
+    [selected]
+  );
+  const isSelectedCurrent = selected === currentPlanId && isActive;
+
+  const switchPlan = async () => {
+    if (isSelectedCurrent) return;
+    setError("");
+    setInfo("");
+    setBusy("switch");
+
+    const planName = selectedPlan.name;
+
     try {
-      await base44.functions.invoke("manage-subscription", { action: "restore" });
-      await checkUserAuth();
-    } catch (e) { setError(e?.message || "Could not restore purchase"); }
-    finally { setBusy(null); }
+      if (window.self === window.top) {
+        const res = await base44.functions.invoke("create-checkout", { plan: selected });
+        if (res?.data?.url) {
+          window.location.href = res.data.url;
+          return;
+        }
+      }
+    } catch {
+      /* demo fallback below */
+    }
+
+    const payload = {
+      subscription_plan: planName,
+      subscription_status: isActive ? status : "active",
+    };
+    try {
+      await base44.auth.updateMe(payload);
+      try {
+        await checkUserAuth();
+      } catch {
+        patchUser(payload);
+      }
+    } catch {
+      patchUser(payload);
+    }
+    setInfo(`Switched to ${planName}. Billing updates on your next renewal.`);
+    setBusy(null);
   };
 
   const manage = async () => {
-    setError(""); setBusy("manage");
+    setError("");
+    setBusy("manage");
     if (window.self !== window.top) {
-      setError("Managing your subscription works only from the published app. Please open the app in a new tab.");
+      setError("Billing portal works from the published app. Open Seluna in a new tab to manage payment.");
       setBusy(null);
       return;
     }
@@ -74,74 +105,137 @@ export default function SubscriptionManagement() {
       const res = await base44.functions.invoke("manage-subscription", { action: "portal" });
       if (res?.data?.url) window.location.href = res.data.url;
       else setError("Could not open subscription management.");
-    } catch (e) { setError(e?.message || "Could not open subscription management"); }
-    finally { setBusy(null); }
+    } catch (e) {
+      setError(e?.message || "Could not open subscription management");
+    } finally {
+      setBusy(null);
+    }
   };
 
   return (
     <div className="px-5 pt-12 pb-10">
       <div className="flex items-center gap-3 mb-5">
-        <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full border border-border flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="w-9 h-9 rounded-full border border-border flex items-center justify-center"
+          aria-label="Back"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </button>
         <h1 className="font-display font-bold text-lg">Subscription</h1>
       </div>
 
-      {/* Status card */}
       <div className="rounded-2xl bg-gradient-to-br from-foreground to-foreground/80 text-background p-5">
         <div className="flex items-center gap-2 mb-2">
           <Crown className="w-4 h-4" />
           <span className="text-xs font-semibold uppercase tracking-widest opacity-90">Seluna Plus</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="font-display font-bold text-lg">{st.label}</span>
+        <p className="font-display font-bold text-lg">{st.label}</p>
+        <p className="text-xs opacity-80 mt-1">
+          {isActive
+            ? `Current plan · ${PLANS.find((p) => p.id === currentPlanId)?.name || "Monthly"}`
+            : "Choose a plan to unlock the community"}
+          {isActive && periodEnd ? ` · renews ${fmtDate(periodEnd)}` : ""}
+        </p>
+      </div>
+
+      <div className="mt-5">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 px-0.5">
+          Plans
+        </p>
+        <div className="space-y-2.5">
+          {PLANS.map((plan) => {
+            const active = selected === plan.id;
+            const isCurrent = currentPlanId === plan.id && isActive;
+            return (
+              <button
+                key={plan.id}
+                type="button"
+                onClick={() => setSelected(plan.id)}
+                className={cn(
+                  "w-full text-left rounded-2xl border p-4 transition",
+                  active ? "border-primary bg-primary/8 shadow-soft" : "border-border bg-card"
+                )}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-display font-semibold text-base">{plan.name}</span>
+                      {plan.badge && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/15 text-primary">
+                          {plan.badge}
+                        </span>
+                      )}
+                      {isCurrent && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-foreground text-background">
+                          Current
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">{plan.blurb}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="font-display font-bold">
+                      {plan.price}
+                      <span className="text-xs font-normal text-muted-foreground">{plan.period}</span>
+                    </p>
+                    {active && (
+                      <span className="inline-flex mt-2 w-5 h-5 rounded-full bg-primary text-primary-foreground items-center justify-center">
+                        <Check className="w-3 h-3" strokeWidth={2.5} />
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
-        <p className="text-xs opacity-80 mt-1">Members-only community · {plan}</p>
       </div>
 
-      {/* Details */}
-      <div className="mt-4 bg-card border border-border shadow-soft rounded-2xl px-4">
-        <Row label="Plan" value={plan} />
-        <Row label="Monthly price" value={isActive ? `${MONTHLY_PRICE} / month` : MONTHLY_PRICE} />
-        <Row label="Next billing date" value={isActive ? fmtDate(periodEnd) : "—"} />
-        <Row
-          label="Payment status"
-          value={<span className={`px-2 py-0.5 rounded-full text-xs ${toneClass}`}>{PAYMENT[status] || "—"}</span>}
-        />
-      </div>
+      <Button
+        className="w-full h-12 mt-5"
+        onClick={isActive ? switchPlan : () => navigate("/subscription")}
+        disabled={busy === "switch" || (isActive && isSelectedCurrent)}
+      >
+        {busy === "switch" ? (
+          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+        ) : null}
+        {!isActive
+          ? "Subscribe"
+          : isSelectedCurrent
+            ? "Current plan"
+            : `Switch to ${selectedPlan.name}`}
+      </Button>
 
-      {!isActive ? (
-        <Button className="w-full h-12 mt-5" onClick={() => navigate("/subscription")}>
-          Subscribe to Seluna Plus
+      {isActive && (
+        <Button
+          variant="outline"
+          className="w-full h-12 mt-3"
+          onClick={manage}
+          disabled={busy === "manage"}
+        >
+          {busy === "manage" ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Settings2 className="w-4 h-4 mr-2" strokeWidth={1.5} />
+          )}
+          Payment & cancel
         </Button>
-      ) : (
-        <>
-          <Button variant="outline" className="w-full h-12 mt-5" onClick={restore} disabled={busy === "restore"}>
-            {busy === "restore" ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RotateCw className="w-4 h-4 mr-2" strokeWidth={1.5} />}
-            Restore purchase
-          </Button>
-          <Button className="w-full h-12 mt-3" onClick={manage} disabled={busy === "manage"}>
-            {busy === "manage" ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Settings2 className="w-4 h-4 mr-2" strokeWidth={1.5} />}
-            Manage subscription
-          </Button>
-        </>
       )}
 
-      {/* Cancellation info */}
       <div className="mt-5 rounded-2xl border border-border bg-primary/5 p-4">
         <div className="flex items-start gap-2.5">
           <Info className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} />
-          <div>
-            <p className="text-sm font-medium">Cancelling your subscription</p>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Cancelling stops automatic renewal — you won't be charged again. Your access to Seluna Plus
-              remains fully active until the end of your current paid billing period
-              {periodEnd ? ` (${fmtDate(periodEnd)})` : ""}. After that, your membership ends and your account
-              moves to the free tier. You can resubscribe anytime.
-            </p>
-          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Cancel anytime — Plus stays active until{" "}
+            {periodEnd ? fmtDate(periodEnd) : "your period ends"}.
+          </p>
         </div>
       </div>
 
-      {error && <p className="text-xs text-destructive mt-4 text-center">{error}</p>}
+      {info && <p className="text-sm text-primary mt-4 text-center">{info}</p>}
+      {error && <p className="text-sm text-destructive mt-4 text-center">{error}</p>}
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -16,7 +16,6 @@ import Friends from '@/pages/Friends';
 import Events from '@/pages/Events';
 import Profile from '@/pages/Profile';
 import Saved from '@/pages/Saved';
-import Category from '@/pages/Category';
 import Reviews from '@/pages/Reviews';
 import Welcome from '@/pages/Welcome';
 import Splash from '@/pages/Splash';
@@ -74,13 +73,22 @@ import PrivacySettings from '@/pages/PrivacySettings';
 import NotificationSettings from '@/pages/NotificationSettings';
 import BlockedMembers from '@/pages/BlockedMembers';
 import DeleteAccount from '@/pages/DeleteAccount';
+import EditPhotos from '@/pages/EditPhotos';
+import EditPersonalDetails from '@/pages/EditPersonalDetails';
+import EditTravelInterests from '@/pages/EditTravelInterests';
 import Terms from '@/pages/Terms';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import HelpSupport from '@/pages/HelpSupport';
 import CommunityGuidelines from '@/pages/CommunityGuidelines';
 import { ShieldAlert } from "lucide-react";
 import PageTransition from "@/components/PageTransition";
+import ErrorBoundary from "@/components/common/ErrorBoundary";
 // Add page imports here
+
+function RouteErrorBoundary({ children }) {
+  const location = useLocation();
+  return <ErrorBoundary resetKey={location.pathname}>{children}</ErrorBoundary>;
+}
 
 function getAgeFromDob(dob) {
   if (!dob) return null;
@@ -105,7 +113,7 @@ const AuthenticatedApp = () => {
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
+      <div className="fixed inset-0 flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-4 border-muted border-t-foreground rounded-full animate-spin"></div>
       </div>
     );
@@ -265,6 +273,11 @@ const AuthenticatedApp = () => {
         <Route path="/help" element={<HelpSupport />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/edit/photos" element={<EditPhotos />} />
+        <Route path="/profile/edit/details" element={<EditPersonalDetails />} />
+        <Route path="/profile/edit/preferences" element={<EditTravelInterests />} />
+        <Route path="/profile/edit/interests" element={<Navigate to="/profile/edit/preferences" replace />} />
+        <Route path="/profile/edit/about" element={<Navigate to="/profile/edit/details" replace />} />
         <Route path="/profile/privacy" element={<PrivacySettings />} />
         <Route path="/profile/notifications" element={<NotificationSettings />} />
         <Route path="/profile/blocked" element={<BlockedMembers />} />
@@ -319,7 +332,9 @@ function App() {
               <ScrollToTop />
               <SavedProvider>
                 <div className="flex-1 min-h-0 h-full overflow-hidden flex flex-col min-w-0 max-w-full">
-                <AuthenticatedApp />
+                <RouteErrorBoundary>
+                  <AuthenticatedApp />
+                </RouteErrorBoundary>
                 </div>
               </SavedProvider>
             </Router>

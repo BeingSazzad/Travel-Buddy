@@ -1,53 +1,75 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Star, Bookmark } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 import { Image } from "@/components/ui/image";
-import { useSaved } from "@/lib/SavedContext";
-import { cn } from "@/lib/utils";
+import SaveButton from "@/components/common/SaveButton";
 import { PRICE_LABELS } from "@/lib/restaurants";
 
 export default function RestaurantCard({ restaurant }) {
-  const { isSaved, toggle } = useSaved();
   const navigate = useNavigate();
   const r = restaurant;
-  const key = `restaurant:${r.name}`;
-  const saved = isSaved(key);
 
   return (
-    <div onClick={() => navigate(`/restaurants/${encodeURIComponent(r.name)}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card interactive-card group">
-      <div className="relative h-40">
-        <Image src={r.image} alt={r.name} fittingType="fill" className="w-full h-full image-zoom" />
-        <div className="gradient-overlay-soft" />
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); e.preventDefault(); toggle({ type: "restaurant", title: r.name, location: r.city, country: r.country, image: r.image, rating: r.rating }); }}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center tap-feedback"
-          aria-label={saved ? "Unsave" : "Save"}
-        >
-          <span key={saved ? "on" : "off"} className={cn("inline-flex", saved && "save-pop")}>
-            <Bookmark className={cn("w-4 h-4", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
-          </span>
-        </button>
-        <span className="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-brand-strong font-medium">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => navigate(`/restaurants/${encodeURIComponent(r.name)}`)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate(`/restaurants/${encodeURIComponent(r.name)}`);
+        }
+      }}
+      className="rounded-3xl overflow-hidden border border-border/60 shadow-soft bg-card interactive-card group text-left cursor-pointer"
+    >
+      <div className="relative h-44">
+        <Image src={r.image} alt={r.name} fittingType="fill" className="w-full h-full object-cover image-zoom" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10 pointer-events-none" />
+        <div className="absolute top-3 right-3 z-20" onClick={(e) => e.stopPropagation()}>
+          <SaveButton
+            item={{
+              type: "restaurant",
+              title: r.name,
+              location: r.city,
+              country: r.country,
+              image: r.image,
+              rating: r.rating,
+            }}
+            variant="overlay"
+          />
+        </div>
+        <span className="absolute top-3 left-3 text-[11px] px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/15 font-medium">
           {PRICE_LABELS[r.price]}
         </span>
-        <span className="absolute bottom-2 left-2 text-xs px-2 py-0.5 rounded-full bg-primary text-white">{r.cuisine}</span>
+        {r.cuisine && (
+          <span className="absolute bottom-3 left-3 text-[11px] px-2.5 py-1 rounded-full bg-primary text-primary-foreground font-medium">
+            {r.cuisine}
+          </span>
+        )}
       </div>
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-base leading-tight">{r.name}</h3>
-          <span className="flex items-center gap-1 text-sm shrink-0">
-            <Star className="w-3.5 h-3.5 fill-primary text-primary" strokeWidth={0} />
-            <span className="font-medium">{r.rating.toFixed(1)}</span>
+
+      <div className="px-4 pt-3.5 pb-4">
+        <h3 className="font-display font-semibold text-[1.05rem] leading-snug tracking-tight">
+          {r.name}
+        </h3>
+
+        <div className="mt-1.5 flex items-center gap-1.5 text-sm min-w-0">
+          <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold shrink-0" strokeWidth={0} />
+          <span className="font-semibold tabular-nums">{r.rating.toFixed(1)}</span>
+          <span className="text-muted-foreground/50">·</span>
+          <span className="text-muted-foreground truncate">
+            {r.reviews.toLocaleString()} reviews
           </span>
         </div>
-        <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-          <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
-          <span>{r.city}, {r.country}</span>
-          <span className="mx-1">·</span>
-          <span>{r.distance} km</span>
-        </div>
-        <p className="text-xs text-muted-foreground mt-1">{r.reviews} reviews</p>
+
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
+          <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
+          <span className="truncate">
+            {r.city}, {r.country}
+            <span className="text-muted-foreground/50"> · </span>
+            {r.distance} km
+          </span>
+        </p>
       </div>
     </div>
   );

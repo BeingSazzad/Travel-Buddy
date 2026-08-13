@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { MapPin, Calendar } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import SaveButton from "@/components/common/SaveButton";
-import { capitalize, fmtEventDate } from "@/lib/event-options";
+import { capitalize, fmtEventDate, fmtEventTime } from "@/lib/event-options";
 
 export default function EventCard({ event }) {
   const navigate = useNavigate();
@@ -51,7 +51,8 @@ export default function EventCard({ event }) {
           <Calendar className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
           <span className="shrink-0">
             {fmtEventDate(event.date)}
-            {event.time ? ` · ${event.time}` : ""}
+            {event.time ? ` · ${fmtEventTime(event.time)}` : ""}
+            {event.end_time ? `–${fmtEventTime(event.end_time)}` : ""}
           </span>
           {event.city && (
             <>

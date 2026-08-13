@@ -69,7 +69,7 @@ export default function HotelDetail() {
   const itemKey = `hotel:${h.name}`;
   const saved = isSaved(itemKey);
   const facilities = Object.entries(h.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]);
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${h.address}, ${h.city}`)}`;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([h.address, h.city, h.country].filter(Boolean).join(", "))}`;
 
   const onShare = async () => {
     try {
@@ -83,7 +83,6 @@ export default function HotelDetail() {
       <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-2">
-          <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={onShare} className="w-9 h-9 rounded-full flex items-center justify-center"><Share2 className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={() => toggle({ type: "hotel", title: h.name, location: h.city, country: h.country, image: h.image, rating: h.memberRating })} className="w-9 h-9 rounded-full flex items-center justify-center">
             <Bookmark className={cn("w-5 h-5", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
@@ -110,24 +109,30 @@ export default function HotelDetail() {
             <span className="text-xs text-muted-foreground">{h.stars}-star hotel</span>
           </div>
           <h1 className="font-display font-bold text-lg mt-1">{h.name}</h1>
-          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground"><MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {h.city}, {h.country} · {h.distance} km from centre</div>
+          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground min-w-0">
+            <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
+            <span className="truncate">{h.city}, {h.country} · {h.distance} km from centre</span>
+          </div>
 
-          <div className="flex items-center gap-2 mt-3">
-            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary">
-              <Star className="w-3.5 h-3.5 fill-primary text-primary" strokeWidth={0} />
-              <span className="font-semibold text-sm">{h.memberRating.toFixed(1)}</span>
-              <span className="text-xs text-muted-foreground">Member rating</span>
-            </span>
-            <span className="text-xs text-muted-foreground">{h.reviews} reviews</span>
+          <div className="mt-3 flex items-center gap-1.5 text-sm min-w-0">
+            <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold shrink-0" strokeWidth={0} />
+            <span className="font-semibold tabular-nums">{h.memberRating.toFixed(1)}</span>
+            <span className="text-muted-foreground/50">·</span>
+            <span className="text-muted-foreground">{h.reviews.toLocaleString()} reviews</span>
           </div>
 
           <p className="text-sm text-muted-foreground leading-relaxed mt-4">{h.description}</p>
 
-          <div className="mt-5 space-y-2">
-            <div className="flex items-start gap-2 text-sm"><MapPin className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{h.address}</span></div>
-            <EventMap compact query={h.address} label={[h.address, h.city].filter(Boolean).join(", ")} />
-            <a href={h.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">{h.website.replace("https://", "")}</span></a>
-            <a href={h.bookingUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><CalendarCheck className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">Book this hotel</span></a>
+          <div className="mt-5 space-y-3">
+            <EventMap
+              compact
+              query={[h.address, h.city, h.country].filter(Boolean).join(", ")}
+              label={h.address}
+            />
+            <div className="space-y-2">
+              <a href={h.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">{h.website.replace("https://", "")}</span></a>
+              <a href={h.bookingUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><CalendarCheck className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">Book this hotel</span></a>
+            </div>
           </div>
 
           <section className="mt-5">

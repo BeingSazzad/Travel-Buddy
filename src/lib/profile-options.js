@@ -1,6 +1,7 @@
 export const COUNTRIES = [
   "Denmark", "Sweden", "Norway", "Finland", "Iceland", "Germany", "Netherlands",
   "Belgium", "Switzerland", "Austria", "France", "Spain", "Italy", "Portugal",
+  "Greece", "Indonesia", "Mexico", "South Africa", "Thailand", "Japan", "Morocco",
   "Ireland", "United Kingdom", "Poland", "United States", "Canada", "Australia", "Other",
 ];
 
@@ -17,6 +18,13 @@ export const INTERESTS = [
 ];
 
 export const TRAVEL_STYLES = [
-  "luxury", "budget", "backpacking", "city breaks", "beach holidays",
-  "wellness", "adventure", "digital nomad",
+  "luxury",
+  "budget",
+  "backpacking",
+  "city break",
+  "beach",
+  "wellness",
+  "adventure",
+  "cultural",
+  "digital nomad",
 ];

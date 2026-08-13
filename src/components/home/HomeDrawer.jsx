@@ -6,6 +6,11 @@ import {
   ChevronRight,
   X,
   LogOut,
+  Bookmark,
+  HelpCircle,
+  HeartHandshake,
+  FileText,
+  Shield,
 } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useAuth } from "@/lib/AuthContext";
@@ -106,6 +111,19 @@ export default function HomeDrawer({ open, onOpenChange }) {
             badge={requests.length}
             onClick={() => go("/friends")}
           />
+
+          <SectionLabel className="pt-3">Your library</SectionLabel>
+          <NavRow icon={Bookmark} label="Saved" onClick={() => go("/saved")} />
+
+          <SectionLabel className="pt-3">Support</SectionLabel>
+          <NavRow icon={HelpCircle} label="Help & support" onClick={() => go("/help")} />
+          <NavRow
+            icon={HeartHandshake}
+            label="Community guidelines"
+            onClick={() => go("/community-guidelines")}
+          />
+          <NavRow icon={FileText} label="Terms & conditions" onClick={() => go("/terms")} />
+          <NavRow icon={Shield} label="Privacy policy" onClick={() => go("/privacy")} />
         </div>
 
         <div className="shrink-0 px-2 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))] border-t border-border/50">

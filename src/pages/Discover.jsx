@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useDiscover } from "@/hooks/useDiscover";
 import SwipeCard from "@/components/swipe/SwipeCard";
 import MatchModal from "@/components/swipe/MatchModal";
-import MatchFilterSheet from "@/components/match/MatchFilterSheet";
+import MatchFilterSheet, { countMatchFilters } from "@/components/match/MatchFilterSheet";
 import ScreenHeader from "@/components/common/ScreenHeader";
 import ReportSheet from "@/components/reports/ReportSheet";
 import EmptyState from "@/components/common/EmptyState";
@@ -22,25 +22,35 @@ const DEFAULT_FILTERS = {
   languages: [],
 };
 
+function norm(s) {
+  return String(s || "").trim().toLowerCase();
+}
+
 function matchesFilters(m, f) {
   if (f.ageMin && (m.age == null || m.age < Number(f.ageMin))) return false;
   if (f.ageMax && (m.age == null || m.age > Number(f.ageMax))) return false;
   if (f.location) {
-    const q = f.location.toLowerCase();
+    const q = norm(f.location);
     const hay = `${m.current_city || ""} ${m.country || ""}`.toLowerCase();
     if (!hay.includes(q)) return false;
   }
   if (f.destination) {
     if (!m.trip) return false;
-    const q = f.destination.toLowerCase();
+    const q = norm(f.destination);
     const hay = `${m.trip.city || ""} ${m.trip.country || ""}`.toLowerCase();
     if (!hay.includes(q)) return false;
   }
   if ((f.dateFrom || f.dateTo) && (!m.trip || !m.trip.start_date || !m.trip.end_date)) return false;
   if (m.trip && f.dateFrom && new Date(m.trip.end_date) < new Date(f.dateFrom)) return false;
   if (m.trip && f.dateTo && new Date(m.trip.start_date) > new Date(f.dateTo)) return false;
-  if (f.interests.length && !(m.interests || []).some((i) => f.interests.includes(i))) return false;
-  if (f.languages.length && !(m.languages || []).some((l) => f.languages.includes(l))) return false;
+  if (f.interests?.length) {
+    const memberSet = new Set((m.interests || []).map(norm));
+    if (!f.interests.some((i) => memberSet.has(norm(i)))) return false;
+  }
+  if (f.languages?.length) {
+    const memberSet = new Set((m.languages || []).map(norm));
+    if (!f.languages.some((l) => memberSet.has(norm(l)))) return false;
+  }
   return true;
 }
 
@@ -59,9 +69,7 @@ export default function Discover() {
   const myAvatar = user?.main_photo || user?.profile_photos?.[0] || memberAvatar("clara");
   const filtered = useMemo(() => deck.filter((m) => matchesFilters(m, filters)), [deck, filters]);
   const current = filtered[0];
-  const activeFilterCount = Object.entries(filters).filter(([, v]) =>
-    Array.isArray(v) ? v.length : v
-  ).length;
+  const activeFilterCount = countMatchFilters(filters);
 
   const openProfile = (member) => {
     const id = member?.user_id || member?.match_user_id;

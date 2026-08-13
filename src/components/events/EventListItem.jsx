@@ -2,18 +2,14 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { Image } from "@/components/ui/image";
-import { memberAvatar } from "@/lib/images";
-import { fmtEventDate } from "@/lib/event-options";
-
-const FALLBACK_ATTENDEE_IDS = ["mock_1", "mock_2", "mock_3"];
+import { fmtEventDate, fmtEventTime } from "@/lib/event-options";
 
 function attendeeAvatars(event) {
-  const avatars = [];
-  if (event.host_avatar) avatars.push(event.host_avatar);
-  FALLBACK_ATTENDEE_IDS.forEach((id) => {
-    if (avatars.length < 3) avatars.push(memberAvatar(id));
-  });
-  return avatars.slice(0, 3);
+  if (event.attendees?.length) {
+    return event.attendees.slice(0, 3).map((a) => a.avatar).filter(Boolean);
+  }
+  // Only real host avatar — don't invent fake going faces
+  return event.host_avatar ? [event.host_avatar] : [];
 }
 
 function formatMeta(event) {
@@ -26,7 +22,13 @@ function formatMeta(event) {
       parts.push(fmtEventDate(event.date));
     }
   }
-  if (event.time) parts.push(event.time);
+  if (event.time) {
+    parts.push(
+      event.end_time
+        ? `${fmtEventTime(event.time)}–${fmtEventTime(event.end_time)}`
+        : fmtEventTime(event.time)
+    );
+  }
   return parts.join(" · ");
 }
 

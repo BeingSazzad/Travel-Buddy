@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Shield, Bell, Ban, HelpCircle, Trash2, LogOut,
-  ChevronRight, Lock, Bookmark, Crown,
+  ChevronRight, Lock, Crown, Camera, UserRound, Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -26,15 +26,35 @@ export default function AccountMenu() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-card border border-border/80 shadow-soft rounded-2xl overflow-hidden">
-        <Row icon={Bookmark} label="Saved" onClick={() => navigate("/saved")} />
-        {!isPlus && (
+      {!isPlus && (
+        <div className="bg-card border border-border/80 shadow-soft rounded-2xl overflow-hidden">
           <Row icon={Crown} label="Seluna Plus" onClick={() => navigate("/subscription")} />
-        )}
+        </div>
+      )}
+
+      <div>
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
+          Personal info
+        </p>
+        <div className="bg-card border border-border/80 shadow-soft rounded-2xl overflow-hidden">
+          <Row
+            icon={UserRound}
+            label="Personal details"
+            onClick={() => navigate("/profile/edit/details")}
+          />
+          <Row icon={Camera} label="Photos" onClick={() => navigate("/profile/edit/photos")} />
+          <Row
+            icon={Sparkles}
+            label="Preferences"
+            onClick={() => navigate("/profile/edit/preferences")}
+          />
+        </div>
       </div>
 
       <div>
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">Settings</p>
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
+          Settings
+        </p>
         <div className="bg-card border border-border/80 shadow-soft rounded-2xl overflow-hidden">
           <Row icon={Shield} label="Privacy" onClick={() => navigate("/profile/privacy")} />
           <Row icon={Bell} label="Notifications" onClick={() => navigate("/profile/notifications")} />

@@ -11,17 +11,34 @@ import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { EVENT_CATEGORIES, defaultEventImage, capitalize, fmtEventDate } from "@/lib/event-options";
-import { COUNTRIES, LANGUAGES } from "@/lib/profile-options";
+import { EVENT_CATEGORIES, defaultEventImage, capitalize, fmtEventDate, fmtEventTime } from "@/lib/event-options";
+import { COUNTRIES } from "@/lib/profile-options";
 import EventCard from "@/components/events/EventCard";
 import { findMockEvent } from "@/lib/mock-events";
 
-const TOTAL = 6;
+/** 3 steps — only what a host must decide to publish a meetup. */
+const TOTAL = 3;
+
 const EMPTY = {
-  title: "", category: "", description: "", date: "", start_time: "", end_time: "",
-  city: "", country: "", location: "", image: "", max_attendees: 10,
-  visibility: "public", pricing: "free", external_link: "", age_min: "", age_max: "",
-  languages: [], agreed_rules: false,
+  title: "",
+  category: "",
+  description: "",
+  date: "",
+  start_time: "",
+  end_time: "",
+  city: "",
+  country: "",
+  location: "",
+  image: "",
+  max_attendees: 12,
+  visibility: "public",
+  agreed_rules: false,
+  // Kept for edit preserve — not shown in simplified create UI
+  pricing: "free",
+  external_link: "",
+  age_min: "",
+  age_max: "",
+  languages: [],
 };
 
 function Chip({ active, onClick, children }) {
@@ -39,6 +56,29 @@ function Chip({ active, onClick, children }) {
   );
 }
 
+function fromEntity(e) {
+  return {
+    title: e.title || "",
+    category: e.category || "",
+    description: e.description || "",
+    date: e.date || "",
+    start_time: e.time || "",
+    end_time: e.end_time || "",
+    city: e.city || "",
+    country: e.country || "",
+    location: e.location || "",
+    image: e.image || "",
+    max_attendees: e.max_attendees || 12,
+    visibility: e.visibility || "public",
+    agreed_rules: true,
+    pricing: e.pricing || "free",
+    external_link: e.external_link || "",
+    age_min: e.age_min ?? "",
+    age_max: e.age_max ?? "",
+    languages: e.languages || [],
+  };
+}
+
 export default function CreateEvent() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -52,62 +92,26 @@ export default function CreateEvent() {
     (async () => {
       try {
         const e = await base44.entities.Event.get(editId);
-        setData({
-          title: e.title || "", category: e.category || "", description: e.description || "",
-          date: e.date || "", start_time: e.time || "", end_time: e.end_time || "",
-          city: e.city || "", country: e.country || "", location: e.location || "",
-          image: e.image || "", max_attendees: e.max_attendees || 10,
-          visibility: e.visibility || "public", pricing: e.pricing || "free",
-          external_link: e.external_link || "", age_min: e.age_min || "", age_max: e.age_max || "",
-          languages: e.languages || [], agreed_rules: true,
-        });
+        setData(fromEntity(e));
       } catch {
         const mock = findMockEvent(editId);
-        if (mock) {
-          setData({
-            title: mock.title || "",
-            category: mock.category || "",
-            description: mock.description || "",
-            date: mock.date || "",
-            start_time: mock.time || "",
-            end_time: mock.end_time || "",
-            city: mock.city || "",
-            country: mock.country || "",
-            location: mock.location || "",
-            image: mock.image || "",
-            max_attendees: mock.max_attendees || 10,
-            visibility: mock.visibility || "public",
-            pricing: mock.pricing || "free",
-            external_link: mock.external_link || "",
-            age_min: mock.age_min || "",
-            age_max: mock.age_max || "",
-            languages: mock.languages || [],
-            agreed_rules: true,
-          });
-        }
+        if (mock) setData(fromEntity(mock));
       }
     })();
   }, [editId]);
 
   const set = (k, v) => setData((d) => ({ ...d, [k]: v }));
-  const toggleLang = (v) =>
-    setData((d) => ({
-      ...d,
-      languages: d.languages.includes(v) ? d.languages.filter((x) => x !== v) : [...d.languages, v],
-    }));
 
   const valid = useMemo(() => {
     if (step === 1) return data.title.trim() && data.category && data.description.trim();
-    if (step === 2) return data.date && data.start_time && data.end_time && data.end_time > data.start_time;
-    if (step === 3) return data.city.trim() && data.country && data.location.trim();
-    if (step === 4) {
-      const maxOk = Number(data.max_attendees) >= 1;
-      const langsOk = data.languages.length > 0;
-      const paidOk = data.pricing !== "paid_external" || data.external_link.trim();
-      const ageOk = !data.age_min || !data.age_max || Number(data.age_max) >= Number(data.age_min);
-      return maxOk && langsOk && paidOk && ageOk;
+    if (step === 2) {
+      const timesOk =
+        data.date &&
+        data.start_time &&
+        (!data.end_time || data.end_time > data.start_time);
+      return timesOk && data.city.trim() && data.country && data.location.trim();
     }
-    if (step === 5) return data.agreed_rules;
+    if (step === 3) return data.agreed_rules;
     return true;
   }, [step, data]);
 
@@ -118,11 +122,16 @@ export default function CreateEvent() {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    const res = await base44.integrations.Core.UploadFile({ file });
-    set("image", res.file_url);
+    try {
+      const res = await base44.integrations.Core.UploadFile({ file });
+      set("image", res.file_url);
+    } catch {
+      alert("Photo upload failed. You can publish without a custom cover.");
+    }
   };
 
   const finish = async () => {
+    if (!valid) return;
     setCreating(true);
     try {
       const payload = {
@@ -131,26 +140,33 @@ export default function CreateEvent() {
         description: data.description.trim(),
         date: data.date,
         time: data.start_time,
-        end_time: data.end_time,
+        end_time: data.end_time || "",
         city: data.city.trim(),
         country: data.country,
         location: data.location.trim(),
         image: data.image || defaultEventImage(data.category),
-        max_attendees: Number(data.max_attendees),
-        visibility: data.visibility,
-        pricing: data.pricing,
-        external_link: data.pricing === "paid_external" ? data.external_link.trim() : "",
-        age_min: data.age_min ? Number(data.age_min) : null,
-        age_max: data.age_max ? Number(data.age_max) : null,
-        languages: data.languages,
+        max_attendees: Number(data.max_attendees) || 12,
+        visibility: data.visibility || "public",
         agreed_rules: true,
+        // Create defaults; edit preserves existing extended fields
+        pricing: editId ? data.pricing || "free" : "free",
+        external_link: editId ? data.external_link || "" : "",
+        age_min: editId && data.age_min !== "" && data.age_min != null ? Number(data.age_min) : null,
+        age_max: editId && data.age_max !== "" && data.age_max != null ? Number(data.age_max) : null,
+        languages: editId ? data.languages || [] : [],
       };
       if (editId) {
         await base44.entities.Event.update(editId, payload);
+        navigate(`/events/${editId}`);
       } else {
-        await base44.entities.Event.create({ ...payload, host_name: user?.full_name || "Seluna host", host_id: user?.id, attendees_count: 0 });
+        const created = await base44.entities.Event.create({
+          ...payload,
+          host_name: user?.full_name || "Seluna host",
+          host_id: user?.id,
+          attendees_count: 0,
+        });
+        navigate(created?.id ? `/events/${created.id}` : "/events");
       }
-      navigate("/events");
     } finally {
       setCreating(false);
     }
@@ -158,6 +174,7 @@ export default function CreateEvent() {
 
   const previewEvent = {
     ...data,
+    id: "preview",
     image: data.image || defaultEventImage(data.category),
     time: data.start_time,
     attendees_count: 0,
@@ -167,7 +184,7 @@ export default function CreateEvent() {
   return (
     <div className="max-w-app mx-auto min-h-screen flex flex-col bg-background">
       <header className="px-5 safe-pt pb-3 flex items-center gap-3">
-        <button onClick={back} className="w-9 h-9 rounded-full flex items-center justify-center">
+        <button type="button" onClick={back} className="w-9 h-9 rounded-full flex items-center justify-center" aria-label="Back">
           <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
         </button>
         <div>
@@ -185,24 +202,36 @@ export default function CreateEvent() {
       <div className="flex-1 px-5 pb-6 overflow-y-auto">
         {step === 1 && (
           <>
-            <h2 className="font-display font-bold text-lg">The basics</h2>
-            <p className="text-sm text-muted-foreground mb-5">What's the event about?</p>
+            <h2 className="font-display font-bold text-lg">What is the meetup?</h2>
+            <p className="text-sm text-muted-foreground mb-5">Keep it clear — women decide in seconds.</p>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Event title *</Label>
-                <Input value={data.title} onChange={(e) => set("title", e.target.value)} placeholder="Sunset yoga rooftop meetup" className="h-12" />
+                <Label>Title *</Label>
+                <Input
+                  value={data.title}
+                  onChange={(e) => set("title", e.target.value)}
+                  placeholder="Sunset yoga at the caldera"
+                  className="h-12"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Category *</Label>
                 <div className="flex flex-wrap gap-2">
                   {EVENT_CATEGORIES.map((c) => (
-                    <Chip key={c} active={data.category === c} onClick={() => set("category", c)}>{capitalize(c)}</Chip>
+                    <Chip key={c} active={data.category === c} onClick={() => set("category", c)}>
+                      {capitalize(c)}
+                    </Chip>
                   ))}
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Description *</Label>
-                <Textarea value={data.description} onChange={(e) => set("description", e.target.value)} placeholder="Tell women what to expect…" rows={4} />
+                <Label>About *</Label>
+                <Textarea
+                  value={data.description}
+                  onChange={(e) => set("description", e.target.value)}
+                  placeholder="What you will do, who it is for, what to bring…"
+                  rows={4}
+                />
               </div>
             </div>
           </>
@@ -210,8 +239,8 @@ export default function CreateEvent() {
 
         {step === 2 && (
           <>
-            <h2 className="font-display font-bold text-lg">Date & time</h2>
-            <p className="text-sm text-muted-foreground mb-5">When does it happen?</p>
+            <h2 className="font-display font-bold text-lg">When & where</h2>
+            <p className="text-sm text-muted-foreground mb-5">Public spot only — never a private home.</p>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Date *</Label>
@@ -219,23 +248,14 @@ export default function CreateEvent() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label>Start time *</Label>
+                  <Label>Starts *</Label>
                   <Input type="time" value={data.start_time} onChange={(e) => set("start_time", e.target.value)} className="h-12" />
                 </div>
                 <div className="space-y-2">
-                  <Label>End time *</Label>
+                  <Label>Ends</Label>
                   <Input type="time" value={data.end_time} onChange={(e) => set("end_time", e.target.value)} className="h-12" />
                 </div>
               </div>
-            </div>
-          </>
-        )}
-
-        {step === 3 && (
-          <>
-            <h2 className="font-display font-bold text-lg">Location</h2>
-            <p className="text-sm text-muted-foreground mb-5">Where will you meet?</p>
-            <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>City *</Label>
@@ -246,146 +266,136 @@ export default function CreateEvent() {
                   <Select value={data.country} onValueChange={(v) => set("country", v)}>
                     <SelectTrigger className="h-12"><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent>
-                      {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      {COUNTRIES.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Venue / meeting location *</Label>
-                <Input value={data.location} onChange={(e) => set("location", e.target.value)} placeholder="A general spot — avoid private home addresses" className="h-12" />
-                <p className="text-xs text-muted-foreground">Share a public meeting point; never a private home address.</p>
+                <Label>Meeting point *</Label>
+                <Input
+                  value={data.location}
+                  onChange={(e) => set("location", e.target.value)}
+                  placeholder="Café name, park gate, museum steps…"
+                  className="h-12"
+                />
               </div>
             </div>
           </>
         )}
 
-        {step === 4 && (
+        {step === 3 && (
           <>
-            <h2 className="font-display font-bold text-lg">Details</h2>
-            <p className="text-sm text-muted-foreground mb-5">Finalise the setup.</p>
+            <h2 className="font-display font-bold text-lg">Ready to publish?</h2>
+            <p className="text-sm text-muted-foreground mb-5">One last check — then you are live.</p>
+
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Cover image *</Label>
+                <Label>Cover photo</Label>
+                <p className="text-xs text-muted-foreground">Optional — we will use a category image if you skip.</p>
                 {data.image ? (
                   <div className="relative rounded-2xl overflow-hidden h-36 border border-border">
                     <Image src={data.image} alt="Cover" fittingType="fill" className="w-full h-full" />
-                    <button onClick={() => set("image", "")} className="absolute top-2 right-2 bg-white/90 rounded-full px-2 py-1 text-xs">Remove</button>
+                    <button type="button" onClick={() => set("image", "")} className="absolute top-2 right-2 bg-white/90 rounded-full px-2 py-1 text-xs">
+                      Remove
+                    </button>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center h-32 rounded-2xl border border-dashed border-border cursor-pointer text-muted-foreground">
+                  <label className="flex flex-col items-center justify-center h-28 rounded-2xl border border-dashed border-border cursor-pointer text-muted-foreground">
                     <Upload className="w-5 h-5 mb-1" strokeWidth={1.5} />
-                    <span className="text-xs">Upload cover image</span>
+                    <span className="text-xs">Upload photo</span>
                     <input type="file" accept="image/*" onChange={onImage} className="hidden" />
                   </label>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label>Maximum attendees *</Label>
-                <Input type="number" min="1" value={data.max_attendees} onChange={(e) => set("max_attendees", e.target.value)} className="h-12" />
+                <Label>Group size</Label>
+                <Select
+                  value={String(data.max_attendees || 12)}
+                  onValueChange={(v) => set("max_attendees", Number(v))}
+                >
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Up to…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[4, 6, 8, 10, 12, 15, 20].map((n) => (
+                      <SelectItem key={n} value={String(n)}>
+                        Up to {n} attendees
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex items-center justify-between rounded-2xl border border-border p-4">
                 <div>
-                  <p className="font-medium text-sm">{data.visibility === "public" ? "Open to everyone" : "Approval required"}</p>
-                  <p className="text-xs text-muted-foreground">{data.visibility === "public" ? "Anyone can join instantly" : "You approve each request"}</p>
+                  <p className="font-medium text-sm">
+                    {data.visibility === "public" ? "Open to join" : "Approve each request"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {data.visibility === "public"
+                      ? "Anyone can join instantly"
+                      : "You review before they join"}
+                  </p>
                 </div>
-                <Switch checked={data.visibility === "public"} onCheckedChange={(c) => set("visibility", c ? "public" : "approval")} />
+                <Switch
+                  checked={data.visibility === "public"}
+                  onCheckedChange={(c) => set("visibility", c ? "public" : "approval")}
+                />
               </div>
 
-              <div className="flex items-center justify-between rounded-2xl border border-border p-4">
-                <div>
-                  <p className="font-medium text-sm">{data.pricing === "free" ? "Free event" : "Paid externally"}</p>
-                  <p className="text-xs text-muted-foreground">{data.pricing === "free" ? "No cost to join" : "Link to an external ticket page"}</p>
+              <div className="rounded-2xl border border-border bg-card/60 p-4">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Preview</p>
+                <div className="pointer-events-none">
+                  <EventCard event={previewEvent} />
                 </div>
-                <Switch checked={data.pricing === "free"} onCheckedChange={(c) => set("pricing", c ? "free" : "paid_external")} />
+                <p className="text-xs text-muted-foreground mt-3">
+                  {fmtEventDate(data.date)}
+                  {data.start_time ? ` · ${fmtEventTime(data.start_time)}` : ""}
+                  {data.end_time ? `–${fmtEventTime(data.end_time)}` : ""}
+                  {" · "}
+                  {[data.location, data.city].filter(Boolean).join(", ")}
+                </p>
               </div>
 
-              {data.pricing === "paid_external" && (
-                <div className="space-y-2">
-                  <Label>External booking link *</Label>
-                  <Input value={data.external_link} onChange={(e) => set("external_link", e.target.value)} placeholder="https://…" className="h-12" />
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label>Age range (optional)</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  <Input type="number" min="0" value={data.age_min} onChange={(e) => set("age_min", e.target.value)} placeholder="Min" className="h-12" />
-                  <Input type="number" min="0" value={data.age_max} onChange={(e) => set("age_max", e.target.value)} placeholder="Max" className="h-12" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Languages spoken *</Label>
-                <div className="flex flex-wrap gap-2">
-                  {LANGUAGES.map((l) => (
-                    <Chip key={l} active={data.languages.includes(l)} onClick={() => toggleLang(l)}>{l}</Chip>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {step === 5 && (
-          <>
-            <h2 className="font-display font-bold text-lg">Community & safety</h2>
-            <p className="text-sm text-muted-foreground mb-5">Please agree before publishing.</p>
-            <div className="rounded-2xl border border-border bg-card p-4 space-y-3 text-sm">
-              <div className="flex items-center gap-2 text-primary"><ShieldCheck className="w-4 h-4" /><span className="font-medium">Seluna event guidelines</span></div>
-              <ul className="space-y-2 text-muted-foreground list-disc pl-5">
-                <li>This event is friendship and travel-focused — no dating, romantic, or commercial soliciting.</li>
-                <li>Meet in public spaces; never share private home addresses.</li>
-                <li>Be respectful and inclusive of all women in the community.</li>
-                <li>Respect attendance limits and cancel your spot if you can't make it.</li>
-                <li>You're responsible for the event and can remove attendees who break the rules.</li>
-              </ul>
-            </div>
-            <label className="flex items-start gap-3 mt-4 cursor-pointer">
-              <input type="checkbox" checked={data.agreed_rules} onChange={(e) => set("agreed_rules", e.target.checked)} className="mt-1 w-5 h-5 accent-primary" />
-              <span className="text-sm">I have read and agree to the Seluna community and safety rules.</span>
-            </label>
-          </>
-        )}
-
-        {step === 6 && (
-          <>
-            <h2 className="font-display font-bold text-lg">Preview</h2>
-            <p className="text-sm text-muted-foreground mb-5">This is how members will see your event.</p>
-            <EventCard event={previewEvent} />
-            <div className="rounded-2xl border border-border bg-card p-4 mt-5 space-y-2 text-sm">
-              <Row label="Date">{fmtEventDate(data.date)}{data.start_time ? ` · ${data.start_time}` : ""}{data.end_time ? `–${data.end_time}` : ""}</Row>
-              <Row label="Location">{[data.location, data.city, data.country].filter(Boolean).join(", ")}</Row>
-              <Row label="Category"><span className="capitalize">{data.category}</span></Row>
-              <Row label="Spots">{data.max_attendees} max</Row>
-              <Row label="Joining">{data.visibility === "public" ? "Open to everyone" : "Approval required"}</Row>
-              <Row label="Cost">{data.pricing === "free" ? "Free" : "Paid externally"}</Row>
-              {data.age_min || data.age_max ? <Row label="Ages">{[data.age_min, data.age_max].filter(Boolean).join("–")}</Row> : null}
-              {data.languages.length > 0 && <Row label="Languages">{data.languages.join(", ")}</Row>}
+              <label className="flex items-start gap-3 cursor-pointer rounded-2xl border border-border p-4">
+                <input
+                  type="checkbox"
+                  checked={data.agreed_rules}
+                  onChange={(e) => set("agreed_rules", e.target.checked)}
+                  className="mt-1 w-5 h-5 accent-primary shrink-0"
+                />
+                <span className="text-sm text-muted-foreground leading-relaxed">
+                  <span className="inline-flex items-center gap-1.5 text-foreground font-medium">
+                    <ShieldCheck className="w-4 h-4 text-primary" strokeWidth={1.5} />
+                    Safety rules
+                  </span>
+                  <br />
+                  Public meetup, friendship-focused — no dating or private home addresses.
+                </span>
+              </label>
             </div>
           </>
         )}
       </div>
 
       <div className="sticky bottom-0 px-5 py-4 bg-background/90 backdrop-blur border-t border-border flex gap-3">
-        <Button variant="outline" className="flex-1" onClick={back}>{step === 1 ? "Cancel" : "Back"}</Button>
+        <Button variant="outline" className="flex-1" onClick={back}>
+          {step === 1 ? "Cancel" : "Back"}
+        </Button>
         {step < TOTAL ? (
-          <Button className="flex-1" onClick={next} disabled={!valid}>Next</Button>
+          <Button className="flex-1" onClick={next} disabled={!valid}>
+            Next
+          </Button>
         ) : (
-          <Button className="flex-1" onClick={finish} disabled={creating}>{creating ? "Saving…" : editId ? "Save changes" : "Publish event"}</Button>
+          <Button className="flex-1" onClick={finish} disabled={creating || !valid}>
+            {creating ? "Publishing…" : editId ? "Save changes" : "Publish"}
+          </Button>
         )}
       </div>
-    </div>
-  );
-}
-
-function Row({ label, children }) {
-  return (
-    <div className="flex justify-between gap-4">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="text-right font-medium">{children}</span>
     </div>
   );
 }

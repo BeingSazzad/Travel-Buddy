@@ -24,7 +24,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
   const targetX = fly === "right" ? 600 : fly === "left" ? -600 : 0;
 
   return (
-    <div className="w-full flex-1 min-h-0 flex flex-col overflow-hidden min-w-0 max-w-full">
+    <div className="w-full flex-1 min-h-0 flex flex-col overflow-hidden min-w-0 max-w-full gap-3">
       <motion.div
         drag={!fly}
         dragConstraints={{ left: 0, right: 0 }}
@@ -67,7 +67,7 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
           <Info className="w-4 h-4" strokeWidth={2} />
         </button>
 
-        <div className="absolute bottom-0 inset-x-0 z-20 px-5 pt-16 pb-24 text-white flex flex-col justify-end pointer-events-none">
+        <div className="absolute bottom-0 inset-x-0 z-20 px-5 pt-16 pb-5 text-white flex flex-col justify-end pointer-events-none">
           <div className="pointer-events-auto">
             <div className="flex items-center gap-2">
               <h2 className="font-display font-bold text-2xl text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.55)]">
@@ -119,31 +119,31 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
             )}
           </div>
         </div>
-
-        <div className="absolute bottom-5 inset-x-0 z-30 flex items-center justify-center gap-10 pointer-events-none">
-          <div className="flex flex-col items-center gap-1.5 pointer-events-auto">
-            <button
-              type="button"
-              onClick={() => trigger("left")}
-              aria-label="Pass — swipe left"
-              className="w-14 h-14 rounded-full bg-card border-2 border-rose-500/35 text-rose-500 shadow-lg flex items-center justify-center tap-feedback hover:bg-rose-500/10 transition-all"
-            >
-              <X className="w-6 h-6" strokeWidth={2.25} />
-            </button>
-            <span className="text-[10px] font-semibold text-white/90 [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]">Pass</span>
-          </div>
-
-          <div className="flex flex-col items-center gap-1.5 pointer-events-auto">
-            <ConnectIconButton
-              size="lg"
-              onClick={() => trigger("right")}
-              aria-label="Connect — swipe right"
-              className="shadow-lg"
-            />
-            <span className="text-[10px] font-semibold text-white/90 [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]">Connect</span>
-          </div>
-        </div>
       </motion.div>
+
+      <div className="shrink-0 flex items-center justify-center gap-10 pb-1 pt-0.5">
+        <div className="flex flex-col items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => trigger("left")}
+            aria-label="Pass — swipe left"
+            className="w-14 h-14 rounded-full bg-card border-2 border-rose-500/35 text-rose-500 shadow-lg flex items-center justify-center tap-feedback hover:bg-rose-500/10 transition-all"
+          >
+            <X className="w-6 h-6" strokeWidth={2.25} />
+          </button>
+          <span className="text-[10px] font-semibold text-muted-foreground">Pass</span>
+        </div>
+
+        <div className="flex flex-col items-center gap-1.5">
+          <ConnectIconButton
+            size="lg"
+            onClick={() => trigger("right")}
+            aria-label="Connect — swipe right"
+            className="shadow-lg"
+          />
+          <span className="text-[10px] font-semibold text-muted-foreground">Connect</span>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MoreVertical, User, Flag, Ban, Trash2, UserMinus } from "lucide-react";
+import { MoreVertical, Flag, Ban, Trash2, UserMinus } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,6 @@ export default function ConversationMenu({
   otherName,
   conversationId,
   matchId,
-  onViewProfile,
   onDone,
 }) {
   const { user } = useAuth();
@@ -73,13 +72,6 @@ export default function ConversationMenu({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" sideOffset={6} className="min-w-[11.5rem] rounded-xl p-1.5">
-          <DropdownMenuItem
-            onClick={() => onViewProfile?.(otherId)}
-            className="gap-2.5 py-2.5 cursor-pointer rounded-lg"
-          >
-            <User className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-            View profile
-          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => openSafety("report")}
             className="gap-2.5 py-2.5 cursor-pointer rounded-lg"

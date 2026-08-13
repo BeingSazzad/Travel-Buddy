@@ -144,23 +144,42 @@ export default function DestinationDetail() {
       <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center tap-feedback"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-1">
-          <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground tap-feedback"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
-          <button onClick={() => navigate(`/trips/new?city=${encodeURIComponent(dest.city)}`)} className="w-9 h-9 rounded-full gradient-brand-accent text-white flex items-center justify-center tap-feedback shadow-sm"><Sparkles className="w-5 h-5" strokeWidth={1.5} /></button>
+          <button onClick={() => navigate(`/trips/new?city=${encodeURIComponent(dest.city)}`)} className="w-9 h-9 rounded-full gradient-brand-accent text-white flex items-center justify-center tap-feedback shadow-sm" aria-label="Plan a trip"><Sparkles className="w-5 h-5" strokeWidth={1.5} /></button>
         </div>
       </header>
 
       <div className="flex-1 overflow-y-auto pb-6">
         {/* Hero */}
         <div className="relative h-72">
-          <Image src={dest.image} alt={dest.city} fittingType="fill" className="w-full h-full" />
-          <div className="gradient-overlay-soft" />
-          <div className="absolute bottom-4 left-5 right-5">
-            <div className="flex items-center gap-1 text-white/80 text-xs mb-1"><MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {dest.city}, {dest.country}</div>
-            <h1 className="font-display font-semibold text-3xl text-white">{dest.city}</h1>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white">{dest.continent}</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white flex items-center gap-1"><Sun className="w-3 h-3" strokeWidth={1.5} /> {dest.weather}</span>
-              {dest.tags.solo && <span className="text-xs px-2 py-0.5 rounded-full bg-white/20 text-white">Solo-friendly</span>}
+          <Image src={dest.image} alt={dest.city} fittingType="fill" className="w-full h-full object-cover" />
+          {/* Strong bottom scrim so white type stays readable on bright photos */}
+          <div
+            className="absolute inset-0 pointer-events-none z-10"
+            style={{
+              background:
+                "linear-gradient(to top, hsl(0 0% 0% / 0.88) 0%, hsl(0 0% 0% / 0.55) 38%, hsl(0 0% 0% / 0.18) 62%, transparent 100%)",
+            }}
+          />
+          <div className="absolute bottom-4 left-5 right-5 z-20">
+            <div className="flex items-center gap-1 text-white/90 text-xs mb-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.75)]">
+              <MapPin className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
+              {dest.city}, {dest.country}
+            </div>
+            <h1 className="font-display font-semibold text-3xl text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)]">
+              {dest.city}
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 mt-2.5">
+              <span className="text-xs px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/20">
+                {dest.continent}
+              </span>
+              <span className="text-xs px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/20 flex items-center gap-1">
+                <Sun className="w-3 h-3" strokeWidth={1.5} /> {dest.weather}
+              </span>
+              {dest.tags.solo && (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/20">
+                  Solo-friendly
+                </span>
+              )}
             </div>
           </div>
         </div>

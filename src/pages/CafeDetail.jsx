@@ -57,7 +57,7 @@ export default function CafeDetail() {
 
   const saved = isSaved(itemKey);
   const facilities = Object.entries(cafe.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]);
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${cafe.address}, ${cafe.city}`)}`;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([cafe.address, cafe.city, cafe.country].filter(Boolean).join(", "))}`;
 
   const onShare = async () => {
     try {
@@ -71,7 +71,6 @@ export default function CafeDetail() {
       <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-2">
-          <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={onShare} className="w-9 h-9 rounded-full flex items-center justify-center"><Share2 className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={() => toggle({ type: "cafe", title: cafe.name, location: cafe.city, country: cafe.country, image: cafe.image, rating: cafe.rating })} className="w-9 h-9 rounded-full flex items-center justify-center">
             <Bookmark className={cn("w-5 h-5", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
@@ -95,26 +94,32 @@ export default function CafeDetail() {
 
         <div className="detail-body">
           <h1 className="font-display font-bold text-lg">{cafe.name}</h1>
-          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground"><MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {cafe.city}, {cafe.country} · {cafe.distance} km</div>
+          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground min-w-0">
+            <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
+            <span className="truncate">{cafe.city}, {cafe.country} · {cafe.distance} km</span>
+          </div>
 
-          <div className="flex items-center gap-2 mt-3">
-            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary">
-              <Star className="w-3.5 h-3.5 fill-primary text-primary" strokeWidth={0} />
-              <span className="font-semibold text-sm">{cafe.rating.toFixed(1)}</span>
-              <span className="text-xs text-muted-foreground">Seluna rating</span>
-            </span>
-            <span className="text-xs text-muted-foreground">{cafe.reviews} reviews</span>
+          <div className="mt-3 flex items-center gap-1.5 text-sm min-w-0">
+            <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold shrink-0" strokeWidth={0} />
+            <span className="font-semibold tabular-nums">{cafe.rating.toFixed(1)}</span>
+            <span className="text-muted-foreground/50">·</span>
+            <span className="text-muted-foreground">{cafe.reviews.toLocaleString()} reviews</span>
           </div>
 
           <p className="text-sm text-muted-foreground leading-relaxed mt-4">{cafe.description}</p>
 
-          {/* Info */}
-          <div className="mt-5 space-y-2">
-            <div className="flex items-start gap-2 text-sm"><MapPin className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{cafe.address}</span></div>
-            <EventMap compact query={cafe.address} label={[cafe.address, cafe.city].filter(Boolean).join(", ")} />
-            <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{cafe.hours}</span></div>
-            <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{cafe.phone}</span></div>
-            <a href={cafe.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">{cafe.website.replace("https://", "")}</span></a>
+          {/* Location once: map + street address; city already under title */}
+          <div className="mt-5 space-y-3">
+            <EventMap
+              compact
+              query={[cafe.address, cafe.city, cafe.country].filter(Boolean).join(", ")}
+              label={cafe.address}
+            />
+            <div className="space-y-2">
+              <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{cafe.hours}</span></div>
+              <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{cafe.phone}</span></div>
+              <a href={cafe.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">{cafe.website.replace("https://", "")}</span></a>
+            </div>
           </div>
 
           {/* Facilities */}

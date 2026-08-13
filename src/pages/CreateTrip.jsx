@@ -16,7 +16,7 @@ import { COUNTRIES } from "@/lib/profile-options";
 import { TRAVEL_STYLES, LOOKING_FOR } from "@/lib/trip-options";
 import TripMatches from "@/components/trips/TripMatches";
 
-const TOTAL = 5;
+const TOTAL = 4;
 const EMPTY = {
   name: "",
   city: "", country: "", start_date: "", end_date: "",
@@ -63,9 +63,16 @@ export default function CreateTrip() {
     }));
 
   const valid = useMemo(() => {
-    if (step === 1) return data.city.trim() && data.country;
-    if (step === 2) return data.start_date && data.end_date && data.end_date >= data.start_date;
-    if (step === 3) return !!data.travel_style;
+    if (step === 1) {
+      return (
+        data.city.trim() &&
+        data.country &&
+        data.start_date &&
+        data.end_date &&
+        data.end_date >= data.start_date
+      );
+    }
+    if (step === 2) return !!data.travel_style;
     return true;
   }, [step, data]);
 
@@ -153,8 +160,8 @@ export default function CreateTrip() {
       <div className="flex-1 px-5 pb-6">
         {step === 1 && (
           <>
-            <h2 className="font-display font-bold text-lg">Where to?</h2>
-            <p className="text-sm text-muted-foreground mb-5">Tell us your destination.</p>
+            <h2 className="font-display font-bold text-lg">Where & when?</h2>
+            <p className="text-sm text-muted-foreground mb-5">Your destination and travel dates.</p>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>City *</Label>
@@ -169,33 +176,26 @@ export default function CreateTrip() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Start date *</Label>
+                  <Input type="date" value={data.start_date} onChange={(e) => set("start_date", e.target.value)} className="h-12" />
+                </div>
+                <div className="space-y-2">
+                  <Label>End date *</Label>
+                  <Input type="date" value={data.end_date} onChange={(e) => set("end_date", e.target.value)} className="h-12" />
+                </div>
+              </div>
+              {data.start_date && data.end_date && data.end_date >= data.start_date && (
+                <p className="text-sm text-muted-foreground">
+                  {formatDates(data)} · {days} {days === 1 ? "day" : "days"}
+                </p>
+              )}
             </div>
           </>
         )}
 
         {step === 2 && (
-          <>
-            <h2 className="font-display font-bold text-lg">When?</h2>
-            <p className="text-sm text-muted-foreground mb-5">Choose your travel dates.</p>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label>Start date *</Label>
-                <Input type="date" value={data.start_date} onChange={(e) => set("start_date", e.target.value)} className="h-12" />
-              </div>
-              <div className="space-y-2">
-                <Label>End date *</Label>
-                <Input type="date" value={data.end_date} onChange={(e) => set("end_date", e.target.value)} className="h-12" />
-              </div>
-            </div>
-            {data.start_date && data.end_date && (
-              <p className="text-sm text-muted-foreground mt-4">
-                {formatDates(data)} · {days} {days === 1 ? "day" : "days"}
-              </p>
-            )}
-          </>
-        )}
-
-        {step === 3 && (
           <>
             <h2 className="font-display font-bold text-lg">Travel style</h2>
             <p className="text-sm text-muted-foreground mb-5">How do you like to travel?</p>
@@ -209,7 +209,7 @@ export default function CreateTrip() {
           </>
         )}
 
-        {step === 4 && (
+        {step === 3 && (
           <>
             <h2 className="font-display font-bold text-lg">What are you looking for?</h2>
             <p className="text-sm text-muted-foreground mb-5">Select all that apply.</p>
@@ -223,7 +223,7 @@ export default function CreateTrip() {
           </>
         )}
 
-        {step === 5 && (
+        {step === 4 && (
           <>
             <h2 className="font-display font-bold text-lg">Almost done</h2>
             <p className="text-sm text-muted-foreground mb-5">Add a note and choose who can see your trip.</p>

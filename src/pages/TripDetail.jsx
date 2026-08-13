@@ -13,6 +13,7 @@ import {
   Pencil,
   CalendarDays,
   ChevronRight,
+  Navigation,
 } from "lucide-react";
 import { CONNECT_STROKE } from "@/components/common/ConnectIconButton";
 import TripActionsMenu from "@/components/trips/TripActionsMenu";
@@ -33,7 +34,7 @@ import { useFriends } from "@/hooks/useFriends";
 import { useConnectionRequests } from "@/hooks/useConnectionRequests";
 import TripForm from "@/components/trips/TripForm";
 import ReportSheet from "@/components/reports/ReportSheet";
-import { fmtEventDate } from "@/lib/event-options";
+import { fmtEventDate, fmtEventTime } from "@/lib/event-options";
 
 const STATUS_LABEL = {
   active: "Active now",
@@ -145,6 +146,9 @@ export default function TripDetail() {
   const isFriend = !!friendRecord;
   const pendingRequest = requests.some((r) => r.user_id === memberId);
   const mapLabel = [trip.city, trip.country].filter(Boolean).join(", ");
+  const directionsUrl = mapLabel
+    ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapLabel)}`
+    : null;
 
   const share = async () => {
     const url = window.location.href;
@@ -235,7 +239,7 @@ export default function TripDetail() {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto pb-28">
+      <div className="flex-1 overflow-y-auto pb-6">
         <div className="relative h-[232px]">
           <Image src={cover} alt={trip.name} fittingType="fill" className="w-full h-full" />
           <div className="gradient-overlay-soft" />
@@ -270,12 +274,12 @@ export default function TripDetail() {
               <span
                 className={cn(
                   "text-xs font-medium px-3 py-1 rounded-full border",
-                  trip.visibility === "public"
-                    ? "bg-success/15 text-success-foreground border-success/25"
+                  (trip.visibility || "public") === "public"
+                    ? "bg-success/15 text-success border-success/30"
                     : "bg-muted text-muted-foreground border-border"
                 )}
               >
-                {trip.visibility === "public" ? "Public trip" : "Hidden trip"}
+                {(trip.visibility || "public") === "public" ? "Public trip" : "Hidden trip"}
               </span>
             )}
           </div>
@@ -368,7 +372,7 @@ export default function TripDetail() {
               <div className="space-y-2">
                 {cityEvents.map((event) => {
                   const eventId = resolveEventId(event);
-                  const meta = [fmtEventDate(event.date), event.time].filter(Boolean).join(" · ");
+                  const meta = [fmtEventDate(event.date), fmtEventTime(event.time)].filter(Boolean).join(" · ");
                   return (
                     <button
                       key={event.id || event.title}
@@ -398,27 +402,33 @@ export default function TripDetail() {
         </div>
       </div>
 
-      <div className="sticky bottom-0 z-30 app-px pt-3 safe-pb bg-background/95 backdrop-blur border-t border-border">
+      <div className="sticky bottom-0 z-30 app-px pt-3 safe-pb bg-background/95 backdrop-blur border-t border-border flex gap-2">
+        <a
+          href={directionsUrl || "#"}
+          target="_blank"
+          rel="noreferrer"
+          className="flex-1"
+          onClick={(e) => {
+            if (!directionsUrl) e.preventDefault();
+          }}
+        >
+          <Button variant="outline" className="w-full" disabled={!directionsUrl}>
+            <Navigation className="w-4 h-4" strokeWidth={1.5} /> Directions
+          </Button>
+        </a>
         {isOwner ? (
-          <Button className="w-full h-11 gap-2" onClick={() => setFormOpen(true)}>
+          <Button className="flex-1" onClick={() => setFormOpen(true)}>
             <Pencil className="w-4 h-4" strokeWidth={1.5} /> Edit trip
           </Button>
+        ) : isFriend ? (
+          <Button className="flex-1" onClick={openMessage}>
+            <MessageCircle className="w-4 h-4" strokeWidth={1.5} /> Message
+          </Button>
         ) : (
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1 h-11 gap-2" onClick={openProfile}>
-              <User className="w-4 h-4" strokeWidth={1.5} /> Profile
-            </Button>
-            {isFriend ? (
-              <Button className="flex-1 h-11 gap-2" onClick={openMessage}>
-                <MessageCircle className="w-4 h-4" strokeWidth={1.5} /> Message
-              </Button>
-            ) : (
-              <Button className="flex-1 h-11 gap-2" onClick={handleConnect}>
-                <UserPlus className="w-4 h-4" strokeWidth={CONNECT_STROKE} />
-                {pendingRequest ? "Connect back" : "Connect"}
-              </Button>
-            )}
-          </div>
+          <Button className="flex-1" onClick={handleConnect}>
+            <UserPlus className="w-4 h-4" strokeWidth={CONNECT_STROKE} />
+            {pendingRequest ? "Connect back" : "Connect"}
+          </Button>
         )}
       </div>
 

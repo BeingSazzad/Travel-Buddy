@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter,
 } from "@/components/ui/sheet";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { INTERESTS, LANGUAGES } from "@/lib/profile-options";
 import { cn } from "@/lib/utils";
-import { MapPin, Calendar, Sparkles, ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
+import { MapPin, Calendar, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 
 function Chip({ active, onClick, children }) {
   return (
@@ -26,64 +26,86 @@ function Chip({ active, onClick, children }) {
   );
 }
 
+/** Count filter dimensions (age/dates = 1 each; interests/languages = selected count). */
+export function countMatchFilters(f = {}) {
+  let n = 0;
+  if (f.ageMin || f.ageMax) n += 1;
+  if (f.location) n += 1;
+  if (f.destination) n += 1;
+  if (f.dateFrom || f.dateTo) n += 1;
+  n += f.interests?.length || 0;
+  n += f.languages?.length || 0;
+  return n;
+}
+
 export default function MatchFilterSheet({ open, onOpenChange, filters, onChange, onReset }) {
+  const [draft, setDraft] = useState(filters);
   const [showMoreInterests, setShowMoreInterests] = useState(false);
   const [showMoreLanguages, setShowMoreLanguages] = useState(false);
 
-  const set = (patch) => onChange({ ...filters, ...patch });
+  // Draft only while open — Apply commits; avoids yanking the swipe deck mid-edit
+  useEffect(() => {
+    if (open) {
+      setDraft(filters);
+      setShowMoreInterests(false);
+      setShowMoreLanguages(false);
+    }
+  }, [open, filters]);
+
+  const set = (patch) => setDraft((d) => ({ ...d, ...patch }));
   const toggleArr = (key, val) => {
-    const arr = filters[key] || [];
+    const arr = draft[key] || [];
     set({ [key]: arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val] });
   };
 
-  // Calculate active filter count
-  const activeCount =
-    (filters.ageMin ? 1 : 0) +
-    (filters.ageMax ? 1 : 0) +
-    (filters.location ? 1 : 0) +
-    (filters.destination ? 1 : 0) +
-    (filters.dateFrom ? 1 : 0) +
-    (filters.dateTo ? 1 : 0) +
-    (filters.interests?.length || 0) +
-    (filters.languages?.length || 0);
-
+  const activeCount = useMemo(() => countMatchFilters(draft), [draft]);
   const visibleInterests = showMoreInterests ? INTERESTS : INTERESTS.slice(0, 8);
-  const visibleLanguages = showMoreLanguages ? LANGUAGES : LANGUAGES.slice(0, 6);
+  const visibleLanguages = showMoreLanguages ? LANGUAGES : LANGUAGES.slice(0, 8);
+
+  const apply = () => {
+    onChange(draft);
+    onOpenChange(false);
+  };
+
+  const resetDraft = () => {
+    onReset?.();
+    // Parent reset may be async via setState — clear draft immediately for UI
+    setDraft({
+      ageMin: "",
+      ageMax: "",
+      location: "",
+      destination: "",
+      dateFrom: "",
+      dateTo: "",
+      interests: [],
+      languages: [],
+    });
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-[32px] max-h-[85vh] overflow-y-auto px-0">
-        {/* Header */}
-        <SheetHeader className="px-6 pb-2 border-b border-border/60 flex flex-row items-center justify-between">
-          <div>
-            <SheetTitle className="font-display text-lg font-bold text-left">Filter Members</SheetTitle>
-            <p className="text-xs text-muted-foreground text-left mt-0.5">
-              {activeCount > 0 ? `${activeCount} filter${activeCount > 1 ? "s" : ""} applied` : "Narrow down travel matches"}
-            </p>
-          </div>
-          {activeCount > 0 && (
-            <button
-              onClick={onReset}
-              className="text-xs font-semibold text-primary flex items-center gap-1 hover:underline mr-6"
-            >
-              <RotateCcw className="w-3.5 h-3.5" /> Reset
-            </button>
-          )}
+      <SheetContent side="bottom" className="rounded-t-[32px] max-h-[85vh] flex flex-col px-0 gap-0">
+        <SheetHeader className="px-6 pb-3 border-b border-border/60 shrink-0">
+          <SheetTitle className="font-display text-lg font-bold text-left">Filter Members</SheetTitle>
+          <p className="text-xs text-muted-foreground text-left mt-0.5">
+            {activeCount > 0
+              ? `${activeCount} filter${activeCount === 1 ? "" : "s"} selected`
+              : "Narrow down travel matches"}
+          </p>
         </SheetHeader>
 
-        <div className="space-y-6 px-6 py-4">
-          {/* Section: Location & Trip */}
+        <div className="flex-1 overflow-y-auto space-y-6 px-6 py-4 pb-28">
           <div className="space-y-3">
             <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
               <MapPin className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
-              <span>Location & Destination</span>
+              <span>Location & destination</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground font-normal">Living in</Label>
                 <Input
                   placeholder="City or country"
-                  value={filters.location}
+                  value={draft.location}
                   onChange={(e) => set({ location: e.target.value })}
                   className="h-11 rounded-xl bg-card"
                 />
@@ -92,7 +114,7 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
                 <Label className="text-xs text-muted-foreground font-normal">Travelling to</Label>
                 <Input
                   placeholder="Target destination"
-                  value={filters.destination}
+                  value={draft.destination}
                   onChange={(e) => set({ destination: e.target.value })}
                   className="h-11 rounded-xl bg-card"
                 />
@@ -100,19 +122,19 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
             </div>
           </div>
 
-          {/* Section: Age Range */}
           <div className="space-y-3 pt-2 border-t border-border/60">
-            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Age Range</Label>
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Age range</Label>
             <div className="flex items-center gap-3">
               <Input
                 type="number"
                 inputMode="numeric"
                 min="18"
                 max="99"
-                placeholder="Min age (18)"
-                value={filters.ageMin}
+                placeholder="Min"
+                value={draft.ageMin}
                 onChange={(e) => set({ ageMin: e.target.value })}
                 className="h-11 rounded-xl bg-card"
+                aria-label="Minimum age"
               />
               <span className="text-muted-foreground font-medium">–</span>
               <Input
@@ -120,37 +142,43 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
                 inputMode="numeric"
                 min="18"
                 max="99"
-                placeholder="Max age (60+)"
-                value={filters.ageMax}
+                placeholder="Max"
+                value={draft.ageMax}
                 onChange={(e) => set({ ageMax: e.target.value })}
                 className="h-11 rounded-xl bg-card"
+                aria-label="Maximum age"
               />
             </div>
           </div>
 
-          {/* Section: Dates */}
           <div className="space-y-3 pt-2 border-t border-border/60">
             <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
               <Calendar className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
-              <span>Travel Dates</span>
+              <span>Travel dates</span>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Input
-                type="date"
-                value={filters.dateFrom}
-                onChange={(e) => set({ dateFrom: e.target.value })}
-                className="h-11 rounded-xl bg-card text-xs"
-              />
-              <Input
-                type="date"
-                value={filters.dateTo}
-                onChange={(e) => set({ dateTo: e.target.value })}
-                className="h-11 rounded-xl bg-card text-xs"
-              />
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground font-normal">From</Label>
+                <Input
+                  type="date"
+                  value={draft.dateFrom}
+                  onChange={(e) => set({ dateFrom: e.target.value })}
+                  className="h-11 rounded-xl bg-card text-xs"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground font-normal">To</Label>
+                <Input
+                  type="date"
+                  value={draft.dateTo}
+                  min={draft.dateFrom || undefined}
+                  onChange={(e) => set({ dateTo: e.target.value })}
+                  className="h-11 rounded-xl bg-card text-xs"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Section: Interests (Progressive Disclosure) */}
           <div className="space-y-3 pt-2 border-t border-border/60">
             <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
               <Sparkles className="w-3.5 h-3.5 text-primary" strokeWidth={2} />
@@ -158,7 +186,7 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
             </div>
             <div className="flex flex-wrap gap-2">
               {visibleInterests.map((i) => (
-                <Chip key={i} active={filters.interests?.includes(i)} onClick={() => toggleArr("interests", i)}>
+                <Chip key={i} active={draft.interests?.includes(i)} onClick={() => toggleArr("interests", i)}>
                   {i}
                 </Chip>
               ))}
@@ -166,51 +194,54 @@ export default function MatchFilterSheet({ open, onOpenChange, filters, onChange
             {INTERESTS.length > 8 && (
               <button
                 type="button"
-                onClick={() => setShowMoreInterests(!showMoreInterests)}
-                className="text-xs font-semibold text-primary flex items-center gap-1 mt-1 hover:underline"
+                onClick={() => setShowMoreInterests((v) => !v)}
+                className="text-xs font-semibold text-primary flex items-center gap-1 mt-1"
               >
                 {showMoreInterests ? (
                   <>Show less <ChevronUp className="w-3.5 h-3.5" /></>
                 ) : (
-                  <>Show {INTERESTS.length - 8} more interests <ChevronDown className="w-3.5 h-3.5" /></>
+                  <>Show {INTERESTS.length - 8} more <ChevronDown className="w-3.5 h-3.5" /></>
                 )}
               </button>
             )}
           </div>
 
-          {/* Section: Languages */}
-          <div className="space-y-3 pt-2 border-t border-border/60 pb-2">
+          <div className="space-y-3 pt-2 border-t border-border/60">
             <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Languages</Label>
             <div className="flex flex-wrap gap-2">
               {visibleLanguages.map((l) => (
-                <Chip key={l} active={filters.languages?.includes(l)} onClick={() => toggleArr("languages", l)}>
+                <Chip key={l} active={draft.languages?.includes(l)} onClick={() => toggleArr("languages", l)}>
                   {l}
                 </Chip>
               ))}
             </div>
-            {LANGUAGES.length > 6 && (
+            {LANGUAGES.length > 8 && (
               <button
                 type="button"
-                onClick={() => setShowMoreLanguages(!showMoreLanguages)}
-                className="text-xs font-semibold text-primary flex items-center gap-1 mt-1 hover:underline"
+                onClick={() => setShowMoreLanguages((v) => !v)}
+                className="text-xs font-semibold text-primary flex items-center gap-1 mt-1"
               >
                 {showMoreLanguages ? (
                   <>Show less <ChevronUp className="w-3.5 h-3.5" /></>
                 ) : (
-                  <>Show {LANGUAGES.length - 6} more languages <ChevronDown className="w-3.5 h-3.5" /></>
+                  <>Show {LANGUAGES.length - 8} more <ChevronDown className="w-3.5 h-3.5" /></>
                 )}
               </button>
             )}
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <SheetFooter className="sticky bottom-0 bg-background/95 backdrop-blur-md border-t border-border/60 p-4 flex-row gap-3">
-          <Button variant="outline" className="flex-1 h-12 rounded-2xl font-semibold" onClick={onReset}>
-            Reset All
+        <SheetFooter className="absolute bottom-0 inset-x-0 bg-background/95 backdrop-blur-md border-t border-border/60 p-4 flex-row gap-3 safe-pb">
+          <Button
+            variant="outline"
+            className="flex-1 h-12 rounded-2xl font-semibold"
+            onClick={resetDraft}
+            disabled={activeCount === 0}
+          >
+            Reset
           </Button>
-          <Button className="flex-1 h-12 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold shadow-md" onClick={() => onOpenChange(false)}>
-            {activeCount > 0 ? `Apply Filters (${activeCount})` : "Show Results"}
+          <Button className="flex-1 h-12 rounded-2xl font-bold shadow-md" onClick={apply}>
+            {activeCount > 0 ? `Show matches` : "Done"}
           </Button>
         </SheetFooter>
       </SheetContent>

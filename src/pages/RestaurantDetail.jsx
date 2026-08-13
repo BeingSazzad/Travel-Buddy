@@ -57,7 +57,7 @@ export default function RestaurantDetail() {
   const itemKey = `restaurant:${r.name}`;
   const saved = isSaved(itemKey);
   const facilities = Object.entries(r.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]);
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${r.address}, ${r.city}`)}`;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([r.address, r.city, r.country].filter(Boolean).join(", "))}`;
 
   const onShare = async () => {
     try {
@@ -71,7 +71,6 @@ export default function RestaurantDetail() {
       <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-2">
-          <button onClick={() => setReportOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center"><Flag className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={onShare} className="w-9 h-9 rounded-full flex items-center justify-center"><Share2 className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={() => toggle({ type: "restaurant", title: r.name, location: r.city, country: r.country, image: r.image, rating: r.rating })} className="w-9 h-9 rounded-full flex items-center justify-center">
             <Bookmark className={cn("w-5 h-5", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
@@ -95,27 +94,33 @@ export default function RestaurantDetail() {
 
         <div className="detail-body">
           <h1 className="font-display font-bold text-lg">{r.name}</h1>
-          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground"><MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {r.city}, {r.country} · {r.distance} km</div>
+          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground min-w-0">
+            <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
+            <span className="truncate">{r.city}, {r.country} · {r.distance} km</span>
+          </div>
 
-          <div className="flex items-center gap-2 mt-3">
-            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary">
-              <Star className="w-3.5 h-3.5 fill-primary text-primary" strokeWidth={0} />
-              <span className="font-semibold text-sm">{r.rating.toFixed(1)}</span>
-              <span className="text-xs text-muted-foreground">Seluna rating</span>
-            </span>
-            <span className="text-xs text-muted-foreground">{r.reviews} reviews</span>
+          <div className="mt-3 flex items-center gap-1.5 text-sm min-w-0">
+            <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold shrink-0" strokeWidth={0} />
+            <span className="font-semibold tabular-nums">{r.rating.toFixed(1)}</span>
+            <span className="text-muted-foreground/50">·</span>
+            <span className="text-muted-foreground">{r.reviews.toLocaleString()} reviews</span>
           </div>
 
           <p className="text-sm text-muted-foreground leading-relaxed mt-4">{r.description}</p>
 
-          <div className="mt-5 space-y-2">
-            <div className="flex items-start gap-2 text-sm"><MapPin className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{r.address}</span></div>
-            <EventMap compact query={r.address} label={[r.address, r.city].filter(Boolean).join(", ")} />
-            <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{r.hours}</span></div>
-            <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-primary mt-0.5" strokeWidth={1.5} /><span>{r.phone}</span></div>
-            <a href={r.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">{r.website.replace("https://", "")}</span></a>
-            {r.menuUrl && <a href={r.menuUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><UtensilsCrossed className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">View menu</span></a>}
-            {r.reservationUrl && <a href={r.reservationUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><CalendarCheck className="w-4 h-4 mt-0.5" strokeWidth={1.5} /><span className="underline">Make a reservation</span></a>}
+          <div className="mt-5 space-y-3">
+            <EventMap
+              compact
+              query={[r.address, r.city, r.country].filter(Boolean).join(", ")}
+              label={r.address}
+            />
+            <div className="space-y-2">
+              <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{r.hours}</span></div>
+              <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{r.phone}</span></div>
+              <a href={r.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">{r.website.replace("https://", "")}</span></a>
+              {r.menuUrl && <a href={r.menuUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><UtensilsCrossed className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">View menu</span></a>}
+              {r.reservationUrl && <a href={r.reservationUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><CalendarCheck className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">Make a reservation</span></a>}
+            </div>
           </div>
 
           <section className="mt-5">

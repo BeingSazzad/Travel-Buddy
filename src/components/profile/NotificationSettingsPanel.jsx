@@ -3,20 +3,33 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Lock } from "lucide-react";
 
+/** Lean notification prefs — only categories users understand and control often */
 export const NOTIFICATION_CATEGORIES = [
-  { key: "notif_matches", label: "Matches", desc: "New travel matches and companion suggestions" },
-  { key: "notif_messages", label: "Messages", desc: "New chat messages" },
-  { key: "notif_events", label: "Events", desc: "Invitations, approvals and event reminders" },
-  { key: "notif_trip_suggestions", label: "Trip suggestions", desc: "Trip reminders and companion suggestions" },
-  { key: "notif_destination_activity", label: "Destination activity", desc: "Members travelling to your destinations" },
-  { key: "notif_deals", label: "Deals", desc: "New exclusive Seluna deals" },
-  { key: "notif_recommendations", label: "Recommendations", desc: "Saved place updates and recommendations" },
-  { key: "notif_marketing", label: "Marketing messages", desc: "Promotions and updates from Seluna" },
+  {
+    key: "notif_matches",
+    label: "Matches",
+    desc: "New connections and women on overlapping trips",
+  },
+  {
+    key: "notif_messages",
+    label: "Messages",
+    desc: "New chat messages",
+  },
+  {
+    key: "notif_events",
+    label: "Events",
+    desc: "Invites and reminders for meetups",
+  },
+  {
+    key: "notif_offers",
+    label: "Offers & updates",
+    desc: "Deals, saved-place tips, and Seluna news",
+  },
 ];
 
 function Toggle({ id, label, desc, checked, onCheck, disabled, locked }) {
   return (
-    <div className="flex items-start justify-between gap-4 py-3 border-b border-border/60 last:border-0">
+    <div className="flex items-start justify-between gap-4 py-3.5 border-b border-border/40 last:border-0">
       <div className="flex-1 min-w-0">
         <Label htmlFor={id} className="text-sm font-medium flex items-center gap-1.5">
           {label}
@@ -36,11 +49,11 @@ export default function NotificationSettingsPanel({
   onPrefChange,
 }) {
   return (
-    <div className="space-y-1">
+    <div>
       <Toggle
         id="notif-master"
         label="All notifications"
-        desc="Master switch for in-app notifications"
+        desc="Turn everything off except safety alerts"
         checked={master}
         onCheck={onMasterChange}
       />
@@ -58,17 +71,17 @@ export default function NotificationSettingsPanel({
         ))}
         <Toggle
           id="notif-safety"
-          label="Safety & account notices"
-          desc="Important security and account alerts — always on"
+          label="Safety & account"
+          desc="Security and account alerts — always on"
           checked={true}
           onCheck={() => {}}
           disabled={true}
           locked
         />
       </div>
-      <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1.5 leading-normal">
-        <Lock className="w-3 h-3 shrink-0" strokeWidth={1.5} />
-        Safety and account-critical notices cannot be disabled.
+      <p className="text-sm text-muted-foreground mt-3 flex items-start gap-1.5 leading-normal">
+        <Lock className="w-3.5 h-3.5 shrink-0 mt-0.5" strokeWidth={1.5} />
+        Safety and account-critical notices cannot be turned off.
       </p>
     </div>
   );

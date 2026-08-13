@@ -63,12 +63,12 @@ export default function Search() {
   }, [query, filters, hasQuery]);
 
   return (
-    <div className="min-h-0 bg-background">
-      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-md px-app safe-pt pb-3 flex items-center gap-2">
+    <div className="min-h-full">
+      <header className="home-header-sticky px-app safe-pt pb-3 flex items-center gap-2">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" aria-label="Back">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <div className="flex-1 flex items-center gap-2 bg-card border border-border rounded-full px-4 h-10">
+        <div className="flex-1 flex items-center gap-2 bg-card/80 border border-border rounded-full px-4 h-10">
           <SearchIcon className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
           <input
             autoFocus
@@ -85,7 +85,7 @@ export default function Search() {
         </div>
         <button
           onClick={() => setSheetOpen(true)}
-          className="relative w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center shrink-0"
+          className="relative w-10 h-10 rounded-full bg-card/80 border border-border flex items-center justify-center shrink-0"
           aria-label="Filters"
         >
           <SlidersHorizontal className="w-4 h-4" strokeWidth={1.5} />

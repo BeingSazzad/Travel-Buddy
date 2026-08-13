@@ -82,9 +82,11 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
 
   const valid =
     form.city.trim() &&
+    form.country &&
     form.start_date &&
     form.end_date &&
-    form.end_date >= form.start_date;
+    form.end_date >= form.start_date &&
+    form.travel_style;
 
   const onCoverImage = async (e) => {
     const file = e.target.files?.[0];
@@ -147,7 +149,7 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
               <Input value={form.city} onChange={(e) => set("city", e.target.value)} placeholder="Lisbon" className="h-10" />
             </div>
             <div className="space-y-2">
-              <Label>Country</Label>
+              <Label>Country *</Label>
               <Select value={form.country} onValueChange={(v) => set("country", v)}>
                 <SelectTrigger className="h-10"><SelectValue placeholder="Select" /></SelectTrigger>
                 <SelectContent>
@@ -169,7 +171,7 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
           </div>
 
           <div className="space-y-2">
-            <Label>Travel style</Label>
+            <Label>Travel style *</Label>
             <Select value={form.travel_style} onValueChange={(v) => set("travel_style", v)}>
               <SelectTrigger className="h-10"><SelectValue placeholder="Select" /></SelectTrigger>
               <SelectContent>

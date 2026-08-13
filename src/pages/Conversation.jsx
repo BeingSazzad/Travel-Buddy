@@ -139,7 +139,6 @@ export default function Conversation() {
           otherId={otherId}
           otherName={otherName}
           conversationId={conversation.id}
-          onViewProfile={(memberId) => memberId && navigate(`/members/${memberId}`)}
           onDone={() => navigate("/messages")}
         />
       </header>

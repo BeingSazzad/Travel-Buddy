@@ -7,7 +7,7 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, SlidersHorizontal } from "lucide-react";
 import TagFilterChips from "@/components/common/TagFilterChips";
 import FilterPicker from "@/components/common/FilterPicker";
 import { cn } from "@/lib/utils";
@@ -125,16 +125,17 @@ export function VenueListToolbar({
         <button
           type="button"
           onClick={() => onFilterOpen(true)}
+          aria-label="Filters"
           className={cn(
-            "flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold border shrink-0 transition-colors",
+            "relative w-9 h-9 rounded-full flex items-center justify-center border shrink-0 transition-colors",
             activeFilterCount > 0
               ? "border-primary/40 bg-primary/10 text-brand-strong"
               : "border-border/60 bg-card/50 text-foreground"
           )}
         >
-          Filters
+          <SlidersHorizontal className="w-4 h-4" strokeWidth={1.5} />
           {activeFilterCount > 0 && (
-            <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-[10px] font-bold text-white flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-primary text-[10px] font-bold text-white flex items-center justify-center">
               {activeFilterCount}
             </span>
           )}

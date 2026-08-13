@@ -1,13 +1,17 @@
 /** Demo / offline coordinates for cities used across Seluna content */
 const CITY_COORDS = {
   lisbon: [38.7223, -9.1393],
+  lisboa: [38.7223, -9.1393],
   portugal: [38.7223, -9.1393],
   paris: [48.8566, 2.3522],
   france: [48.8566, 2.3522],
   bali: [-8.4095, 115.1889],
+  canggu: [-8.6478, 115.1385],
   ubud: [-8.5069, 115.2625],
   indonesia: [-2.5489, 118.0149],
   copenhagen: [55.6761, 12.5683],
+  københavn: [55.6761, 12.5683],
+  kobenhavn: [55.6761, 12.5683],
   denmark: [55.6761, 12.5683],
   santorini: [36.3932, 25.4615],
   ammoudi: [36.4047, 25.4309],
@@ -41,7 +45,8 @@ const CITY_COORDS = {
   seminyak: [-8.6905, 115.1682],
 };
 
-const DEFAULT_CENTER = [48.8566, 2.3522];
+/** Neutral ocean fallback — never imply a wrong city (old default was Paris). */
+const DEFAULT_CENTER = [20, 0];
 
 function hashString(str) {
   let hash = 0;
@@ -60,17 +65,24 @@ function jitter([lat, lon], seed) {
   return [lat + dLat, lon + dLon];
 }
 
+function normalizePlaceQuery(query) {
+  return query
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "");
+}
+
 /**
  * Resolve [lat, lon] from a free-text place query without any API.
  */
 export function resolveCoordinates(query) {
   if (!query || typeof query !== "string") return null;
-  const q = query.toLowerCase();
+  const q = normalizePlaceQuery(query);
 
   // Prefer longer / more specific keys first
   const keys = Object.keys(CITY_COORDS).sort((a, b) => b.length - a.length);
   for (const key of keys) {
-    if (q.includes(key)) {
+    if (q.includes(normalizePlaceQuery(key))) {
       return jitter(CITY_COORDS[key], query);
     }
   }

@@ -54,9 +54,9 @@ export default function PrivacyPolicy() {
           <p className="text-sm text-muted-foreground mt-1">Your privacy & safety are our highest priorities</p>
         </div>
 
-        <div className="space-y-4">
+        <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-soft divide-y divide-border/70">
           {SECTIONS.map((s) => (
-            <div key={s.title} className="rounded-2xl border border-border/80 bg-card p-4 shadow-soft">
+            <div key={s.title} className="py-4 first:pt-0 last:pb-0">
               <h2 className="row-title text-foreground mb-1.5">{s.title}</h2>
               <p className="text-sm text-muted-foreground leading-relaxed">{s.body}</p>
             </div>

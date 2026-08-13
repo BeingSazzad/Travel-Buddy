@@ -87,15 +87,15 @@ export default function Notifications() {
 
   return (
     <div className="app-px safe-pt pb-4">
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center tap-feedback"
+            className="w-9 h-9 rounded-full flex items-center justify-center tap-feedback -ml-1"
             aria-label="Go back"
           >
-            <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
+            <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
           </button>
           <h1 className="font-display font-bold text-lg">Notifications</h1>
         </div>
@@ -123,7 +123,7 @@ export default function Notifications() {
           description="New matches, messages and updates will show here."
         />
       ) : (
-        <div className="space-y-2">
+        <div className="divide-y-0">
           {items.map((n) => (
             <NotificationItem key={n.id} n={n} onMarkRead={handleMarkRead} />
           ))}

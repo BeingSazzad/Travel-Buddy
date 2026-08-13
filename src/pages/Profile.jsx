@@ -3,7 +3,6 @@ import { Crown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import ProfileHeader from "@/components/profile/ProfileHeader";
-import ProfileAbout from "@/components/profile/ProfileAbout";
 import AccountMenu from "@/components/profile/AccountMenu";
 import VerificationCard from "@/components/profile/VerificationCard";
 
@@ -21,10 +20,6 @@ export default function Profile() {
       </div>
 
       <ProfileHeader />
-
-      <div className="mt-4">
-        <ProfileAbout />
-      </div>
 
       {isPlus && (
         <button

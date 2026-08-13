@@ -1,61 +1,87 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Star, Bookmark } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 import { Image } from "@/components/ui/image";
-import { useSaved } from "@/lib/SavedContext";
+import SaveButton from "@/components/common/SaveButton";
 import { cn } from "@/lib/utils";
 
 function HotelStars({ stars }) {
   return (
-    <span className="flex items-center gap-0.5">
+    <span className="flex items-center gap-0.5" aria-label={`${stars}-star hotel`}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} className={cn("w-3 h-3", i < stars ? "fill-primary text-primary" : "text-border")} strokeWidth={0} />
+        <Star
+          key={i}
+          className={cn("w-3 h-3", i < stars ? "fill-brand-gold text-brand-gold" : "text-border")}
+          strokeWidth={0}
+        />
       ))}
     </span>
   );
 }
 
 export default function HotelCard({ hotel }) {
-  const { isSaved, toggle } = useSaved();
   const navigate = useNavigate();
   const h = hotel;
-  const key = `hotel:${h.name}`;
-  const saved = isSaved(key);
 
   return (
-    <div onClick={() => navigate(`/hotels/${encodeURIComponent(h.name)}`)} className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card interactive-card group">
-      <div className="relative h-40">
-        <Image src={h.image} alt={h.name} fittingType="fill" className="w-full h-full image-zoom" />
-        <div className="gradient-overlay-soft" />
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); e.preventDefault(); toggle({ type: "hotel", title: h.name, location: h.city, country: h.country, image: h.image, rating: h.memberRating }); }}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center tap-feedback"
-          aria-label={saved ? "Unsave" : "Save"}
-        >
-          <span key={saved ? "on" : "off"} className={cn("inline-flex", saved && "save-pop")}>
-            <Bookmark className={cn("w-4 h-4", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
-          </span>
-        </button>
-        <span className="absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-primary font-medium">€{h.pricePerNight}/night</span>
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => navigate(`/hotels/${encodeURIComponent(h.name)}`)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate(`/hotels/${encodeURIComponent(h.name)}`);
+        }
+      }}
+      className="rounded-3xl overflow-hidden border border-border/60 shadow-soft bg-card interactive-card group text-left cursor-pointer"
+    >
+      <div className="relative h-44">
+        <Image src={h.image} alt={h.name} fittingType="fill" className="w-full h-full object-cover image-zoom" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10 pointer-events-none" />
+        <div className="absolute top-3 right-3 z-20" onClick={(e) => e.stopPropagation()}>
+          <SaveButton
+            item={{
+              type: "hotel",
+              title: h.name,
+              location: h.city,
+              country: h.country,
+              image: h.image,
+              rating: h.memberRating,
+            }}
+            variant="overlay"
+          />
+        </div>
+        <span className="absolute top-3 left-3 text-[11px] px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/15 font-medium">
+          €{h.pricePerNight}/night
+        </span>
       </div>
-      <div className="p-4">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-base leading-tight">{h.name}</h3>
-          <span className="flex items-center gap-1 text-sm shrink-0">
-            <Star className="w-3.5 h-3.5 fill-primary text-primary" strokeWidth={0} />
-            <span className="font-medium">{h.memberRating.toFixed(1)}</span>
+
+      <div className="px-4 pt-3.5 pb-4">
+        <h3 className="font-display font-semibold text-[1.05rem] leading-snug tracking-tight">
+          {h.name}
+        </h3>
+
+        <div className="mt-1.5 flex items-center gap-1.5 text-sm min-w-0">
+          <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold shrink-0" strokeWidth={0} />
+          <span className="font-semibold tabular-nums">{h.memberRating.toFixed(1)}</span>
+          <span className="text-muted-foreground/50">·</span>
+          <span className="text-muted-foreground truncate">
+            {h.reviews.toLocaleString()} reviews
           </span>
         </div>
-        <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-          <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
-          <span>{h.city}, {h.country}</span>
-          <span className="mx-1">·</span>
-          <span>{h.distance} km from centre</span>
-        </div>
-        <div className="flex items-center justify-between mt-2">
+
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
+          <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
+          <span className="truncate">
+            {h.city}, {h.country}
+            <span className="text-muted-foreground/50"> · </span>
+            {h.distance} km from centre
+          </span>
+        </p>
+
+        <div className="mt-2">
           <HotelStars stars={h.stars} />
-          <span className="text-xs text-muted-foreground">{h.reviews} reviews</span>
         </div>
       </div>
     </div>

@@ -106,9 +106,9 @@ export default function CommunityGuidelines() {
           )}
         </div>
 
-        <div className="space-y-3">
+        <div className="rounded-2xl border border-border bg-card p-4 divide-y divide-border/70">
           {SECTIONS.map((s, i) => (
-            <div key={s.title} className="rounded-2xl border border-border bg-card p-4">
+            <div key={s.title} className="py-4 first:pt-0 last:pb-0">
               <p className="row-title flex items-center gap-2">
                 <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center font-medium">
                   {i + 1}

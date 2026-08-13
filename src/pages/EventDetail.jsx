@@ -14,8 +14,8 @@ import {
   UserCheck,
   ChevronDown,
   Users,
-  Tag,
   UserRound,
+  Navigation,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -24,30 +24,27 @@ import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
 import ManageAttendees from "@/components/events/ManageAttendees";
 import ReportSheet from "@/components/reports/ReportSheet";
-import { capitalize, fmtEventDateLong } from "@/lib/event-options";
+import { capitalize, fmtEventWhen } from "@/lib/event-options";
 import { useSaved } from "@/lib/SavedContext";
 import { savedItemKey } from "@/lib/saved-item-key";
 import { findMockEvent } from "@/lib/mock-events";
 import { getMockConversationId } from "@/lib/member-profile";
 import { cn } from "@/lib/utils";
-import { FALLBACK_AVATAR_URL, memberAvatar } from "@/lib/images";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 
 const FALLBACK_AVATAR = FALLBACK_AVATAR_URL;
 const HERO_BTN =
   "w-10 h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/15 flex items-center justify-center text-white active:scale-95 transition-transform";
 
-function MetaRow({ children, onClick, className }) {
+function Fact({ icon: Icon, label, value }) {
+  if (!value) return null;
   return (
-    <div
-      className={cn(
-        "flex items-center gap-3 py-3.5 min-w-0",
-        onClick && "cursor-pointer active:opacity-90",
-        className
-      )}
-      onClick={onClick}
-      role={onClick ? "button" : undefined}
-    >
-      {children}
+    <div className="min-w-0">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+        {Icon && <Icon className="w-3 h-3 text-primary/80" strokeWidth={1.75} />}
+        {label}
+      </p>
+      <p className="text-sm text-foreground mt-0.5 leading-snug">{value}</p>
     </div>
   );
 }
@@ -71,25 +68,40 @@ export default function EventDetail() {
     try {
       const e = await base44.entities.Event.get(id);
       setEvent(e);
-      const res = await base44.functions.invoke("event-attendees", { event_id: id });
-      setAttendees(res.data?.attendees || []);
+      try {
+        const res = await base44.functions.invoke("event-attendees", { event_id: id });
+        setAttendees(res.data?.attendees || []);
+      } catch {
+        setAttendees(e.attendees || []);
+      }
       if (e?.host_id && e.host_id !== user?.id) {
-        const hp = await base44.functions.invoke("member-profile", { user_id: e.host_id });
-        setHost(hp.data?.profile || null);
+        try {
+          const hp = await base44.functions.invoke("member-profile", { user_id: e.host_id });
+          setHost(hp.data?.profile || null);
+        } catch {
+          setHost(null);
+        }
+      } else {
+        setHost(null);
       }
     } catch {
       const mock = findMockEvent(id);
       if (mock) {
         setEvent(mock);
+        setAttendees(mock.attendees || []);
         if (mock.host_id) {
           setHost({
             name: mock.host_name,
             avatar: mock.host_avatar,
             user_id: mock.host_id,
           });
+        } else {
+          setHost(null);
         }
       } else {
         setEvent(null);
+        setAttendees([]);
+        setHost(null);
       }
     } finally {
       setLoading(false);
@@ -126,6 +138,11 @@ export default function EventDetail() {
   const full = going.length >= (event.max_attendees || 0);
   const goingCount = going.length > 0 ? going.length : event.attendees_count || 0;
   const locationLine = [event.location, event.city, event.country].filter(Boolean).join(", ");
+  const areaLine = [event.city, event.country].filter(Boolean).join(", ");
+  const meetingPoint = event.location || areaLine;
+  const directionsUrl = locationLine
+    ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(locationLine)}`
+    : null;
 
   const savedItem = {
     type: "event",
@@ -139,19 +156,12 @@ export default function EventDetail() {
   const savedKey = savedItemKey(savedItem);
   const saved = isSaved(savedKey);
 
-  const dateLine = [
-    fmtEventDateLong(event.date),
-    event.end_date && event.end_date !== event.date ? `– ${fmtEventDateLong(event.end_date)}` : null,
-    event.time,
-    event.end_time ? `– ${event.end_time}` : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  const dateLine = fmtEventWhen(event);
 
   const goingAvatars =
     going.length > 0
       ? going.slice(0, 3).map((a) => a.avatar || FALLBACK_AVATAR)
-      : [host?.avatar || event.host_avatar, memberAvatar("mock_1"), memberAvatar("mock_2")].filter(Boolean).slice(0, 3);
+      : [host?.avatar || event.host_avatar].filter(Boolean);
 
   const rsvp = async (action, extra = {}) => {
     const join = action === "join";
@@ -279,127 +289,154 @@ export default function EventDetail() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto app-scroll pb-28">
-        <div className="app-px pt-5">
-          <h1 className="font-display font-bold text-2xl leading-tight tracking-tight text-foreground">
-            {event.title}
-          </h1>
-          {locationLine && (
-            <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-2 min-w-0">
-              <MapPin className="w-4 h-4 shrink-0 text-primary/80" strokeWidth={1.5} />
-              <span className="truncate">{locationLine}</span>
-            </p>
-          )}
-
-          {/* Meta rows with dividers */}
-          <div className="mt-5 border-t border-border/60 divide-y divide-border/60">
-            {dateLine && (
-              <MetaRow>
-                <Calendar className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
-                <span className="text-sm text-foreground">{dateLine}</span>
-              </MetaRow>
-            )}
-
-            {event.max_attendees != null && (
-              <MetaRow>
-                <Users className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
-                <span className="text-sm text-foreground">
-                  Up to {event.max_attendees} attendees
-                  {event.visibility === "approval" ? " · approval required" : ""}
+      <div className="flex-1 overflow-y-auto app-scroll pb-6">
+        <div className="app-px pt-5 space-y-6">
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              {event.visibility === "approval" && (
+                <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/12 text-primary border border-primary/25">
+                  Approval required
                 </span>
-              </MetaRow>
+              )}
+              {event.pricing === "paid_external" && (
+                <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border">
+                  Paid tickets
+                </span>
+              )}
+            </div>
+            <h1 className="font-display font-bold text-2xl leading-tight tracking-tight text-foreground">
+              {event.title}
+            </h1>
+            {areaLine && (
+              <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-2 min-w-0">
+                <MapPin className="w-4 h-4 shrink-0 text-primary/80" strokeWidth={1.5} />
+                <span className="truncate">{areaLine}</span>
+              </p>
             )}
+          </div>
 
-            <MetaRow>
-              <Tag className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
-              <span className="text-sm text-foreground">
-                {event.pricing === "paid_external" ? "Paid (external tickets)" : "Free to join"}
+          {/* Key facts — scannable, not a long divider list */}
+          <div className="rounded-2xl border border-border/70 bg-card/40 p-4 space-y-4">
+            <Fact icon={Calendar} label="When" value={dateLine} />
+            <div className="grid grid-cols-2 gap-4">
+              <Fact
+                icon={Users}
+                label="Spots"
+                value={
+                  event.max_attendees != null
+                    ? `${goingCount}/${event.max_attendees} filled`
+                    : goingCount > 0
+                      ? `${goingCount} going`
+                      : null
+                }
+              />
+              {(event.age_min || event.age_max) && (
+                <Fact
+                  icon={UserRound}
+                  label="Ages"
+                  value={`${event.age_min || "any"}–${event.age_max || "any"}`}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Who's interested / going — host can open manage sheet */}
+          <button
+            type="button"
+            onClick={isHost ? () => setManageOpen(true) : undefined}
+            className={cn(
+              "w-full text-left rounded-2xl border border-border/70 bg-card/40 p-4",
+              isHost && "tap-feedback"
+            )}
+          >
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <p className="font-display font-semibold text-sm">
+                {isHost && pending.length > 0 ? "Join requests" : "Who's going"}
+              </p>
+              <span className="text-xs text-muted-foreground shrink-0">
+                {isHost && pending.length > 0
+                  ? `${pending.length} to review`
+                  : goingCount > 0
+                    ? `${goingCount} going`
+                    : "Be the first"}
               </span>
-            </MetaRow>
-
-            {(event.age_min || event.age_max) && (
-              <MetaRow>
-                <UserRound className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
-                <span className="text-sm text-foreground">
-                  Ages {event.age_min || "any"}–{event.age_max || "any"}
-                </span>
-              </MetaRow>
-            )}
-
-            {goingCount > 0 && (
-              <MetaRow>
-                <div className="flex items-center shrink-0">
-                  {goingAvatars.map((src, i) => (
+            </div>
+            {goingAvatars.length > 0 || (isHost && pending.length > 0) ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center">
+                  {(isHost && pending.length > 0
+                    ? pending.slice(0, 3).map((a) => a.avatar || FALLBACK_AVATAR)
+                    : goingAvatars
+                  ).map((src, i) => (
                     <img
                       key={i}
                       src={src}
                       alt=""
-                      className="w-7 h-7 rounded-full object-cover border-2 border-background -ml-2 first:ml-0"
+                      className="w-9 h-9 rounded-full object-cover border-2 border-background -ml-2 first:ml-0"
                     />
                   ))}
                 </div>
-                <span className="text-sm text-foreground">{goingCount} going</span>
-              </MetaRow>
+                <p className="text-xs text-muted-foreground flex-1 min-w-0">
+                  {isHost && pending.length > 0
+                    ? "Tap to approve or decline"
+                    : (() => {
+                        const names = going.slice(0, 2).map((a) => a.name).filter(Boolean);
+                        if (!names.length) return `${goingCount} going`;
+                        return names.join(", ") + (goingCount > 2 ? ` +${goingCount - 2}` : "");
+                      })()}
+                </p>
+                {isHost && (
+                  <ChevronDown className="w-4 h-4 -rotate-90 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">No one has joined yet.</p>
             )}
+          </button>
 
-            <MetaRow
+          {/* Host */}
+          <div className="w-full flex items-center gap-3 rounded-2xl border border-border/70 bg-card/40 p-3.5">
+            <button
+              type="button"
               onClick={!isHost && event.host_id ? () => navigate(`/members/${event.host_id}`) : undefined}
+              className={cn(
+                "flex items-center gap-3 flex-1 min-w-0 text-left",
+                !isHost && event.host_id && "tap-feedback"
+              )}
             >
               <img
                 src={host?.avatar || event.host_avatar || FALLBACK_AVATAR}
-                alt={event.host_name}
-                className="w-7 h-7 rounded-full object-cover shrink-0"
+                alt=""
+                className="w-11 h-11 rounded-full object-cover shrink-0 border border-border"
               />
-              <span className="text-sm text-foreground">
-                Hosted by <span className="font-medium">{event.host_name}</span>
-              </span>
-            </MetaRow>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Host</p>
+                <p className="text-sm font-semibold truncate">{event.host_name || "Seluna host"}</p>
+              </div>
+            </button>
+            {!isHost && event.host_id && (
+              <button
+                type="button"
+                onClick={() => messageUser(event.host_id)}
+                className="w-10 h-10 rounded-full border border-border bg-background flex items-center justify-center shrink-0"
+                aria-label="Message host"
+              >
+                <MessageCircle className="w-4 h-4" strokeWidth={1.5} />
+              </button>
+            )}
           </div>
 
           {event.description && (
-            <section className="mt-7">
-              <h2 className="font-display font-semibold text-base mb-2">About this event</h2>
+            <section>
+              <h2 className="font-display font-semibold text-base mb-2">About</h2>
               <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
                 {event.description}
               </p>
             </section>
           )}
 
-          <div className="mt-6">
-            <EventMap
-              compact
-              query={locationLine}
-              label={locationLine}
-            />
-          </div>
-
-          {going.length > 0 && (
-            <section className="mt-6">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="font-display font-semibold text-base">Who&apos;s going</h2>
-                <span className="text-xs text-muted-foreground">
-                  {going.length}/{event.max_attendees || 0}
-                  {pending.length > 0 && isHost ? ` · ${pending.length} pending` : ""}
-                </span>
-              </div>
-              <div className="flex items-center flex-wrap gap-2">
-                {going.slice(0, 10).map((a) => (
-                  <img
-                    key={a.attendance_id || a.user_id}
-                    src={a.avatar || FALLBACK_AVATAR}
-                    alt={a.name}
-                    className="w-9 h-9 rounded-full object-cover border-2 border-background"
-                  />
-                ))}
-                {going.length > 10 && (
-                  <span className="text-xs text-muted-foreground">+{going.length - 10}</span>
-                )}
-              </div>
-            </section>
-          )}
-
           {event.languages && event.languages.length > 0 && (
-            <section className="mt-6">
+            <section>
               <h2 className="font-display font-semibold text-base mb-2 flex items-center gap-1.5">
                 <Globe className="w-4 h-4 text-primary" strokeWidth={1.5} /> Languages
               </h2>
@@ -413,18 +450,20 @@ export default function EventDetail() {
             </section>
           )}
 
+          <EventMap compact query={locationLine || meetingPoint} label={meetingPoint} />
+
           {event.pricing === "paid_external" && event.external_link && (
             <a
               href={event.external_link}
               target="_blank"
               rel="noreferrer"
-              className="block mt-6 w-full text-center rounded-full border border-border py-2.5 text-sm font-medium"
+              className="block w-full text-center rounded-2xl border border-border py-3 text-sm font-semibold"
             >
               Get tickets ↗
             </a>
           )}
 
-          <div className="mt-6 rounded-2xl border border-border/60 bg-card/50 p-4">
+          <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
             <button
               type="button"
               onClick={() => setSafetyOpen((o) => !o)}
@@ -462,7 +501,7 @@ export default function EventDetail() {
           </div>
 
           {isHost && (
-            <section className="mt-6">
+            <section>
               <h2 className="font-display font-semibold text-base mb-2">Host tools</h2>
               <div className="grid grid-cols-2 gap-2">
                 <Button
@@ -473,7 +512,8 @@ export default function EventDetail() {
                   <Pencil className="w-4 h-4" strokeWidth={1.5} /> Edit
                 </Button>
                 <Button variant="outline" className="justify-start gap-2" onClick={() => setManageOpen(true)}>
-                  <UserCheck className="w-4 h-4" strokeWidth={1.5} /> Attendees
+                  <UserCheck className="w-4 h-4" strokeWidth={1.5} />
+                  Attendees{pending.length > 0 ? ` (${pending.length})` : ""}
                 </Button>
                 <Button
                   variant="outline"
@@ -488,52 +528,39 @@ export default function EventDetail() {
         </div>
       </div>
 
-      {!isHost && (
-        <div className="fixed bottom-0 left-0 right-0 z-30 max-w-app mx-auto app-px pt-3 safe-pb bg-background/92 backdrop-blur-xl border-t border-border/60">
-          <div className="flex items-center gap-3">
-            {myAtt?.status === "going" ? (
-              <Button
-                variant="outline"
-                className="flex-1 h-12 rounded-full text-sm font-semibold"
-                onClick={() => rsvp("leave")}
-                disabled={busy}
-              >
-                Leave event
-              </Button>
-            ) : myAtt?.status === "pending" ? (
-              <div className="flex-1 flex gap-2">
-                <Button variant="outline" className="flex-1 h-12 rounded-full" disabled>
-                  Request sent
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="text-destructive h-12 px-4"
-                  onClick={() => rsvp("leave")}
-                  disabled={busy}
-                >
-                  Cancel
-                </Button>
-              </div>
-            ) : (
-              <Button
-                className="flex-1 h-12 rounded-full text-sm font-semibold shadow-md"
-                onClick={() => rsvp("join")}
-                disabled={busy || full}
-              >
-                {primaryCtaLabel()}
-              </Button>
-            )}
-            <button
-              type="button"
-              onClick={() => messageUser(event.host_id)}
-              className="w-12 h-12 shrink-0 rounded-full border border-border bg-card flex items-center justify-center active:scale-95 transition-transform"
-              aria-label="Message host"
-            >
-              <MessageCircle className="w-5 h-5 text-foreground" strokeWidth={1.5} />
-            </button>
-          </div>
-        </div>
-      )}
+      <div className="sticky bottom-0 z-30 app-px pt-3 safe-pb bg-background/95 backdrop-blur border-t border-border flex gap-2">
+        <a
+          href={directionsUrl || "#"}
+          target="_blank"
+          rel="noreferrer"
+          className="flex-1"
+          onClick={(e) => {
+            if (!directionsUrl) e.preventDefault();
+          }}
+        >
+          <Button variant="outline" className="w-full" disabled={!directionsUrl}>
+            <Navigation className="w-4 h-4" strokeWidth={1.5} /> Directions
+          </Button>
+        </a>
+        {isHost ? (
+          <Button className="flex-1" onClick={() => setManageOpen(true)}>
+            <UserCheck className="w-4 h-4" strokeWidth={1.5} />
+            {pending.length > 0 ? `Requests (${pending.length})` : "Attendees"}
+          </Button>
+        ) : myAtt?.status === "going" ? (
+          <Button variant="outline" className="flex-1" onClick={() => rsvp("leave")} disabled={busy}>
+            Leave event
+          </Button>
+        ) : myAtt?.status === "pending" ? (
+          <Button variant="outline" className="flex-1" onClick={() => rsvp("leave")} disabled={busy}>
+            Cancel request
+          </Button>
+        ) : (
+          <Button className="flex-1" onClick={() => rsvp("join")} disabled={busy || full}>
+            {primaryCtaLabel()}
+          </Button>
+        )}
+      </div>
 
       <ManageAttendees open={manageOpen} onOpenChange={setManageOpen} event={event} onChange={load} />
       <ReportSheet

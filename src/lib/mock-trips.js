@@ -15,6 +15,7 @@ export function memberIdForTripCreator(creatorId) {
   return creatorId;
 }
 
+/** Fields match CreateTrip / TripForm payload exactly. */
 export function getMockTrips(userId = "demo_user") {
   return [
     {
@@ -26,12 +27,11 @@ export function getMockTrips(userId = "demo_user") {
       end_date: "2026-08-17",
       description:
         "Ready for historic streets, gorgeous tiles, and pastel de nata! Join me for sightseeing and seafood dinners.",
-      travel_style: "social",
-      looking_for: ["food", "culture", "sightseeing"],
+      travel_style: "city break",
+      looking_for: ["dinner", "sightseeing", "culture"],
+      visibility: "public",
       created_by_id: userId,
       created_by: { name: DEMO_USER_DISPLAY_NAME },
-      members_count: 5,
-      status: "upcoming",
       cover_image: imageForCity("Lisbon"),
     },
     {
@@ -42,12 +42,11 @@ export function getMockTrips(userId = "demo_user") {
       start_date: "2026-08-20",
       end_date: "2026-08-28",
       description: "Relaxing yoga retreat in Ubud followed by beach clubs in Seminyak.",
-      travel_style: "relaxed",
-      looking_for: ["wellness", "beach"],
+      travel_style: "wellness",
+      looking_for: ["yoga", "beach"],
+      visibility: "public",
       created_by_id: userId,
       created_by: { name: DEMO_USER_DISPLAY_NAME },
-      members_count: 4,
-      status: "draft",
       cover_image: imageForCity("Ubud"),
     },
     {
@@ -60,11 +59,13 @@ export function getMockTrips(userId = "demo_user") {
       description:
         "Wandering through museums, vintage shopping, and drinking espresso at cute cafes in Paris.",
       travel_style: "cultural",
-      looking_for: ["shopping", "museums", "cafes"],
+      looking_for: ["shopping", "museums", "coffee"],
+      visibility: "public",
       created_by_id: "other_user_1",
-      created_by: { name: findMockMember("mock_4").name, main_photo: findMockMember("mock_4").avatar },
-      members_count: 3,
-      status: "upcoming",
+      created_by: {
+        name: findMockMember("mock_4").name,
+        main_photo: findMockMember("mock_4").avatar,
+      },
       cover_image: imageForCity("Paris"),
     },
     {
@@ -76,11 +77,13 @@ export function getMockTrips(userId = "demo_user") {
       end_date: "2026-08-22",
       description: "Exploring waterfalls, local culture, and temples around Ubud. Let's travel together!",
       travel_style: "adventure",
-      looking_for: ["temples", "hiking", "culture"],
+      looking_for: ["sightseeing", "hiking", "culture"],
+      visibility: "public",
       created_by_id: "other_user_2",
-      created_by: { name: findMockMember("mock_1").name, main_photo: findMockMember("mock_1").avatar },
-      members_count: 6,
-      status: "upcoming",
+      created_by: {
+        name: findMockMember("mock_1").name,
+        main_photo: findMockMember("mock_1").avatar,
+      },
       cover_image: imageForCity("Bali"),
     },
     {
@@ -91,12 +94,14 @@ export function getMockTrips(userId = "demo_user") {
       start_date: "2026-08-14",
       end_date: "2026-08-18",
       description: "Cozy cafes, canal walks, and design museums with a small group of women travellers.",
-      travel_style: "social",
-      looking_for: ["cafes", "culture", "design"],
+      travel_style: "city break",
+      looking_for: ["coffee", "culture", "museums"],
+      visibility: "public",
       created_by_id: "other_user_3",
-      created_by: { name: findMockMember("mock_2").name, main_photo: findMockMember("mock_2").avatar },
-      members_count: 4,
-      status: "upcoming",
+      created_by: {
+        name: findMockMember("mock_2").name,
+        main_photo: findMockMember("mock_2").avatar,
+      },
       cover_image: imageForCity("Copenhagen"),
     },
   ];
