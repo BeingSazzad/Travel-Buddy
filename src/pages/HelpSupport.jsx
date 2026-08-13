@@ -2,6 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, HelpCircle, Mail, ShieldAlert } from "lucide-react";
 import ScrollPage, { ScrollPageHeader, ScrollPageBody } from "@/components/common/ScrollPage";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const FAQ = [
   {
@@ -72,14 +78,22 @@ export default function HelpSupport() {
 
         <div>
           <h2 className="section-header mb-3">Frequently Asked Questions</h2>
-          <div className="space-y-3">
+          <Accordion type="single" collapsible className="space-y-2">
             {FAQ.map((f, i) => (
-              <div key={i} className="rounded-2xl border border-border/80 bg-card p-4 shadow-soft">
-                <p className="row-title text-foreground mb-1">{f.q}</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.a}</p>
-              </div>
+              <AccordionItem
+                key={i}
+                value={`faq-${i}`}
+                className="rounded-2xl border border-border/80 bg-card shadow-soft px-4 border-b-0"
+              >
+                <AccordionTrigger className="py-3.5 text-sm font-semibold text-foreground hover:no-underline gap-3">
+                  {f.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-3.5">
+                  {f.a}
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </div>
 
         <div className="rounded-2xl bg-primary/10 p-4 text-center">

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Plus, MapPinned, Compass, Sparkles } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
@@ -7,7 +7,6 @@ import { useTrips } from "@/hooks/useTrips";
 import { useMatches } from "@/hooks/useMatches";
 import { tripStatus, tripsOverlap } from "@/lib/trip-utils";
 import TripCard from "@/components/trips/TripCard";
-import TripForm from "@/components/trips/TripForm";
 import MatchSuggestions from "@/components/trips/MatchSuggestions";
 import ScreenHeader from "@/components/common/ScreenHeader";
 import { onRefresh } from "@/lib/refresh-bus";
@@ -15,14 +14,12 @@ import { onRefresh } from "@/lib/refresh-bus";
 const STATUS_ORDER = ["active", "upcoming", "previous"];
 
 export default function Trips() {
-  const { trips, loading, user, reload, create, update, remove } = useTrips();
+  const { trips, loading, user, reload } = useTrips();
   const { matches: matchList, loading: matchesLoading } = useMatches();
   useEffect(() => onRefresh("/trips", reload), [reload]);
   const navigate = useNavigate();
   const location = useLocation();
   const initialTab = location.state?.tab === "nearby" ? "nearby" : "my";
-  const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState(null);
 
   const myTrips = useMemo(() => trips.filter((t) => t.created_by_id === user?.id), [trips, user]);
   const otherTrips = useMemo(() => trips.filter((t) => t.created_by_id !== user?.id), [trips, user]);
@@ -37,14 +34,6 @@ export default function Trips() {
   }, [myTrips]);
 
   const openNew = () => navigate("/trips/new");
-  const openEdit = (trip) => { setEditing(trip); setFormOpen(true); };
-  const submit = async (data) => {
-    if (editing) await update(editing.id, data);
-    else await create(data);
-  };
-  const del = async (trip) => {
-    if (window.confirm(`Delete "${trip.name}"?`)) await remove(trip.id);
-  };
 
   return (
     <div className="page-shell">
@@ -65,7 +54,6 @@ export default function Trips() {
           <TabsTrigger value="nearby" className="rounded-xl text-xs font-semibold px-2">Trip matches</TabsTrigger>
         </TabsList>
 
-        {/* My Trips */}
         <TabsContent value="my" className="mt-6">
           {loading ? (
             <p className="text-sm text-muted-foreground">Loading…</p>
@@ -83,10 +71,7 @@ export default function Trips() {
                       <TripCard
                         key={t.id}
                         trip={t}
-                        canEdit
                         overlapCount={overlapFor(t)}
-                        onEdit={openEdit}
-                        onDelete={del}
                         onPress={() => navigate(`/trips/${t.id}`)}
                       />
                     ))}
@@ -97,7 +82,6 @@ export default function Trips() {
           )}
         </TabsContent>
 
-        {/* Discover Trips */}
         <TabsContent value="discover" className="mt-6">
           {otherTrips.length === 0 ? (
             <EmptyState icon={Compass} title="No trips to discover yet" description="Community trips from other women will appear here once they're planned." />
@@ -118,7 +102,6 @@ export default function Trips() {
           )}
         </TabsContent>
 
-        {/* Trip matches */}
         <TabsContent value="nearby" className="mt-6">
           {myTrips.length === 0 ? (
             <EmptyState icon={MapPinned} title="Add a trip to see matches" description="We'll suggest women travelling to the same place around the same time. Tap a match to view their profile." actionLabel="New trip" onAction={openNew} />
@@ -131,8 +114,6 @@ export default function Trips() {
           )}
         </TabsContent>
       </Tabs>
-
-      <TripForm open={formOpen} onOpenChange={setFormOpen} initial={editing} onSubmit={submit} />
     </div>
   );
 }

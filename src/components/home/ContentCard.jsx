@@ -16,7 +16,7 @@ export default function ContentCard({ item, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="relative w-[180px] h-[240px] shrink-0 rounded-[24px] overflow-hidden border border-border/10 shadow-soft interactive-card group z-10 text-left"
+      className="relative w-[180px] h-[240px] shrink-0 rounded-3xl overflow-hidden border border-border/60 shadow-soft interactive-card group z-10 text-left"
     >
       <Image
         src={item.image}
@@ -34,7 +34,7 @@ export default function ContentCard({ item, onClick }) {
       )}
 
       {badge && (
-        <span className="absolute top-3 left-3 z-20 text-[10px] uppercase tracking-wider font-semibold gradient-brand-accent text-white px-2.5 py-1 rounded-full shadow-sm">
+        <span className="absolute top-3 left-3 z-20 text-[10px] uppercase tracking-wider font-semibold px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/20 shadow-sm">
           {badge}
         </span>
       )}

@@ -3,7 +3,6 @@ import { MapPin, Users, Calendar, Sparkles } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { tripStatus, formatDates, imageForCity } from "@/lib/trip-utils";
-import TripActionsMenu from "@/components/trips/TripActionsMenu";
 
 const STATUS_CONFIG = {
   upcoming: {
@@ -23,9 +22,6 @@ const STATUS_CONFIG = {
 export default function TripCard({
   trip,
   overlapCount = null,
-  canEdit = false,
-  onEdit = () => {},
-  onDelete = () => {},
   onPress,
   note = "",
 }) {
@@ -47,7 +43,7 @@ export default function TripCard({
       onClick={onPress}
       onKeyDown={interactive ? (e) => e.key === "Enter" && onPress() : undefined}
       className={cn(
-        "relative h-[232px] rounded-[24px] overflow-hidden border border-border/60 shadow-soft group transition-all duration-300",
+        "relative h-[232px] rounded-3xl overflow-hidden border border-border/60 shadow-soft group transition-all duration-300",
         interactive && "interactive-card cursor-pointer tap-feedback hover:border-primary/40"
       )}
     >
@@ -60,7 +56,6 @@ export default function TripCard({
 
       <div className="gradient-overlay" />
 
-      {/* Status pill */}
       <span
         className={cn(
           "absolute top-3 right-3 z-20 text-[11px] font-semibold px-3 py-1 rounded-full shadow-md flex items-center gap-1",
@@ -72,12 +67,6 @@ export default function TripCard({
         )}
         {config.label}
       </span>
-
-      {canEdit && (
-        <div className="absolute top-3 left-3 z-20">
-          <TripActionsMenu overlay onEdit={() => onEdit(trip)} onDelete={() => onDelete(trip)} />
-        </div>
-      )}
 
       <div className="absolute bottom-0 inset-x-0 z-20 p-4 flex flex-col gap-2.5">
         <div>

@@ -42,7 +42,7 @@ export default function EventListItem({ event }) {
     <button
       type="button"
       onClick={() => navigate(`/events/${event.id}`)}
-      className="w-full flex items-center gap-3 py-3 px-3 rounded-2xl border border-border/50 bg-card/60 interactive-card tap-feedback text-left group"
+      className="w-full flex items-center gap-3 py-3 px-3 rounded-2xl border border-border/60 bg-card shadow-soft interactive-card tap-feedback text-left group"
     >
       <div className="w-[52px] h-[52px] shrink-0 rounded-xl overflow-hidden bg-muted">
         <Image

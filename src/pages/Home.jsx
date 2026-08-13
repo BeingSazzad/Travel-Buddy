@@ -15,7 +15,7 @@ import { resolveEventId } from "@/lib/mock-events";
 
 function SectionHeading({ title, actionLabel, onAction }) {
   return (
-    <div className="flex items-center justify-between app-px mb-3">
+    <div className="flex items-center justify-between app-px mb-2">
       <h2 className="section-header text-foreground">{title}</h2>
       {onAction && (
         <button
@@ -60,7 +60,7 @@ export default function Home() {
       <div className="home-hero-zone">
         <HomeHeader />
 
-        <section className="pt-5 pb-6">
+        <section className="pt-3 pb-4">
           <SectionHeading title="Explore" />
           <CategoryGrid />
         </section>

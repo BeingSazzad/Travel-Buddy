@@ -43,8 +43,8 @@ export default function DestinationCard({ destination, variant = "list" }) {
       className={cn(
         "relative overflow-hidden border border-border/10 shadow-soft interactive-card group text-left cursor-pointer",
         featured
-          ? "w-[11.25rem] h-[14rem] shrink-0 rounded-[24px]"
-          : "w-full h-48 rounded-3xl"
+          ? "w-[11.25rem] h-[14rem] shrink-0 rounded-3xl"
+          : "w-full h-48 rounded-3xl border border-border/60"
       )}
     >
       <Image

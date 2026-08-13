@@ -28,8 +28,11 @@ export default function HomeDrawer({ open, onOpenChange }) {
 
   const close = () => onOpenChange(false);
   const go = (path) => {
-    close();
-    navigate(path);
+    // Brief hold so open drawer can be captured before navigate/close
+    window.setTimeout(() => {
+      close();
+      navigate(path);
+    }, 420);
   };
 
   const NavRow = ({ icon: Icon, label, onClick, badge }) => (
@@ -131,8 +134,10 @@ export default function HomeDrawer({ open, onOpenChange }) {
             icon={LogOut}
             label="Log out"
             onClick={() => {
-              close();
-              logout();
+              window.setTimeout(() => {
+                close();
+                logout();
+              }, 420);
             }}
           />
         </div>

@@ -1,16 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { MapPin, Bookmark, Share2, Clock, Tag } from "lucide-react";
+import { MapPin, Share2, Clock, Tag } from "lucide-react";
 import { Image } from "@/components/ui/image";
-import { useSaved } from "@/lib/SavedContext";
-import { cn } from "@/lib/utils";
-import { savedItemKey } from "@/lib/saved-item-key";
+import SaveButton from "@/components/common/SaveButton";
 
-const fmtDate = (d) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "");
+const fmtDate = (d) =>
+  d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
 
 export default function DealCard({ deal, onRedeem }) {
   const navigate = useNavigate();
-  const { isSaved, toggle } = useSaved();
   const saveItem = {
     type: "deal",
     title: deal.title,
@@ -19,17 +17,26 @@ export default function DealCard({ deal, onRedeem }) {
     image: deal.image,
     dealId: deal.id,
   };
-  const key = savedItemKey(saveItem);
-  const saved = isSaved(key);
 
-  const expired = deal.expiration_date && new Date(deal.expiration_date) < new Date(new Date().toDateString());
+  const expired =
+    deal.expiration_date && new Date(deal.expiration_date) < new Date(new Date().toDateString());
 
   const onShare = async (e) => {
     e.stopPropagation();
     try {
-      if (navigator.share) await navigator.share({ title: deal.title, text: `${deal.discount} at ${deal.partner}`, url: window.location.href });
-      else { await navigator.clipboard.writeText(`${deal.title} — ${deal.discount} at ${deal.partner}`); alert("Deal copied"); }
-    } catch (err) {}
+      if (navigator.share) {
+        await navigator.share({
+          title: deal.title,
+          text: `${deal.discount} at ${deal.partner}`,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(`${deal.title} — ${deal.discount} at ${deal.partner}`);
+        alert("Deal copied");
+      }
+    } catch {
+      /* cancelled */
+    }
   };
 
   return (
@@ -37,49 +44,73 @@ export default function DealCard({ deal, onRedeem }) {
       role="button"
       tabIndex={0}
       onClick={() => navigate(`/deals/${deal.id}`)}
-      onKeyDown={(e) => e.key === "Enter" && navigate(`/deals/${deal.id}`)}
-      className="rounded-2xl overflow-hidden border border-border shadow-soft bg-card interactive-card group cursor-pointer tap-feedback"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate(`/deals/${deal.id}`);
+        }
+      }}
+      className="rounded-3xl overflow-hidden border border-border/60 shadow-soft bg-card interactive-card group text-left cursor-pointer"
     >
-      <div className="relative h-36">
-        <Image src={deal.image} alt={deal.partner} fittingType="fill" className="w-full h-full image-zoom" />
-        <div className="gradient-overlay-soft" />
-        <span className="absolute top-2 left-2 px-2.5 py-1 rounded-full gradient-brand-accent text-white text-xs font-semibold flex items-center gap-1 shadow-sm z-20">
-          <Tag className="w-3 h-3" strokeWidth={1.5} /> {deal.discount}
+      <div className="relative h-44">
+        <Image
+          src={deal.image}
+          alt={deal.partner}
+          fittingType="fill"
+          className="w-full h-full object-cover image-zoom"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10 pointer-events-none" />
+        <span className="absolute top-3 left-3 z-20 inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full gradient-brand-accent text-white border border-white/15 shadow-sm">
+          <Tag className="w-3 h-3" strokeWidth={1.5} />
+          {deal.discount}
         </span>
-        <div className="absolute top-2 right-2 flex gap-1.5">
+        <div className="absolute top-3 right-3 z-20 flex gap-1.5" onClick={(e) => e.stopPropagation()}>
+          <SaveButton item={saveItem} variant="overlay" />
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggle(saveItem);
-            }}
-            className="w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center tap-feedback"
-            aria-label={saved ? "Unsave" : "Save"}
+            type="button"
+            onClick={onShare}
+            className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/30 flex items-center justify-center tap-feedback"
+            aria-label="Share deal"
           >
-            <span key={saved ? "on" : "off"} className={cn("inline-flex", saved && "save-pop")}>
-              <Bookmark className={cn("w-4 h-4", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
+            <Share2 className="w-4 h-4 text-white" strokeWidth={1.75} />
+          </button>
+        </div>
+        {expired && (
+          <div className="absolute inset-0 z-10 bg-foreground/50 flex items-center justify-center">
+            <span className="px-3 py-1 rounded-full bg-white text-foreground text-xs font-semibold">
+              Expired
             </span>
-          </button>
-          <button onClick={onShare} className="w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center tap-feedback">
-            <Share2 className="w-4 h-4 text-foreground" strokeWidth={1.5} />
-          </button>
-        </div>
-        {expired && <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center"><span className="px-3 py-1 rounded-full bg-white text-foreground text-xs font-semibold">Expired</span></div>}
+          </div>
+        )}
       </div>
-      <div className="p-4">
-        <p className="text-xs uppercase tracking-wide text-primary font-medium">{deal.partner}</p>
-        <h3 className="font-semibold text-base leading-tight mt-0.5">{deal.title}</h3>
-        <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-          <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} /> {deal.city}{deal.country ? `, ${deal.country}` : ""}
-          <span className="mx-1">·</span>
-          <Clock className="w-3.5 h-3.5" strokeWidth={1.5} /> {fmtDate(deal.expiration_date)}
-        </div>
+
+      <div className="px-4 pt-3.5 pb-4">
+        <p className="text-[10px] uppercase tracking-wider text-primary font-semibold">{deal.partner}</p>
+        <h3 className="font-display font-semibold text-[1.05rem] leading-snug tracking-tight mt-0.5">
+          {deal.title}
+        </h3>
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
+          <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
+          <span className="truncate">
+            {deal.city}
+            {deal.country ? `, ${deal.country}` : ""}
+          </span>
+          {deal.expiration_date && (
+            <>
+              <span className="text-muted-foreground/50">·</span>
+              <Clock className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
+              <span className="shrink-0">{fmtDate(deal.expiration_date)}</span>
+            </>
+          )}
+        </p>
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
-            onRedeem(deal);
+            onRedeem?.(deal);
           }}
           disabled={expired}
-          className="w-full mt-3 h-10 rounded-full gradient-brand-accent text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed tap-feedback shadow-sm hover:shadow-md transition-shadow"
+          className="w-full mt-3.5 h-10 rounded-full gradient-brand-accent text-white text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed tap-feedback shadow-sm"
         >
           {expired ? "Expired" : "Redeem deal"}
         </button>
