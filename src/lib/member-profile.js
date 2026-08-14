@@ -116,13 +116,48 @@ export const MOCK_MEMBERS = [
     languages: ["English", "Spanish", "Catalan"],
     interests: ["Food", "Nightlife", "Culture"],
     trip: {
-      city: "Barcelona",
-      country: "Spain",
-      start_date: "2026-07-02",
-      end_date: "2026-07-08",
+      city: "Marrakech",
+      country: "Morocco",
+      start_date: "2026-09-10",
+      end_date: "2026-09-16",
     },
+    seed_only: true,
   },
 ];
+
+function seedMember(id, name, first, age, home, country, city, destCountry, start, end, bio, interests, languages) {
+  return {
+    user_id: id,
+    name,
+    first_name: first,
+    age,
+    current_city: home,
+    country,
+    bio,
+    main_photo: memberAvatar(id),
+    avatar: memberAvatar(id),
+    profile_photos: memberPhotos(id),
+    languages,
+    interests,
+    seed_only: true,
+    trip: { city, country: destCountry, start_date: start, end_date: end },
+  };
+}
+
+MOCK_MEMBERS.push(
+  seedMember("mock_7", "Hana Kim", "Hana", 29, "Seoul", "South Korea", "Tokyo", "Japan", "2026-09-04", "2026-09-11", "Slow mornings in Shimokitazawa and evening ramen walks. Looking for a calm travel buddy in Tokyo.", ["Food", "Cafes", "Culture"], ["English", "Korean"]),
+  seedMember("mock_8", "Priya Shah", "Priya", 27, "Mumbai", "India", "Tokyo", "Japan", "2026-09-06", "2026-09-13", "First time in Tokyo — temples, teamLabs, and convenience-store ice cream. Let's wander.", ["Photography", "Food", "Museums"], ["English", "Hindi"]),
+  seedMember("mock_9", "Léa Dubois", "Léa", 30, "Lyon", "France", "Paris", "France", "2026-09-02", "2026-09-07", "Back in Paris for a long weekend of galleries and late café terraces.", ["Art", "Cafes", "Shopping"], ["French", "English"]),
+  seedMember("mock_10", "Amara Diallo", "Amara", 26, "Dakar", "Senegal", "Paris", "France", "2026-09-03", "2026-09-09", "Museum days and Seine walks. Happy to share restaurant lists.", ["Culture", "Food", "Photography"], ["French", "English"]),
+  seedMember("mock_11", "Inês Nunes", "Inês", 28, "Porto", "Portugal", "Lisbon", "Portugal", "2026-08-18", "2026-08-24", "Tram rides, miradouros at sunset, and pastel de nata crawls.", ["Food", "City", "Cafes"], ["Portuguese", "English"]),
+  seedMember("mock_12", "Freja Olsen", "Freja", 25, "Aarhus", "Denmark", "Copenhagen", "Denmark", "2026-08-16", "2026-08-20", "Canal bikes, design shops, and cinnamon buns. Looking for a small group.", ["Design", "Cafes", "Cycling"], ["Danish", "English"]),
+  seedMember("mock_13", "Yara Haddad", "Yara", 29, "Amman", "Jordan", "Marrakech", "Morocco", "2026-09-12", "2026-09-18", "Riads, hammams, and a guided souk morning. Prefer daytime exploring.", ["Culture", "Wellness", "Food"], ["Arabic", "English"]),
+  seedMember("mock_14", "Sofia Alvarez", "Sofia", 27, "Mexico City", "Mexico", "Tulum", "Mexico", "2026-08-22", "2026-08-28", "Cenotes, sunrise yoga, and quiet beach time. Solo-friendly hangouts welcome.", ["Wellness", "Beach", "Yoga"], ["Spanish", "English"]),
+  seedMember("mock_15", "Naledi Mokoena", "Naledi", 31, "Johannesburg", "South Africa", "Cape Town", "South Africa", "2026-09-08", "2026-09-15", "Hikes, wine, and the Atlantic at golden hour. Looking for adventure-minded women.", ["Hiking", "Wine", "Adventure"], ["English", "Zulu"]),
+  seedMember("mock_16", "Mei Chen", "Mei", 24, "Singapore", "Singapore", "Bali", "Indonesia", "2026-08-18", "2026-08-25", "Ubud cafés and a temple morning. Easy-going and early riser.", ["Cafes", "Culture", "Wellness"], ["English", "Mandarin"]),
+  seedMember("mock_17", "Lucia Rossi", "Lucia", 28, "Rome", "Italy", "Tulum", "Mexico", "2026-08-24", "2026-08-30", "Beach clubs by day, quiet dinners. Happy to share a taxi to the ruins.", ["Beach", "Food", "Culture"], ["Italian", "English"]),
+  seedMember("mock_18", "Hannah Berg", "Hannah", 26, "Oslo", "Norway", "Cape Town", "South Africa", "2026-09-09", "2026-09-16", "Table Mountain at sunrise and a Stellenbosch wine afternoon.", ["Hiking", "Wine", "Photography"], ["Norwegian", "English"]),
+);
 
 /** Mutual matches — friends list, messaging, "Remove friend" */
 export const DEMO_FRIEND_MEMBER_IDS = ["mock_2", "mock_4"];
@@ -140,7 +175,7 @@ export function getDiscoverDeckMembers() {
     ...DEMO_INCOMING_REQUEST_IDS,
     ...DEMO_BLOCKED_MEMBER_IDS,
   ]);
-  return MOCK_MEMBERS.filter((m) => !excluded.has(m.user_id));
+  return MOCK_MEMBERS.filter((m) => !excluded.has(m.user_id) && !m.seed_only);
 }
 
 const MOCK_CONV_MAP = {

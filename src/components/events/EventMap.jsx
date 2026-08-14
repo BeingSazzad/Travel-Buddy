@@ -67,7 +67,7 @@ export default function EventMap({ query, compact = false, label, zoom = 14 }) {
   }, [query]);
 
   const heightClass = compact ? "h-36" : "h-44";
-  const displayLabel = label || query;
+  const displayLabel = label;
 
   if (!ready || !coords) {
     return (

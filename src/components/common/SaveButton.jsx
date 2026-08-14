@@ -19,7 +19,7 @@ export default function SaveButton({ item, className, variant = "surface" }) {
         toggle(item);
       }}
       className={cn(
-        "w-8 h-8 rounded-full flex items-center justify-center tap-feedback",
+        "w-8 h-8 rounded-full flex items-center justify-center tap-feedback pointer-events-auto relative z-30",
         overlay
           ? saved
             ? "bg-primary/90 backdrop-blur-md border border-brand-gold/45 shadow-md"

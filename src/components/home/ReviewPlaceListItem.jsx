@@ -16,7 +16,7 @@ export default function ReviewPlaceListItem({ item, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center gap-3 py-3 px-3 rounded-2xl border border-border/50 bg-card/60 interactive-card tap-feedback text-left group"
+      className="w-full flex items-center gap-3 py-3 px-3 rounded-3xl border border-border/60 bg-card/60 interactive-card tap-feedback text-left group"
     >
       <div className="w-[52px] h-[52px] shrink-0 rounded-xl overflow-hidden bg-muted">
         <Image
@@ -33,8 +33,8 @@ export default function ReviewPlaceListItem({ item, onClick }) {
             {item.title}
           </h3>
           {rating != null && !Number.isNaN(rating) && (
-            <span className="flex items-center gap-0.5 text-xs font-semibold text-primary shrink-0">
-              <Star className="w-3.5 h-3.5 fill-primary text-primary" strokeWidth={0} />
+            <span className="flex items-center gap-0.5 text-xs font-semibold text-brand-gold shrink-0">
+              <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold" strokeWidth={0} />
               {rating.toFixed(1)}
             </span>
           )}

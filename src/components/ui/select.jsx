@@ -5,6 +5,7 @@ import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { preventDismiss } from "@/lib/prevent-dismiss"
 
 const Select = SelectPrimitive.Root
 
@@ -60,6 +61,9 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
         className
       )}
       position={position}
+      onPointerDownOutside={preventDismiss}
+      onInteractOutside={preventDismiss}
+      onFocusOutside={preventDismiss}
       {...props}>
       <SelectScrollUpButton />
       <SelectPrimitive.Viewport

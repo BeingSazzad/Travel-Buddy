@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Shield, Bell, Ban, HelpCircle, Trash2, LogOut,
-  ChevronRight, Lock, Crown, Camera, UserRound, Sparkles,
+  ChevronRight, Lock, Crown, Camera, UserRound, Sparkles, BadgeCheck,
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -11,6 +11,7 @@ export default function AccountMenu() {
   const navigate = useNavigate();
   const isPlus =
     user?.subscription_status === "active" || user?.subscription_status === "cancelled_active";
+  const isVerified = user?.identity_verified && user?.age_verified;
 
   const Row = ({ icon: Icon, label, onClick, danger }) => (
     <button
@@ -26,7 +27,11 @@ export default function AccountMenu() {
 
   return (
     <div className="space-y-4">
-      {!isPlus && (
+      {isPlus ? (
+        <div className="bg-card border border-border/80 shadow-soft rounded-2xl overflow-hidden">
+          <Row icon={Crown} label="Seluna Plus" onClick={() => navigate("/subscription-management")} />
+        </div>
+      ) : (
         <div className="bg-card border border-border/80 shadow-soft rounded-2xl overflow-hidden">
           <Row icon={Crown} label="Seluna Plus" onClick={() => navigate("/subscription")} />
         </div>
@@ -48,6 +53,13 @@ export default function AccountMenu() {
             label="Preferences"
             onClick={() => navigate("/profile/edit/preferences")}
           />
+          {!isVerified && (
+            <Row
+              icon={BadgeCheck}
+              label="Verify identity"
+              onClick={() => navigate("/profile/verify")}
+            />
+          )}
         </div>
       </div>
 

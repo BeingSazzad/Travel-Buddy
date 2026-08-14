@@ -75,6 +75,7 @@ import BlockedMembers from '@/pages/BlockedMembers';
 import DeleteAccount from '@/pages/DeleteAccount';
 import EditPhotos from '@/pages/EditPhotos';
 import EditPersonalDetails from '@/pages/EditPersonalDetails';
+import VerifyIdentity from '@/pages/VerifyIdentity';
 import EditTravelInterests from '@/pages/EditTravelInterests';
 import Terms from '@/pages/Terms';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
@@ -275,6 +276,7 @@ const AuthenticatedApp = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/profile/edit/photos" element={<EditPhotos />} />
         <Route path="/profile/edit/details" element={<EditPersonalDetails />} />
+        <Route path="/profile/verify" element={<VerifyIdentity />} />
         <Route path="/profile/edit/preferences" element={<EditTravelInterests />} />
         <Route path="/profile/edit/interests" element={<Navigate to="/profile/edit/preferences" replace />} />
         <Route path="/profile/edit/about" element={<Navigate to="/profile/edit/details" replace />} />

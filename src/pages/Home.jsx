@@ -7,11 +7,31 @@ import ContentCard from "@/components/home/ContentCard";
 import HomeDealCard from "@/components/home/HomeDealCard";
 import RecentlyReviewedSection from "@/components/home/RecentlyReviewedSection";
 import HorizontalScroll from "@/components/common/HorizontalScroll";
-import HomeFeatured from "@/components/home/HomeFeatured";
-import EventList from "@/components/events/EventList";
-import { MOCK_EVENTS } from "@/lib/mock-events";
 import { SECTIONS } from "@/lib/home-data";
+import { countTravellersHere, destinationsWithTravellers } from "@/lib/destination-stats";
 import { resolveEventId } from "@/lib/mock-events";
+
+function homeSections() {
+  const recommended = SECTIONS.find((s) => s.title === "Recommended for you");
+  const recommendedItems = (recommended?.items || []).filter(
+    (item) => item.type !== "destination" || countTravellersHere(item.city) > 0
+  );
+  const recommendedCities = new Set(recommendedItems.map((i) => i.city));
+  const trending = destinationsWithTravellers().filter((d) => !recommendedCities.has(d.city));
+
+  return SECTIONS.map((s) => {
+    if (s.title === "Recommended for you") return { ...s, items: recommendedItems };
+    if (s.title === "Trending destinations") return { ...s, items: trending };
+    return s;
+  }).filter((s) => s.items?.length || s.title === "Recently reviewed places");
+}
+
+function homeCardVariant(title) {
+  if (title === "Recommended for you" || title === "Trending destinations") return "destination";
+  if (title === "Popular events") return "event";
+  if (title === "Women travelling soon") return "member";
+  return "destination";
+}
 
 function SectionHeading({ title, actionLabel, onAction }) {
   return (
@@ -49,14 +69,8 @@ export default function Home() {
     else navigate("/search");
   };
 
-  const dealsSection = SECTIONS.find((s) => s.title === "Exclusive deals");
-  const genericSections = SECTIONS.filter(
-    (s) => s.title !== "Popular events" && s.title !== "Exclusive deals" && s.title !== "Recently reviewed places"
-  );
-
   return (
     <div className="pb-8 min-w-0 max-w-full overflow-x-hidden">
-      {/* Single hero wash — header + explore share one background */}
       <div className="home-hero-zone">
         <HomeHeader />
 
@@ -67,40 +81,45 @@ export default function Home() {
       </div>
 
       <div className="home-feed space-y-8">
-        <HomeFeatured />
+        {homeSections().map((s) => {
+          if (s.title === "Exclusive deals") {
+            return (
+              <section key={s.title} className="min-w-0 max-w-full">
+                <SectionHeading title={s.title} actionLabel="See all" onAction={() => navigate(s.seeAllPath)} />
+                <HorizontalScroll>
+                  {s.items.map((item, i) => (
+                    <HomeDealCard key={item.dealId || i} item={item} onClick={() => handleCardClick(item)} />
+                  ))}
+                </HorizontalScroll>
+              </section>
+            );
+          }
 
-        <section className="min-w-0 max-w-full">
-          <SectionHeading title="Upcoming events" actionLabel="View all" onAction={() => navigate("/events")} />
-          <div className="app-px">
-            <EventList events={MOCK_EVENTS.slice(0, 3)} />
-          </div>
-        </section>
+          if (s.title === "Recently reviewed places") {
+            return (
+              <section key={s.title} className="min-w-0 max-w-full">
+                <SectionHeading title={s.title} actionLabel="See all" onAction={() => navigate("/reviews")} />
+                <RecentlyReviewedSection onItemClick={handleCardClick} />
+              </section>
+            );
+          }
 
-        {genericSections.map((s) => (
-          <SectionRow
-            key={s.title}
-            title={s.title}
-            items={s.items}
-            onSeeAll={() => navigate(s.seeAllPath)}
-            renderCard={(item) => <ContentCard item={item} onClick={() => handleCardClick(item)} />}
-          />
-        ))}
-
-        {dealsSection && (
-          <section className="min-w-0 max-w-full">
-            <SectionHeading title="Exclusive deals" actionLabel="See all" onAction={() => navigate(dealsSection.seeAllPath)} />
-            <HorizontalScroll>
-              {dealsSection.items.map((item, i) => (
-                <HomeDealCard key={item.dealId || i} item={item} onClick={() => handleCardClick(item)} />
-              ))}
-            </HorizontalScroll>
-          </section>
-        )}
-
-        <section className="min-w-0 max-w-full">
-          <SectionHeading title="Recently reviewed places" actionLabel="See all" onAction={() => navigate("/reviews")} />
-          <RecentlyReviewedSection onItemClick={handleCardClick} />
-        </section>
+          return (
+            <SectionRow
+              key={s.title}
+              title={s.title}
+              items={s.items}
+              onSeeAll={() => navigate(s.seeAllPath)}
+              renderCard={(item, i) => (
+                <ContentCard
+                  item={item}
+                  variant={homeCardVariant(s.title)}
+                  onClick={() => handleCardClick(item)}
+                />
+              )}
+            />
+          );
+        })}
       </div>
     </div>
   );

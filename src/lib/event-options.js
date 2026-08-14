@@ -58,7 +58,7 @@ export const fmtEventWhen = (event) => {
   ]
     .filter(Boolean)
     .join(" ");
-  const timePart = [fmtEventTime(event.time), event.end_time ? fmtEventTime(event.end_time) : null]
+  const timePart = [fmtEventTime(event.time || event.start_time), event.end_time ? fmtEventTime(event.end_time) : null]
     .filter(Boolean)
     .join(" – ");
   return [datePart, timePart].filter(Boolean).join(" · ");

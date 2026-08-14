@@ -1,5 +1,5 @@
 import React from "react";
-import { MapPin, Users, Calendar, Sparkles } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { tripStatus, formatDates, imageForCity } from "@/lib/trip-utils";
@@ -43,7 +43,7 @@ export default function TripCard({
       onClick={onPress}
       onKeyDown={interactive ? (e) => e.key === "Enter" && onPress() : undefined}
       className={cn(
-        "relative h-[232px] rounded-3xl overflow-hidden border border-border/60 shadow-soft group transition-all duration-300",
+        "relative h-48 rounded-3xl overflow-hidden border border-border/60 shadow-soft group transition-all duration-300",
         interactive && "interactive-card cursor-pointer tap-feedback hover:border-primary/40"
       )}
     >
@@ -58,7 +58,7 @@ export default function TripCard({
 
       <span
         className={cn(
-          "absolute top-3 right-3 z-20 text-[11px] font-semibold px-3 py-1 rounded-full shadow-md flex items-center gap-1",
+          "absolute top-3 left-3 z-20 text-[10px] font-semibold px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1",
           config.className
         )}
       >
@@ -68,55 +68,23 @@ export default function TripCard({
         {config.label}
       </span>
 
-      <div className="absolute bottom-0 inset-x-0 z-20 p-4 flex flex-col gap-2.5">
-        <div>
-          <h3
-            className="font-display font-bold text-base text-white leading-snug drop-shadow-[0_1px_6px_rgba(0,0,0,0.65)] group-hover:text-brand-gold transition-colors"
-          >
-            {trip.name}
-          </h3>
-          <div className="flex items-center gap-1.5 mt-1 text-xs text-white/85 font-medium">
-            <MapPin className="w-3.5 h-3.5 text-brand-gold shrink-0" strokeWidth={1.75} />
-            <span className="truncate drop-shadow-[0_1px_4px_rgba(0,0,0,0.55)]">
-              {trip.city}{trip.country ? `, ${trip.country}` : ""}
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/15">
-          <div className="flex items-center gap-1.5 text-xs text-white/80 font-medium min-w-0">
-            <Calendar className="w-3.5 h-3.5 text-brand-gold shrink-0" strokeWidth={1.5} />
-            <span className="truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
-              {formatDates(trip)}
-            </span>
-          </div>
-
-          {trip.travel_style && (
-            <span
-              className="shrink-0 text-[11px] font-semibold capitalize px-2.5 py-0.5 rounded-full bg-white/12 border border-white/25 text-white backdrop-blur-sm"
-            >
-              {trip.travel_style}
-            </span>
-          )}
-        </div>
-
-        {overlapCount != null && (
-          <div className="flex items-center gap-1.5 text-xs text-white/75 font-medium">
-            <Users className="w-3.5 h-3.5 text-brand-gold shrink-0" strokeWidth={1.75} />
-            <span className="truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
-              {overlapCount > 0
-                ? `${overlapCount} ${overlapCount === 1 ? "woman" : "women"} travelling on same dates`
-                : "No overlapping trips yet"}
-            </span>
-          </div>
-        )}
-
-        {note && (
-          <div className="flex items-center gap-1.5 text-xs text-brand-gold font-semibold">
-            <Sparkles className="w-3.5 h-3.5 shrink-0" strokeWidth={1.75} />
-            <span className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">{note}</span>
-          </div>
-        )}
+      <div className="absolute bottom-0 inset-x-0 z-20 p-4">
+        <h3 className="font-display font-semibold text-lg text-white leading-snug drop-shadow-[0_1px_4px_rgba(0,0,0,0.65)]">
+          {trip.name}
+        </h3>
+        <p className="flex items-center gap-1 mt-1 text-[11px] text-white/85 min-w-0">
+          <MapPin className="w-3 h-3 shrink-0 text-brand-gold" strokeWidth={1.5} />
+          <span className="truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.65)]">
+            {[trip.city, trip.country].filter(Boolean).join(", ")}
+          </span>
+        </p>
+        <p className="text-[11px] text-brand-gold font-medium mt-1 truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.65)]">
+          {formatDates(trip)}
+          {overlapCount > 0 ? ` · ${overlapCount} overlapping` : ""}
+        </p>
+        {note ? (
+          <p className="text-[11px] text-brand-gold font-medium mt-1 truncate">{note}</p>
+        ) : null}
       </div>
     </div>
   );

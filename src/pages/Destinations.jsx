@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { countTravellersHere } from "@/lib/destination-stats";
 import { CONTINENTS, WEATHERS, TAG_FILTERS } from "@/lib/destinations";
 import { useDestinations } from "@/lib/useContent";
 import DestinationCard from "@/components/destinations/DestinationCard";
@@ -28,21 +29,17 @@ export default function Destinations() {
   }, []);
 
   const withStats = useMemo(() => {
-    return destinations.map((d) => {
-      const liveMembers = new Set(trips.filter((t) => t.city === d.city).map((t) => t.created_by_id)).size;
-      const liveEvents = events.filter((e) => e.city === d.city).length;
-      return {
-        ...d,
-        stats: {
-          members: Math.max(liveMembers, d.counts?.members || 0),
-          cafes: d.counts?.cafes || 0,
-          restaurants: d.counts?.restaurants || 0,
-          hotels: d.counts?.hotels || 0,
-          events: Math.max(liveEvents, d.counts?.events || 0),
-          deals: d.counts?.deals || 0,
-        },
-      };
-    });
+    return destinations.map((d) => ({
+      ...d,
+      stats: {
+        members: countTravellersHere(d.city, trips),
+        cafes: d.counts?.cafes || 0,
+        restaurants: d.counts?.restaurants || 0,
+        hotels: d.counts?.hotels || 0,
+        events: events.filter((e) => (e.city || "").toLowerCase() === d.city.toLowerCase()).length,
+        deals: d.counts?.deals || 0,
+      },
+    }));
   }, [destinations, trips, events]);
 
   const toggle = (k) => setTags((t) => ({ ...t, [k]: !t[k] }));
@@ -53,13 +50,6 @@ export default function Destinations() {
     setTags(emptyTags());
     setWeather("All");
   };
-
-  const filtersIdle = continent === "All" && weather === "All" && activeFilterCount === 0;
-
-  const featured = useMemo(
-    () => withStats.filter((d) => d.featured),
-    [withStats]
-  );
 
   const filtered = useMemo(() => {
     let list = withStats.filter((d) =>
@@ -75,11 +65,6 @@ export default function Destinations() {
     return list;
   }, [withStats, continent, weather, tags, sort]);
 
-  const listItems = useMemo(
-    () => (filtersIdle ? filtered.filter((d) => !d.featured) : filtered),
-    [filtered, filtersIdle]
-  );
-
   if (loading) {
     return (
       <div className="page-shell">
@@ -93,19 +78,6 @@ export default function Destinations() {
     <div className="page-shell">
       <ScreenHeader title="Destinations" subtitle="Cities loved by women who travel" />
 
-      {filtersIdle && featured.length > 0 && (
-        <section className="mb-5">
-          <h2 className="section-header text-foreground mb-3">Featured</h2>
-          <div className="h-scroll min-w-0 max-w-full">
-            <div className="flex gap-3 pb-1">
-              {featured.map((d) => (
-                <DestinationCard key={d.city} destination={d} variant="featured" />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       <ScrollFilterChips
         items={CONTINENTS.map((c) => ({ key: c, label: c }))}
         active={(c) => continent === c}
@@ -114,11 +86,7 @@ export default function Destinations() {
 
       <div className="mt-3">
         <VenueListToolbar
-          resultLabel={
-            filtersIdle
-              ? "More cities"
-              : `${listItems.length} ${listItems.length === 1 ? "city" : "cities"}`
-          }
+          resultLabel={`${filtered.length} ${filtered.length === 1 ? "city" : "cities"}`}
           sort={sort}
           onSortChange={setSort}
           sortOptions={[
@@ -148,7 +116,7 @@ export default function Destinations() {
       />
 
       <div className="space-y-3.5">
-        {listItems.length === 0 ? (
+        {filtered.length === 0 ? (
           <EmptyState
             icon={MapPin}
             title="No destinations match"
@@ -160,7 +128,7 @@ export default function Destinations() {
             }}
           />
         ) : (
-          listItems.map((d) => <DestinationCard key={d.city} destination={d} />)
+          filtered.map((d) => <DestinationCard key={d.city} destination={d} />)
         )}
       </div>
     </div>

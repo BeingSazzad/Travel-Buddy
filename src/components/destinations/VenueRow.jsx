@@ -7,13 +7,15 @@ const VENUE_ROUTES = {
   cafe: (name) => `/cafes/${encodeURIComponent(name)}`,
   restaurant: (name) => `/restaurants/${encodeURIComponent(name)}`,
   hotel: (name) => `/hotels/${encodeURIComponent(name)}`,
-  deal: () => "/deals",
+  deal: (venue) => (venue.dealId ? `/deals/${venue.dealId}` : "/deals"),
 };
 
 export default function VenueRow({ venue, venueType }) {
   const navigate = useNavigate();
   const route =
-    venueType === "deal" ? VENUE_ROUTES.deal() : VENUE_ROUTES[venueType]?.(venue.name);
+    venueType === "deal"
+      ? VENUE_ROUTES.deal(venue)
+      : VENUE_ROUTES[venueType]?.(venue.name);
 
   const content = (
     <>
@@ -34,7 +36,7 @@ export default function VenueRow({ venue, venueType }) {
   );
 
   const shell =
-    "w-full flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-2.5 text-left shadow-soft";
+    "w-full flex items-center gap-3 rounded-3xl border border-border/60 bg-card p-2.5 text-left shadow-soft";
 
   if (!route) {
     return <div className={shell}>{content}</div>;

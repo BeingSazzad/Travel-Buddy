@@ -22,8 +22,8 @@ export default function InterestPicker({ options, selected, onToggle }) {
             className={cn(
               "px-3.5 py-2 rounded-full text-sm border transition capitalize text-center",
               active
-                ? "bg-primary text-white border-primary"
-                : "border-border text-foreground hover:border-primary"
+                ? "chip-on"
+                : "border-border text-foreground bg-transparent"
             )}
           >
             {opt}

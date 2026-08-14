@@ -9,8 +9,9 @@ import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import ReportSheet from "@/components/reports/ReportSheet";
-import { fallbackRestaurant } from "@/lib/images";
 import { useRestaurants } from "@/lib/useContent";
+import { PageLoading, PageNotFound } from "@/components/common/PageStatus";
+import { venueGallery, formatRating, siteLabel, shareOrCopy } from "@/lib/venue-detail";
 
 export default function RestaurantDetail() {
   const { name } = useParams();
@@ -19,52 +20,24 @@ export default function RestaurantDetail() {
   const { items: restaurants, loading } = useRestaurants();
   const r = useMemo(() => {
     const decoded = decodeURIComponent(name || "");
-    const found = restaurants.find((x) => x.name.toLowerCase() === decoded.toLowerCase());
-    if (found) return found;
-    if (!name) return null;
-    const restName = decodeURIComponent(name);
-    const fb = fallbackRestaurant(restName);
-    return {
-      name: restName,
-      city: "Travel Destination",
-      country: "Global",
-      address: `15 Culinary Way, ${restName}`,
-      distance: 1.8,
-      rating: 4.9,
-      reviews: 48,
-      price: "$$$",
-      hours: "12:00 PM – 11:00 PM",
-      phone: "+1 555-0199",
-      website: "https://selunatribe.app",
-      description: `An exquisite dining experience featuring local produce, authentic wine, and a warm atmosphere.`,
-      cuisine: "International",
-      image: fb.image,
-      gallery: fb.gallery,
-      tags: { outdoor: true, reservations: true, vegan: true }
-    };
+    return restaurants.find((x) => x.name.toLowerCase() === decoded.toLowerCase()) || null;
   }, [restaurants, name]);
   const [reportOpen, setReportOpen] = useState(false);
 
-  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
+  if (loading) return <PageLoading />;
   if (!r)
     return (
-      <div className="h-screen flex flex-col items-center justify-center gap-3">
-        <p className="font-display font-semibold">Restaurant not found</p>
-        <button onClick={() => navigate("/restaurants")} className="text-sm text-primary underline">Back to restaurants</button>
-      </div>
+      <PageNotFound title="Restaurant not found" backLabel="Back to restaurants" onBack={() => navigate("/restaurants")} />
     );
 
   const itemKey = `restaurant:${r.name}`;
   const saved = isSaved(itemKey);
-  const facilities = Object.entries(r.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]);
+  const gallery = venueGallery(r);
+  const rating = formatRating(r.rating);
+  const facilities = Object.entries(r.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]).filter(Boolean);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([r.address, r.city, r.country].filter(Boolean).join(", "))}`;
 
-  const onShare = async () => {
-    try {
-      if (navigator.share) await navigator.share({ title: r.name, text: r.description, url: window.location.href });
-      else { await navigator.clipboard.writeText(window.location.href); alert("Link copied"); }
-    } catch (e) {}
-  };
+  const onShare = () => shareOrCopy({ title: r.name, text: r.description });
 
   return (
     <div className="max-w-app mx-auto min-h-dvh flex flex-col bg-background">
@@ -80,12 +53,12 @@ export default function RestaurantDetail() {
 
       <div className="flex-1 overflow-y-auto pb-6">
         <div className="relative h-64">
-          <Image src={r.gallery[0]} alt={r.name} fittingType="fill" className="w-full h-full" />
+          <Image src={gallery[0]} alt={r.name} fittingType="fill" className="w-full h-full" />
           <span className="absolute top-3 left-3 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-primary font-medium">{PRICE_LABELS[r.price]}</span>
           <span className="absolute bottom-3 left-3 text-xs px-2 py-0.5 rounded-full bg-primary text-white">{r.cuisine}</span>
         </div>
         <div className="flex gap-2 app-px -mt-6 relative">
-          {r.gallery.map((g, i) => (
+          {gallery.map((g, i) => (
             <div key={i} className="w-20 h-20 rounded-xl overflow-hidden border-2 border-background shadow-card">
               <Image src={g} alt="" fittingType="fill" className="w-full h-full" />
             </div>
@@ -93,20 +66,26 @@ export default function RestaurantDetail() {
         </div>
 
         <div className="detail-body">
-          <h1 className="font-display font-bold text-lg">{r.name}</h1>
+          <h1 className="page-title">{r.name}</h1>
           <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground min-w-0">
             <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
-            <span className="truncate">{r.city}, {r.country} · {r.distance} km</span>
+            <span className="truncate">{[r.city, r.country].filter(Boolean).join(", ")}{r.distance != null ? ` · ${r.distance} km` : ""}</span>
           </div>
 
-          <div className="mt-3 flex items-center gap-1.5 text-sm min-w-0">
-            <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold shrink-0" strokeWidth={0} />
-            <span className="font-semibold tabular-nums">{r.rating.toFixed(1)}</span>
-            <span className="text-muted-foreground/50">·</span>
-            <span className="text-muted-foreground">{r.reviews.toLocaleString()} reviews</span>
-          </div>
+          {rating && (
+            <div className="mt-3 flex items-center gap-1.5 text-sm min-w-0">
+              <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold shrink-0" strokeWidth={0} />
+              <span className="font-semibold tabular-nums">{rating}</span>
+              {r.reviews != null && (
+                <>
+                  <span className="text-muted-foreground/50">·</span>
+                  <span className="text-muted-foreground">{Number(r.reviews).toLocaleString()} reviews</span>
+                </>
+              )}
+            </div>
+          )}
 
-          <p className="text-sm text-muted-foreground leading-relaxed mt-4">{r.description}</p>
+          {r.description && <p className="text-sm text-muted-foreground leading-relaxed mt-4">{r.description}</p>}
 
           <div className="mt-5 space-y-3">
             <EventMap
@@ -115,20 +94,22 @@ export default function RestaurantDetail() {
               label={r.address}
             />
             <div className="space-y-2">
-              <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{r.hours}</span></div>
-              <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{r.phone}</span></div>
-              <a href={r.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">{r.website.replace("https://", "")}</span></a>
+              {r.hours && <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{r.hours}</span></div>}
+              {r.phone && <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{r.phone}</span></div>}
+              {r.website && <a href={r.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">{siteLabel(r.website)}</span></a>}
               {r.menuUrl && <a href={r.menuUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><UtensilsCrossed className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">View menu</span></a>}
               {r.reservationUrl && <a href={r.reservationUrl} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><CalendarCheck className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">Make a reservation</span></a>}
             </div>
           </div>
 
-          <section className="mt-5">
-            <h2 className="font-display font-semibold text-base mb-2">Facilities</h2>
-            <div className="flex flex-wrap gap-2">
-              {facilities.map((f) => <span key={f} className="text-xs px-2.5 py-1 rounded-full border border-border">{f}</span>)}
-            </div>
-          </section>
+          {facilities.length > 0 && (
+            <section className="mt-5">
+              <h2 className="section-header mb-2">Facilities</h2>
+              <div className="flex flex-wrap gap-2">
+                {facilities.map((f) => <span key={f} className="text-xs px-2.5 py-1 rounded-full border border-border">{f}</span>)}
+              </div>
+            </section>
+          )}
 
           <ReviewSection itemKey={itemKey} itemType="restaurant" itemTitle={r.name} />
 

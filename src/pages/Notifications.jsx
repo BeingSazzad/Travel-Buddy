@@ -73,7 +73,7 @@ export default function Notifications() {
   };
 
   const markAll = async () => {
-    if (!unreadCount) return;
+    if (!unreadCount || !user?.id) return;
     setItems((prev) => prev.map((n) => ({ ...n, read: true })));
     try {
       await base44.entities.Notification.updateMany(
@@ -97,7 +97,7 @@ export default function Notifications() {
           >
             <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
           </button>
-          <h1 className="font-display font-bold text-lg">Notifications</h1>
+          <h1 className="page-title">Notifications</h1>
         </div>
         {unreadCount > 0 && (
           <button

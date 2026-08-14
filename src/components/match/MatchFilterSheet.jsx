@@ -17,7 +17,7 @@ function Chip({ active, onClick, children }) {
       className={cn(
         "h-9 px-3.5 rounded-xl text-xs border font-medium capitalize transition-all active:scale-95 flex items-center justify-center",
         active
-          ? "bg-primary text-white border-primary shadow-sm"
+          ? "chip-on shadow-sm"
           : "bg-card border-border/80 text-foreground hover:bg-muted/50"
       )}
     >

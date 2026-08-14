@@ -9,8 +9,9 @@ import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import ReportSheet from "@/components/reports/ReportSheet";
-import { fallbackCafe } from "@/lib/images";
 import { useCafes } from "@/lib/useContent";
+import { PageLoading, PageNotFound } from "@/components/common/PageStatus";
+import { venueGallery, formatRating, siteLabel, shareOrCopy } from "@/lib/venue-detail";
 
 export default function CafeDetail() {
   const { name } = useParams();
@@ -19,52 +20,29 @@ export default function CafeDetail() {
   const { items: cafes, loading } = useCafes();
   const cafe = useMemo(() => {
     const decoded = decodeURIComponent(name || "");
-    const found = cafes.find((c) => c.name.toLowerCase() === decoded.toLowerCase());
-    if (found) return found;
-    if (!name) return null;
-    const cafeName = decodeURIComponent(name);
-    const fb = fallbackCafe(cafeName);
-    return {
-      name: cafeName,
-      city: "Travel Spot",
-      country: "Global",
-      address: `10 Central Ave, ${cafeName}`,
-      distance: 1.2,
-      rating: 4.8,
-      reviews: 32,
-      price: "$$",
-      hours: "08:00 AM – 08:00 PM",
-      phone: "+1 555-0192",
-      website: "https://selunatribe.app",
-      description: `A cozy, female-friendly cafe spot serving specialty coffee, fresh pastries, and wifi.`,
-      image: fb.image,
-      gallery: fb.gallery,
-      tags: { wifi: true, power: true, quiet: true }
-    };
+    return cafes.find((c) => c.name.toLowerCase() === decoded.toLowerCase()) || null;
   }, [cafes, name]);
   const [reportOpen, setReportOpen] = useState(false);
 
   const itemKey = cafe ? `cafe:${cafe.name}` : "";
 
-  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
+  if (loading) return <PageLoading />;
   if (!cafe)
     return (
-      <div className="h-screen flex flex-col items-center justify-center gap-3">
-        <p className="font-display font-semibold">Café not found</p>
-        <button onClick={() => navigate("/cafes")} className="text-sm text-primary underline">Back to cafés</button>
-      </div>
+      <PageNotFound
+        title="Café not found"
+        backLabel="Back to cafés"
+        onBack={() => navigate("/cafes")}
+      />
     );
 
   const saved = isSaved(itemKey);
-  const facilities = Object.entries(cafe.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]);
+  const gallery = venueGallery(cafe);
+  const rating = formatRating(cafe.rating);
+  const facilities = Object.entries(cafe.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]).filter(Boolean);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([cafe.address, cafe.city, cafe.country].filter(Boolean).join(", "))}`;
 
-  const onShare = async () => {
-    try {
-      if (navigator.share) await navigator.share({ title: cafe.name, text: cafe.description, url: window.location.href });
-      else { await navigator.clipboard.writeText(window.location.href); alert("Link copied"); }
-    } catch (e) {}
-  };
+  const onShare = () => shareOrCopy({ title: cafe.name, text: cafe.description });
 
   return (
     <div className="max-w-app mx-auto min-h-dvh flex flex-col bg-background">
@@ -81,11 +59,13 @@ export default function CafeDetail() {
       <div className="flex-1 overflow-y-auto pb-6">
         {/* Gallery */}
         <div className="relative h-64">
-          <Image src={cafe.gallery[0]} alt={cafe.name} fittingType="fill" className="w-full h-full" />
+          {gallery[0] && (
+            <Image src={gallery[0]} alt={cafe.name} fittingType="fill" className="w-full h-full" />
+          )}
           <span className="absolute top-3 left-3 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-primary font-medium">{PRICE_LABELS[cafe.price]}</span>
         </div>
         <div className="flex gap-2 app-px -mt-6 relative">
-          {cafe.gallery.map((g, i) => (
+          {gallery.map((g, i) => (
             <div key={i} className="w-20 h-20 rounded-xl overflow-hidden border-2 border-background shadow-card">
               <Image src={g} alt="" fittingType="fill" className="w-full h-full" />
             </div>
@@ -93,20 +73,26 @@ export default function CafeDetail() {
         </div>
 
         <div className="detail-body">
-          <h1 className="font-display font-bold text-lg">{cafe.name}</h1>
+          <h1 className="page-title">{cafe.name}</h1>
           <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground min-w-0">
             <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
-            <span className="truncate">{cafe.city}, {cafe.country} · {cafe.distance} km</span>
+            <span className="truncate">{[cafe.city, cafe.country].filter(Boolean).join(", ")}{cafe.distance != null ? ` · ${cafe.distance} km` : ""}</span>
           </div>
 
-          <div className="mt-3 flex items-center gap-1.5 text-sm min-w-0">
-            <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold shrink-0" strokeWidth={0} />
-            <span className="font-semibold tabular-nums">{cafe.rating.toFixed(1)}</span>
-            <span className="text-muted-foreground/50">·</span>
-            <span className="text-muted-foreground">{cafe.reviews.toLocaleString()} reviews</span>
-          </div>
+          {rating && (
+            <div className="mt-3 flex items-center gap-1.5 text-sm min-w-0">
+              <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold shrink-0" strokeWidth={0} />
+              <span className="font-semibold tabular-nums">{rating}</span>
+              {cafe.reviews != null && (
+                <>
+                  <span className="text-muted-foreground/50">·</span>
+                  <span className="text-muted-foreground">{Number(cafe.reviews).toLocaleString()} reviews</span>
+                </>
+              )}
+            </div>
+          )}
 
-          <p className="text-sm text-muted-foreground leading-relaxed mt-4">{cafe.description}</p>
+          {cafe.description && <p className="text-sm text-muted-foreground leading-relaxed mt-4">{cafe.description}</p>}
 
           {/* Location once: map + street address; city already under title */}
           <div className="mt-5 space-y-3">
@@ -116,19 +102,21 @@ export default function CafeDetail() {
               label={cafe.address}
             />
             <div className="space-y-2">
-              <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{cafe.hours}</span></div>
-              <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{cafe.phone}</span></div>
-              <a href={cafe.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">{cafe.website.replace("https://", "")}</span></a>
+              {cafe.hours && <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{cafe.hours}</span></div>}
+              {cafe.phone && <div className="flex items-start gap-2 text-sm"><Phone className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{cafe.phone}</span></div>}
+              {cafe.website && <a href={cafe.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">{siteLabel(cafe.website)}</span></a>}
             </div>
           </div>
 
           {/* Facilities */}
-          <section className="mt-5">
-            <h2 className="font-display font-semibold text-base mb-2">Facilities</h2>
-            <div className="flex flex-wrap gap-2">
-              {facilities.map((f) => <span key={f} className="text-xs px-2.5 py-1 rounded-full border border-border">{f}</span>)}
-            </div>
-          </section>
+          {facilities.length > 0 && (
+            <section className="mt-5">
+              <h2 className="section-header mb-2">Facilities</h2>
+              <div className="flex flex-wrap gap-2">
+                {facilities.map((f) => <span key={f} className="text-xs px-2.5 py-1 rounded-full border border-border">{f}</span>)}
+              </div>
+            </section>
+          )}
 
           <ReviewSection itemKey={itemKey} itemType="cafe" itemTitle={cafe.name} />
 

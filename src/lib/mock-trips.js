@@ -104,11 +104,98 @@ export function getMockTrips(userId = "demo_user") {
       },
       cover_image: imageForCity("Copenhagen"),
     },
+    {
+      id: "trip_mock_6",
+      name: "Tokyo neon week",
+      city: "Tokyo",
+      country: "Japan",
+      start_date: "2026-09-04",
+      end_date: "2026-09-11",
+      description: "Shimokitazawa cafés, teamLab, and evening walks in Shinjuku.",
+      travel_style: "city break",
+      looking_for: ["coffee", "culture", "food"],
+      visibility: "public",
+      created_by_id: "mock_7",
+      created_by: { name: findMockMember("mock_7")?.name, main_photo: findMockMember("mock_7")?.avatar },
+      cover_image: imageForCity("Tokyo"),
+    },
+    {
+      id: "trip_mock_7",
+      name: "Marrakech riad days",
+      city: "Marrakech",
+      country: "Morocco",
+      start_date: "2026-09-12",
+      end_date: "2026-09-18",
+      description: "Souks with a guide, hammam afternoon, and rooftop sunsets.",
+      travel_style: "cultural",
+      looking_for: ["culture", "wellness"],
+      visibility: "public",
+      created_by_id: "mock_13",
+      created_by: { name: findMockMember("mock_13")?.name, main_photo: findMockMember("mock_13")?.avatar },
+      cover_image: imageForCity("Marrakech"),
+    },
+    {
+      id: "trip_mock_8",
+      name: "Tulum reset",
+      city: "Tulum",
+      country: "Mexico",
+      start_date: "2026-08-22",
+      end_date: "2026-08-28",
+      description: "Cenotes, sunrise yoga, and slow beach days.",
+      travel_style: "wellness",
+      looking_for: ["yoga", "beach"],
+      visibility: "public",
+      created_by_id: "mock_14",
+      created_by: { name: findMockMember("mock_14")?.name, main_photo: findMockMember("mock_14")?.avatar },
+      cover_image: imageForCity("Tulum"),
+    },
+    {
+      id: "trip_mock_9",
+      name: "Cape Town coast",
+      city: "Cape Town",
+      country: "South Africa",
+      start_date: "2026-09-08",
+      end_date: "2026-09-15",
+      description: "Hikes, Atlantic light, and a Stellenbosch afternoon.",
+      travel_style: "adventure",
+      looking_for: ["hiking", "wine"],
+      visibility: "public",
+      created_by_id: "mock_15",
+      created_by: { name: findMockMember("mock_15")?.name, main_photo: findMockMember("mock_15")?.avatar },
+      cover_image: imageForCity("Cape Town"),
+    },
   ];
 }
 
 export function findMockTrip(id, userId = "demo_user") {
   return getMockTrips(userId).find((t) => t.id === id);
+}
+
+export function cityKeyMatch(cityA, cityB) {
+  const a = (cityA || "").toLowerCase();
+  const b = (cityB || "").toLowerCase();
+  if (!a || !b) return false;
+  if (a === b) return true;
+  if ((a === "bali" && b === "ubud") || (a === "ubud" && b === "bali")) return true;
+  return false;
+}
+
+/** Unique people with a trip to this city (profiles + demo trips + live trips). No padded totals. */
+export function travellersForCity(city, liveTrips = []) {
+  const ids = new Set();
+  MOCK_MEMBERS.forEach((m) => {
+    if (cityKeyMatch(m.trip?.city, city)) ids.add(m.user_id);
+  });
+  [...getMockTrips(), ...(liveTrips || [])].forEach((t) => {
+    if (!cityKeyMatch(t.city, city)) return;
+    ids.add(memberIdForTripCreator(t.created_by_id) || t.created_by_id);
+  });
+  return ids.size;
+}
+
+export function travellingHereLabel(count) {
+  if (!count) return "";
+  return count === 1 ? "1 travelling here" : `${count} travelling here`;
 }
 
 export function mockTripsForCity(city, userId = "demo_user") {

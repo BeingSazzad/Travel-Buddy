@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, MapPin, Sun, Sparkles, ShieldCheck, Bus, BedDouble, Users, CalendarHeart, Flag } from "lucide-react";
+import { ArrowLeft, MapPin, Sun, Sparkles, ShieldCheck, Bus, BedDouble, Users, CalendarHeart, Flag, Coffee, UtensilsCrossed, Tag } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
@@ -9,13 +9,16 @@ import VenueRow from "@/components/destinations/VenueRow";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import ReportSheet from "@/components/reports/ReportSheet";
 import EventCard from "@/components/events/EventCard";
-import { contentFor } from "@/lib/destination-content";
+import { contentFor, samePlace } from "@/lib/destination-content";
+import { PageLoading, PageNotFound } from "@/components/common/PageStatus";
 import { useDestinations } from "@/lib/useContent";
 import { eventsForCity } from "@/lib/mock-events";
 import { demoVisitorsForCity, memberIdForTripCreator } from "@/lib/mock-trips";
 import { findMockMember } from "@/lib/member-profile";
 import { DEMO_USER, isSameAppUser } from "@/lib/demo-user";
-import { fallbackDestination, FALLBACK_AVATAR_URL } from "@/lib/images";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
+import SaveButton from "@/components/common/SaveButton";
+import { formatDates } from "@/lib/trip-utils";
 
 const AV = FALLBACK_AVATAR_URL;
 const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
@@ -37,29 +40,19 @@ export default function DestinationDetail() {
   const [reportOpen, setReportOpen] = useState(false);
   const { items: destinations, loading } = useDestinations();
   const dest = useMemo(() => {
-    const cityKey = decodeURIComponent(city || "").toLowerCase();
-    const found = destinations.find((d) => d.city.toLowerCase() === cityKey);
-    if (found) return found;
-    if (!city) return null;
-    const cityName = decodeURIComponent(city);
-    const fb = fallbackDestination(cityName);
-    return {
-      city: cityName,
-      country: "Explore",
-      continent: "Global",
-      image: fb.image,
-      description: `Explore top cafes, local restaurants, hotels, and fellow women travel buddies visiting ${cityName}.`,
-      weather: "Sunny",
-      tags: { solo: true },
-      counts: { members: 6, events: 2 }
-    };
+    const cityName = decodeURIComponent(city || "");
+    const cityKey = cityName.toLowerCase();
+    return (
+      destinations.find((d) => d.city.toLowerCase() === cityKey) ||
+      destinations.find((d) => samePlace(d.city, cityName)) ||
+      null
+    );
   }, [destinations, city]);
   const content = useMemo(() => contentFor(dest?.city), [dest?.city]);
 
   const [trips, setTrips] = useState([]);
   const [profiles, setProfiles] = useState({});
   const [events, setEvents] = useState([]);
-  const stats = useMemo(() => ({ members: dest?.counts?.members || 0, events: dest?.counts?.events || 0 }), [dest]);
 
   useEffect(() => {
     if (!dest) return;
@@ -116,27 +109,34 @@ export default function DestinationDetail() {
       <div className="space-y-2">
         {list.slice(0, 4).map((t) => {
           const p = profiles[t.created_by_id];
+          const memberId = memberIdForTripCreator(t.created_by_id) || t.created_by_id;
           return (
-            <div key={t.id} className="flex items-center gap-3">
-              <img src={p?.avatar || AV} alt={p?.name || "Member"} className="w-9 h-9 rounded-full object-cover" />
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => memberId && navigate(`/members/${memberId}`)}
+              className="w-full flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-2.5 text-left tap-feedback"
+            >
+              <img src={p?.avatar || AV} alt="" className="w-9 h-9 rounded-full object-cover" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{p?.name || "Seluna member"}</p>
-                <p className="text-xs text-muted-foreground truncate">{t.start_date} → {t.end_date}</p>
+                <p className="text-xs text-muted-foreground truncate">{formatDates(t)}</p>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
     );
   };
 
-  if (loading) return <p className="text-sm text-muted-foreground text-center pt-20">Loading…</p>;
+  if (loading) return <PageLoading />;
   if (!dest)
     return (
-      <div className="h-screen flex flex-col items-center justify-center gap-3">
-        <p className="font-display font-semibold">Destination not found</p>
-        <button onClick={() => navigate("/destinations")} className="text-sm text-primary underline">Back to destinations</button>
-      </div>
+      <PageNotFound
+        title="Destination not found"
+        backLabel="Back to destinations"
+        onBack={() => navigate("/destinations")}
+      />
     );
 
   return (
@@ -144,7 +144,15 @@ export default function DestinationDetail() {
       <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center tap-feedback"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-1">
-          <button onClick={() => navigate(`/trips/new?city=${encodeURIComponent(dest.city)}`)} className="w-9 h-9 rounded-full gradient-brand-accent text-white flex items-center justify-center tap-feedback shadow-sm" aria-label="Plan a trip"><Sparkles className="w-5 h-5" strokeWidth={1.5} /></button>
+          <SaveButton
+            item={{
+              type: "destination",
+              title: dest.city,
+              location: dest.city,
+              country: dest.country,
+              image: dest.image,
+            }}
+          />
         </div>
       </header>
 
@@ -169,13 +177,17 @@ export default function DestinationDetail() {
               {dest.city}
             </h1>
             <div className="flex flex-wrap items-center gap-2 mt-2.5">
-              <span className="text-xs px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/20">
-                {dest.continent}
-              </span>
-              <span className="text-xs px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/20 flex items-center gap-1">
-                <Sun className="w-3 h-3" strokeWidth={1.5} /> {dest.weather}
-              </span>
-              {dest.tags.solo && (
+              {dest.continent && dest.continent !== "Global" && (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/20">
+                  {dest.continent}
+                </span>
+              )}
+              {dest.weather && (
+                <span className="text-xs px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/20 flex items-center gap-1">
+                  <Sun className="w-3 h-3" strokeWidth={1.5} /> {dest.weather}
+                </span>
+              )}
+              {dest.tags?.solo && (
                 <span className="text-xs px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md text-white border border-white/20">
                   Solo-friendly
                 </span>
@@ -185,50 +197,49 @@ export default function DestinationDetail() {
         </div>
 
         <div className="app-px">
-          <p className="text-sm text-muted-foreground leading-relaxed mt-4">{dest.description}</p>
+          {dest.description && <p className="text-sm text-muted-foreground leading-relaxed mt-4">{dest.description}</p>}
 
-          {/* Map */}
           <div className="mt-5">
-            <EventMap
-              compact
-              query={`${dest.city}, ${dest.country}`}
-              label={`${dest.city}, ${dest.country}`}
-            />
+            <EventMap compact query={`${dest.city}, ${dest.country}`} />
           </div>
 
-          {/* Travel tips */}
-          <Section icon={Sparkles} title="Travel tips">
-            <ul className="text-sm text-muted-foreground space-y-1.5 list-disc pl-5">
-              {content.travelTips.map((t, i) => <li key={i}>{t}</li>)}
-            </ul>
-          </Section>
+          {content.travelTips.length > 0 && (
+            <Section icon={Sparkles} title="Travel tips">
+              <ul className="text-sm text-muted-foreground space-y-1.5 list-disc pl-5">
+                {content.travelTips.map((t, i) => <li key={i}>{t}</li>)}
+              </ul>
+            </Section>
+          )}
 
-          {/* Safety */}
-          <Section icon={ShieldCheck} title="Safety tips">
-            <ul className="text-sm text-muted-foreground space-y-1.5 list-disc pl-5">
-              {content.safetyTips.map((t, i) => <li key={i}>{t}</li>)}
-            </ul>
-          </Section>
+          {content.safetyTips.length > 0 && (
+            <Section icon={ShieldCheck} title="Safety tips">
+              <ul className="text-sm text-muted-foreground space-y-1.5 list-disc pl-5">
+                {content.safetyTips.map((t, i) => <li key={i}>{t}</li>)}
+              </ul>
+            </Section>
+          )}
 
-          {/* Best areas */}
-          <Section icon={BedDouble} title="Best areas to stay">
-            <div className="space-y-2">
-              {content.bestAreas.map((a) => (
-                <div key={a.name} className="rounded-2xl border border-border bg-card p-3">
-                  <p className="font-medium text-sm">{a.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{a.note}</p>
-                </div>
-              ))}
-            </div>
-          </Section>
+          {content.bestAreas.length > 0 && (
+            <Section icon={BedDouble} title="Best areas to stay">
+              <div className="space-y-2">
+                {content.bestAreas.map((a) => (
+                  <div key={a.name} className="rounded-2xl border border-border bg-card p-3">
+                    <p className="font-medium text-sm">{a.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{a.note}</p>
+                  </div>
+                ))}
+              </div>
+            </Section>
+          )}
 
-          {/* Transport */}
-          <Section icon={Bus} title="Getting around">
-            <p className="text-sm text-muted-foreground leading-relaxed">{content.transport}</p>
-          </Section>
+          {content.transport ? (
+            <Section icon={Bus} title="Getting around">
+              <p className="text-sm text-muted-foreground leading-relaxed">{content.transport}</p>
+            </Section>
+          ) : null}
 
           {/* Women */}
-          <Section icon={Users} title={`Women here (${currently.length || soon.length || stats.members})`}>
+          <Section icon={Users} title={`Women here (${(currently.length ? currently : soon).length})`}>
             <MemberStack list={currently.length ? currently : soon} />
           </Section>
           {currently.length > 0 && soon.length > 0 && (
@@ -237,19 +248,24 @@ export default function DestinationDetail() {
             </Section>
           )}
 
-          {/* Venues */}
-          <Section icon={Sparkles} title="Cafés">
-            <div className="grid grid-cols-1 gap-2">{content.cafes.map((v) => <VenueRow key={v.name} venue={v} venueType="cafe" />)}</div>
-          </Section>
-          <Section icon={Sparkles} title="Restaurants">
-            <div className="grid grid-cols-1 gap-2">{content.restaurants.map((v) => <VenueRow key={v.name} venue={v} venueType="restaurant" />)}</div>
-          </Section>
-          <Section icon={BedDouble} title="Hotels">
-            <div className="grid grid-cols-1 gap-2">{content.hotels.map((v) => <VenueRow key={v.name} venue={v} venueType="hotel" />)}</div>
-          </Section>
+          {/* Venues from live catalogs */}
+          {content.cafes.length > 0 && (
+            <Section icon={Coffee} title="Cafés">
+              <div className="grid grid-cols-1 gap-2">{content.cafes.map((v) => <VenueRow key={v.name} venue={v} venueType="cafe" />)}</div>
+            </Section>
+          )}
+          {content.restaurants.length > 0 && (
+            <Section icon={UtensilsCrossed} title="Restaurants">
+              <div className="grid grid-cols-1 gap-2">{content.restaurants.map((v) => <VenueRow key={v.name} venue={v} venueType="restaurant" />)}</div>
+            </Section>
+          )}
+          {content.hotels.length > 0 && (
+            <Section icon={BedDouble} title="Hotels">
+              <div className="grid grid-cols-1 gap-2">{content.hotels.map((v) => <VenueRow key={v.name} venue={v} venueType="hotel" />)}</div>
+            </Section>
+          )}
 
-          {/* Events (live) */}
-          <Section icon={CalendarHeart} title={`Events (${Math.max(events.length, stats.events)})`}>
+          <Section icon={CalendarHeart} title={`Events (${events.length})`}>
             {events.length === 0 ? (
               <p className="text-sm text-muted-foreground">No events listed yet for {dest.city}.</p>
             ) : (
@@ -261,19 +277,19 @@ export default function DestinationDetail() {
             )}
           </Section>
 
-          {/* Deals */}
-          <Section icon={Sparkles} title="Deals">
-            <div className="grid grid-cols-1 gap-2">{content.deals.map((v) => <VenueRow key={v.name} venue={v} venueType="deal" />)}</div>
-          </Section>
+          {content.deals.length > 0 && (
+            <Section icon={Tag} title="Deals">
+              <div className="grid grid-cols-1 gap-2">{content.deals.map((v) => <VenueRow key={v.name} venue={v} venueType="deal" />)}</div>
+            </Section>
+          )}
 
-          {/* Reviews */}
-          <Section icon={Users} title="Member reviews">
+          <div className="mt-6">
             <ReviewSection itemKey={`destination:${dest.city}`} itemType="destination" itemTitle={dest.city} />
             <button onClick={() => setReportOpen(true)} className="mt-3 text-xs text-muted-foreground flex items-center gap-1.5 underline underline-offset-2">
               <Flag className="w-3.5 h-3.5" strokeWidth={1.5} /> Report incorrect information
             </button>
             <ReportSheet open={reportOpen} onOpenChange={setReportOpen} target={{ type: "place", id: `destination:${dest.city}`, title: dest.city }} />
-          </Section>
+          </div>
         </div>
       </div>
 

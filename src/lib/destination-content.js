@@ -1,4 +1,8 @@
-import { cafeImage, restaurantImage, hotelImage, dealImage, memberAvatar, CITY_IMAGES, unsplash } from "./images";
+import { CAFES } from "./cafes";
+import { RESTAURANTS } from "./restaurants";
+import { HOTELS } from "./hotels";
+import { MOCK_DEALS } from "./mock-deals";
+import { cafeImage, restaurantImage, hotelImage, dealImage, memberAvatar } from "./images";
 
 export const CONTENT = {
   Lisbon: {
@@ -91,6 +95,62 @@ export const CONTENT = {
   },
 };
 
+export function samePlace(a, b) {
+  const x = (a || "").toLowerCase().trim();
+  const y = (b || "").toLowerCase().trim();
+  if (!x || !y) return false;
+  if (x === y) return true;
+  const bali = new Set(["bali", "ubud", "canggu", "seminyak"]);
+  return bali.has(x) && bali.has(y);
+}
+
+function guideFor(city) {
+  const key = Object.keys(CONTENT).find(
+    (k) => k.toLowerCase() === (city || "").toLowerCase() || samePlace(k, city)
+  );
+  if (!key) return null;
+  const g = CONTENT[key];
+  return {
+    travelTips: g.travelTips || [],
+    safetyTips: g.safetyTips || [],
+    bestAreas: g.bestAreas || [],
+    transport: g.transport || "",
+  };
+}
+
+export function hasCityGuide(city) {
+  return Boolean(guideFor(city));
+}
+
 export function contentFor(city) {
-  return CONTENT[city] || CONTENT["Lisbon"];
+  const guide = guideFor(city) || {
+    travelTips: [],
+    safetyTips: [],
+    bestAreas: [],
+    transport: "",
+  };
+  return {
+    ...guide,
+    cafes: CAFES.filter((c) => samePlace(c.city, city)).map((c) => ({
+      name: c.name,
+      img: c.image,
+      rating: c.rating,
+    })),
+    restaurants: RESTAURANTS.filter((r) => samePlace(r.city, city)).map((r) => ({
+      name: r.name,
+      img: r.image,
+      rating: r.rating,
+    })),
+    hotels: HOTELS.filter((h) => samePlace(h.city, city)).map((h) => ({
+      name: h.name,
+      img: h.image,
+      rating: h.memberRating,
+    })),
+    deals: MOCK_DEALS.filter((d) => samePlace(d.city, city)).map((d) => ({
+      name: d.title,
+      img: d.image,
+      note: d.discount,
+      dealId: d.id,
+    })),
+  };
 }

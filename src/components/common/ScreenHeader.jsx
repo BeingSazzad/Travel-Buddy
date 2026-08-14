@@ -26,8 +26,8 @@ export default function ScreenHeader({
           </button>
         )}
         <div className="min-w-0">
-          <h1 className="font-display font-bold text-lg truncate">{title}</h1>
-          {subtitle && <p className="text-sm text-muted-foreground truncate">{subtitle}</p>}
+          <h1 className="page-title truncate">{title}</h1>
+          {subtitle && <p className="row-subtitle truncate mt-0.5">{subtitle}</p>}
         </div>
       </div>
       {extraActions && (

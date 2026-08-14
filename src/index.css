@@ -161,8 +161,36 @@ img { -webkit-user-drag: none; }
 .gradient-brand {
   background: linear-gradient(135deg, hsl(var(--brand-espresso)) 0%, hsl(var(--brand-walnut)) 48%, hsl(var(--brand-caramel)) 100%);
 }
-.gradient-brand-horizontal {
-  background: linear-gradient(90deg, hsl(var(--brand-espresso)) 0%, hsl(var(--brand-walnut)) 50%, hsl(var(--brand-caramel)) 100%);
+/* Membership card — espresso → walnut with champagne sheen */
+.gradient-membership-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 70% at 0% 0%, hsl(40 65% 72% / 0.28) 0%, transparent 52%),
+    radial-gradient(ellipse 70% 60% at 100% 110%, hsl(28 50% 28% / 0.55) 0%, transparent 50%),
+    linear-gradient(
+      145deg,
+      hsl(25 28% 22%) 0%,
+      hsl(var(--brand-espresso)) 38%,
+      hsl(var(--brand-walnut)) 72%,
+      hsl(25 32% 28%) 100%
+    );
+  color: hsl(0 0% 100%);
+  border: 1px solid hsl(38 45% 62% / 0.35);
+  box-shadow:
+    0 1px 0 hsl(0 0% 100% / 0.16) inset,
+    0 12px 28px -14px hsl(25 40% 10% / 0.55);
+}
+.chip-on {
+  background: linear-gradient(
+    145deg,
+    hsl(var(--brand-walnut)) 0%,
+    hsl(var(--brand-espresso)) 100%
+  );
+  color: hsl(0 0% 100%);
+  border-color: hsl(38 40% 55% / 0.45);
+  box-shadow: 0 1px 0 hsl(0 0% 100% / 0.14) inset;
 }
 .gradient-brand-accent {
   background:

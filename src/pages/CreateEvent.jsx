@@ -12,7 +12,8 @@ import { cn } from "@/lib/utils";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { EVENT_CATEGORIES, defaultEventImage, capitalize, fmtEventDate, fmtEventTime } from "@/lib/event-options";
-import { COUNTRIES } from "@/lib/profile-options";
+import { COUNTRIES, LANGUAGES } from "@/lib/profile-options";
+import InterestPicker from "@/components/profile/InterestPicker";
 import EventCard from "@/components/events/EventCard";
 import { findMockEvent } from "@/lib/mock-events";
 
@@ -48,7 +49,7 @@ function Chip({ active, onClick, children }) {
       onClick={onClick}
       className={cn(
         "px-3.5 py-2 rounded-full text-sm border capitalize transition",
-        active ? "bg-primary text-white border-primary" : "border-border text-foreground"
+        active ? "chip-on" : "border-border text-foreground"
       )}
     >
       {children}
@@ -149,11 +150,11 @@ export default function CreateEvent() {
         visibility: data.visibility || "public",
         agreed_rules: true,
         // Create defaults; edit preserves existing extended fields
-        pricing: editId ? data.pricing || "free" : "free",
-        external_link: editId ? data.external_link || "" : "",
-        age_min: editId && data.age_min !== "" && data.age_min != null ? Number(data.age_min) : null,
-        age_max: editId && data.age_max !== "" && data.age_max != null ? Number(data.age_max) : null,
-        languages: editId ? data.languages || [] : [],
+        pricing: data.pricing || "free",
+        external_link: data.pricing === "paid_external" ? (data.external_link || "").trim() : "",
+        age_min: data.age_min !== "" && data.age_min != null ? Number(data.age_min) : null,
+        age_max: data.age_max !== "" && data.age_max != null ? Number(data.age_max) : null,
+        languages: data.languages || [],
       };
       if (editId) {
         await base44.entities.Event.update(editId, payload);
@@ -330,7 +331,60 @@ export default function CreateEvent() {
                 </Select>
               </div>
 
-              <div className="flex items-center justify-between rounded-2xl border border-border p-4">
+              <div className="space-y-2">
+                <Label>Languages</Label>
+                <InterestPicker options={LANGUAGES} selected={data.languages || []} onToggle={(v) => set("languages", v)} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Min age</Label>
+                  <Input
+                    type="number"
+                    min="18"
+                    max="99"
+                    value={data.age_min}
+                    onChange={(e) => set("age_min", e.target.value)}
+                    placeholder="18"
+                    className="h-12"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Max age</Label>
+                  <Input
+                    type="number"
+                    min="18"
+                    max="99"
+                    value={data.age_max}
+                    onChange={(e) => set("age_max", e.target.value)}
+                    placeholder="Any"
+                    className="h-12"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-sm">Paid tickets</p>
+                    <p className="text-xs text-muted-foreground">Free meetup unless you add a ticket link</p>
+                  </div>
+                  <Switch
+                    checked={data.pricing === "paid_external"}
+                    onCheckedChange={(c) => set("pricing", c ? "paid_external" : "free")}
+                  />
+                </div>
+                {data.pricing === "paid_external" && (
+                  <Input
+                    value={data.external_link}
+                    onChange={(e) => set("external_link", e.target.value)}
+                    placeholder="https://"
+                    className="h-12"
+                  />
+                )}
+              </div>
+
+              <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-sm">
                     {data.visibility === "public" ? "Open to join" : "Approve each request"}

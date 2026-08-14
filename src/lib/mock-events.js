@@ -42,7 +42,7 @@ export const MOCK_EVENTS = [
     category: "wellness",
     description:
       "Start your morning with a relaxing yoga session overlooking the caldera in Oia. All levels welcome — bring a mat if you have one.",
-    attendees_count: 8,
+    attendees_count: 3,
     max_attendees: 12,
     ...hostFields("mock_1"),
     image: eventImageFor({ city: "Santorini", category: "wellness" }),
@@ -164,6 +164,28 @@ export const MOCK_EVENTS = [
     languages: ["English"],
     attendees: goingAttendees(["mock_1", "mock_2", "mock_4"]),
   },
+  {
+    id: "event_mock_7",
+    title: "Paris café crawl",
+    name: "Paris café crawl",
+    city: "Paris",
+    country: "France",
+    location: "Café de Flore, Saint-Germain",
+    date: "2026-08-20",
+    time: "10:30",
+    end_time: "12:30",
+    category: "cafes",
+    description:
+      "A slow Saint-Germain coffee walk with other women in town — Flore to Boot Café, then a stroll along the Seine if the weather's kind.",
+    attendees_count: 7,
+    max_attendees: 12,
+    ...hostFields("mock_3"),
+    image: eventImageFor({ city: "Paris", category: "cafes" }),
+    visibility: "public",
+    pricing: "free",
+    languages: ["English", "French"],
+    attendees: goingAttendees(["mock_3", "mock_4", "mock_2"]),
+  },
 ];
 
 /** Home / search title → mock event id */
@@ -178,6 +200,7 @@ export const EVENT_TITLE_TO_ID = {
   "Matterhorn morning hike": "event_mock_4",
   "Canal-side coffee": "event_mock_5",
   "Ubud temple morning": "event_mock_6",
+  "Paris café crawl": "event_mock_7",
 };
 
 export function findMockEvent(id) {

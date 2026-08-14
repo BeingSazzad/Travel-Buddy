@@ -113,28 +113,45 @@ export default function SubscriptionManagement() {
   };
 
   return (
-    <div className="px-5 pt-12 pb-10">
+    <div className="page-shell">
       <div className="flex items-center gap-3 mb-5">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-full border border-border flex items-center justify-center"
+          className="w-9 h-9 rounded-full flex items-center justify-center tap-feedback -ml-1"
           aria-label="Back"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
         </button>
-        <h1 className="font-display font-bold text-lg">Subscription</h1>
+        <h1 className="page-title">Subscription</h1>
       </div>
 
-      <div className="rounded-2xl bg-gradient-to-br from-foreground to-foreground/80 text-background p-5">
-        <div className="flex items-center gap-2 mb-2">
-          <Crown className="w-4 h-4" />
-          <span className="text-xs font-semibold uppercase tracking-widest opacity-90">Seluna Plus</span>
+      <div className="rounded-3xl gradient-membership-card p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/65">
+              <Crown className="w-3.5 h-3.5 text-brand-gold" strokeWidth={1.75} />
+              Membership
+            </p>
+            <h2 className="font-display font-semibold text-xl text-white mt-1.5 leading-tight">
+              Seluna Plus
+            </h2>
+          </div>
+          <span
+            className={cn(
+              "shrink-0 mt-0.5 text-[11px] font-semibold px-2.5 py-1 rounded-full",
+              st.tone === "success" && "bg-white/15 text-brand-gold border border-white/20",
+              st.tone === "accent" && "bg-white/12 text-white border border-white/20",
+              st.tone === "destructive" && "bg-destructive/80 text-white",
+              st.tone === "muted" && "bg-white/10 text-white/70"
+            )}
+          >
+            {st.label}
+          </span>
         </div>
-        <p className="font-display font-bold text-lg">{st.label}</p>
-        <p className="text-xs opacity-80 mt-1">
+        <p className="text-xs text-white/70 mt-3 leading-relaxed">
           {isActive
-            ? `Current plan · ${PLANS.find((p) => p.id === currentPlanId)?.name || "Monthly"}`
+            ? `${PLANS.find((p) => p.id === currentPlanId)?.name || "Monthly"} plan`
             : "Choose a plan to unlock the community"}
           {isActive && periodEnd ? ` · renews ${fmtDate(periodEnd)}` : ""}
         </p>

@@ -1,12 +1,12 @@
 import React from "react";
-import EventListItem from "./EventListItem";
+import EventCard from "./EventCard";
 
 export default function EventList({ events, className = "" }) {
   if (!events?.length) return null;
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`space-y-3 ${className}`}>
       {events.map((event) => (
-        <EventListItem key={event.id} event={event} />
+        <EventCard key={event.id} event={event} />
       ))}
     </div>
   );

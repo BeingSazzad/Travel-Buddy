@@ -31,21 +31,19 @@ import { findMockEvent } from "@/lib/mock-events";
 import { getMockConversationId } from "@/lib/member-profile";
 import { cn } from "@/lib/utils";
 import { FALLBACK_AVATAR_URL } from "@/lib/images";
+import { PageLoading, PageNotFound } from "@/components/common/PageStatus";
 
 const FALLBACK_AVATAR = FALLBACK_AVATAR_URL;
 const HERO_BTN =
   "w-10 h-10 rounded-full bg-black/30 backdrop-blur-md border border-white/15 flex items-center justify-center text-white active:scale-95 transition-transform";
 
-function Fact({ icon: Icon, label, value }) {
-  if (!value) return null;
+function Meta({ icon: Icon, children }) {
+  if (!children) return null;
   return (
-    <div className="min-w-0">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-        {Icon && <Icon className="w-3 h-3 text-primary/80" strokeWidth={1.75} />}
-        {label}
-      </p>
-      <p className="text-sm text-foreground mt-0.5 leading-snug">{value}</p>
-    </div>
+    <p className="flex items-center gap-2 text-sm text-foreground min-w-0">
+      <Icon className="w-4 h-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
+      <span className="min-w-0">{children}</span>
+    </p>
   );
 }
 
@@ -112,22 +110,11 @@ export default function EventDetail() {
     load();
   }, [load]);
 
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center text-sm text-muted-foreground">
-        Loading event…
-      </div>
-    );
-  }
+  if (loading) return <PageLoading />;
 
   if (!event) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center gap-3 px-6 text-center">
-        <p className="font-display font-semibold">Event not found</p>
-        <button onClick={() => navigate("/events")} className="text-sm text-primary underline">
-          Back to events
-        </button>
-      </div>
+      <PageNotFound title="Event not found" backLabel="Back to events" onBack={() => navigate("/events")} />
     );
   }
 
@@ -290,77 +277,60 @@ export default function EventDetail() {
       </div>
 
       <div className="flex-1 overflow-y-auto app-scroll pb-6">
-        <div className="app-px pt-5 space-y-6">
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              {event.visibility === "approval" && (
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/12 text-primary border border-primary/25">
-                  Approval required
-                </span>
-              )}
-              {event.pricing === "paid_external" && (
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full bg-muted text-muted-foreground border border-border">
-                  Paid tickets
-                </span>
-              )}
-            </div>
-            <h1 className="font-display font-bold text-2xl leading-tight tracking-tight text-foreground">
+        <div className="app-px pt-5 space-y-5">
+          <header>
+            <h1 className="font-display font-bold text-2xl leading-tight tracking-tight">
               {event.title}
             </h1>
-            {areaLine && (
-              <p className="flex items-center gap-1.5 text-sm text-muted-foreground mt-2 min-w-0">
-                <MapPin className="w-4 h-4 shrink-0 text-primary/80" strokeWidth={1.5} />
-                <span className="truncate">{areaLine}</span>
-              </p>
+          </header>
+
+          {event.description && (
+            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+              {event.description}
+            </p>
+          )}
+
+          <div className="space-y-1.5">
+            <Meta icon={Calendar}>{dateLine}</Meta>
+            <Meta icon={MapPin}>
+              {[event.location, event.city, event.country].filter(Boolean).join(" · ")}
+            </Meta>
+            <Meta icon={Users}>
+              {event.max_attendees != null
+                ? `${goingCount} of ${event.max_attendees} spots filled`
+                : goingCount > 0
+                  ? `${goingCount} going`
+                  : null}
+            </Meta>
+            {(event.age_min || event.age_max) && (
+              <Meta icon={UserRound}>
+                Ages {event.age_min || "18"}–{event.age_max || "any"}
+              </Meta>
             )}
+            {event.languages?.length > 0 && (
+              <Meta icon={Globe}>Languages · {event.languages.join(", ")}</Meta>
+            )}
+            <p className="text-sm text-muted-foreground">
+              {event.visibility === "approval" ? "Host approves each request" : "Open to join"}
+              {event.pricing === "paid_external" ? " · Paid tickets" : ""}
+            </p>
           </div>
 
-          {/* Key facts — scannable, not a long divider list */}
-          <div className="rounded-2xl border border-border/70 bg-card/40 p-4 space-y-4">
-            <Fact icon={Calendar} label="When" value={dateLine} />
-            <div className="grid grid-cols-2 gap-4">
-              <Fact
-                icon={Users}
-                label="Spots"
-                value={
-                  event.max_attendees != null
-                    ? `${goingCount}/${event.max_attendees} filled`
-                    : goingCount > 0
-                      ? `${goingCount} going`
-                      : null
-                }
-              />
-              {(event.age_min || event.age_max) && (
-                <Fact
-                  icon={UserRound}
-                  label="Ages"
-                  value={`${event.age_min || "any"}–${event.age_max || "any"}`}
-                />
-              )}
-            </div>
-          </div>
-
-          {/* Who's interested / going — host can open manage sheet */}
           <button
             type="button"
             onClick={isHost ? () => setManageOpen(true) : undefined}
-            className={cn(
-              "w-full text-left rounded-2xl border border-border/70 bg-card/40 p-4",
-              isHost && "tap-feedback"
-            )}
+            className={cn("w-full text-left", isHost && "tap-feedback")}
           >
-            <div className="flex items-center justify-between gap-3 mb-3">
-              <p className="font-display font-semibold text-sm">
-                {isHost && pending.length > 0 ? "Join requests" : "Who's going"}
-              </p>
-              <span className="text-xs text-muted-foreground shrink-0">
+            <p className="section-header mb-2">
+              {isHost && pending.length > 0 ? "Join requests" : "Who’s going"}
+              <span className="font-sans font-medium text-muted-foreground text-xs ml-2">
                 {isHost && pending.length > 0
                   ? `${pending.length} to review`
                   : goingCount > 0
-                    ? `${goingCount} going`
-                    : "Be the first"}
+                    ? `${goingCount}`
+                    : ""}
               </span>
-            </div>
+            </p>
             {goingAvatars.length > 0 || (isHost && pending.length > 0) ? (
               <div className="flex items-center gap-3">
                 <div className="flex items-center">
@@ -372,30 +342,26 @@ export default function EventDetail() {
                       key={i}
                       src={src}
                       alt=""
-                      className="w-9 h-9 rounded-full object-cover border-2 border-background -ml-2 first:ml-0"
+                      className="w-8 h-8 rounded-full object-cover border-2 border-background -ml-1.5 first:ml-0"
                     />
                   ))}
                 </div>
-                <p className="text-xs text-muted-foreground flex-1 min-w-0">
+                <p className="text-sm text-muted-foreground flex-1 min-w-0">
                   {isHost && pending.length > 0
                     ? "Tap to approve or decline"
                     : (() => {
                         const names = going.slice(0, 2).map((a) => a.name).filter(Boolean);
-                        if (!names.length) return `${goingCount} going`;
+                        if (!names.length) return goingCount ? `${goingCount} going` : "Be the first";
                         return names.join(", ") + (goingCount > 2 ? ` +${goingCount - 2}` : "");
                       })()}
                 </p>
-                {isHost && (
-                  <ChevronDown className="w-4 h-4 -rotate-90 text-muted-foreground shrink-0" strokeWidth={1.5} />
-                )}
               </div>
             ) : (
-              <p className="text-xs text-muted-foreground">No one has joined yet.</p>
+              <p className="text-sm text-muted-foreground">No one has joined yet.</p>
             )}
           </button>
 
-          {/* Host */}
-          <div className="w-full flex items-center gap-3 rounded-2xl border border-border/70 bg-card/40 p-3.5">
+          <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={!isHost && event.host_id ? () => navigate(`/members/${event.host_id}`) : undefined}
@@ -407,10 +373,10 @@ export default function EventDetail() {
               <img
                 src={host?.avatar || event.host_avatar || FALLBACK_AVATAR}
                 alt=""
-                className="w-11 h-11 rounded-full object-cover shrink-0 border border-border"
+                className="w-10 h-10 rounded-full object-cover shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Host</p>
+                <p className="text-xs text-muted-foreground">Hosted by</p>
                 <p className="text-sm font-semibold truncate">{event.host_name || "Seluna host"}</p>
               </div>
             </button>
@@ -418,37 +384,13 @@ export default function EventDetail() {
               <button
                 type="button"
                 onClick={() => messageUser(event.host_id)}
-                className="w-10 h-10 rounded-full border border-border bg-background flex items-center justify-center shrink-0"
+                className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 tap-feedback"
                 aria-label="Message host"
               >
-                <MessageCircle className="w-4 h-4" strokeWidth={1.5} />
+                <MessageCircle className="w-5 h-5" strokeWidth={1.5} />
               </button>
             )}
           </div>
-
-          {event.description && (
-            <section>
-              <h2 className="font-display font-semibold text-base mb-2">About</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                {event.description}
-              </p>
-            </section>
-          )}
-
-          {event.languages && event.languages.length > 0 && (
-            <section>
-              <h2 className="font-display font-semibold text-base mb-2 flex items-center gap-1.5">
-                <Globe className="w-4 h-4 text-primary" strokeWidth={1.5} /> Languages
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {event.languages.map((l) => (
-                  <span key={l} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary">
-                    {l}
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
 
           <EventMap compact query={locationLine || meetingPoint} label={meetingPoint} />
 
@@ -457,28 +399,27 @@ export default function EventDetail() {
               href={event.external_link}
               target="_blank"
               rel="noreferrer"
-              className="block w-full text-center rounded-2xl border border-border py-3 text-sm font-semibold"
+              className="block text-sm font-semibold text-primary"
             >
-              Get tickets ↗
+              Get tickets
             </a>
           )}
 
-          <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
+          <div>
             <button
               type="button"
               onClick={() => setSafetyOpen((o) => !o)}
-              className="w-full flex items-center justify-between gap-2 text-left"
+              className="flex items-center gap-1.5 text-sm text-muted-foreground"
             >
-              <h2 className="font-display font-semibold text-base flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-primary" strokeWidth={1.5} /> Safety tips
-              </h2>
+              <ShieldCheck className="w-4 h-4" strokeWidth={1.5} />
+              Safety tips
               <ChevronDown
-                className={cn("w-4 h-4 text-muted-foreground transition-transform", safetyOpen && "rotate-180")}
+                className={cn("w-3.5 h-3.5 transition-transform", safetyOpen && "rotate-180")}
                 strokeWidth={1.5}
               />
             </button>
             {safetyOpen && (
-              <ul className="text-xs text-muted-foreground space-y-1.5 list-disc pl-5 mt-3">
+              <ul className="text-sm text-muted-foreground space-y-1.5 list-disc pl-5 mt-2">
                 <li>Meet in public spaces; this event should not share private home addresses.</li>
                 <li>Friendship and travel focus only — report any inappropriate behaviour.</li>
                 <li>Trust your instincts and leave if anything feels unsafe.</li>
@@ -502,7 +443,7 @@ export default function EventDetail() {
 
           {isHost && (
             <section>
-              <h2 className="font-display font-semibold text-base mb-2">Host tools</h2>
+              <h2 className="section-header mb-2">Host tools</h2>
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant="outline"

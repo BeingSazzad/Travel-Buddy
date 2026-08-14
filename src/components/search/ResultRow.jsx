@@ -46,7 +46,7 @@ export default function ResultRow({ item }) {
   return (
     <div
       onClick={handleClick}
-      className="w-full flex items-center gap-3 py-2.5 px-2 rounded-xl hover:bg-card/60 text-left tap-feedback cursor-pointer"
+      className="w-full flex items-center gap-3 py-2.5 px-3 rounded-3xl border border-border/60 bg-card/60 hover:bg-card text-left tap-feedback cursor-pointer"
     >
       <div className={cn("shrink-0 overflow-hidden", isMember ? "w-11 h-11 rounded-full" : "w-12 h-12 rounded-xl")}>
         <Image src={item.image} alt="" fittingType="fill" className="w-full h-full object-cover" />

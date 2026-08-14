@@ -195,7 +195,7 @@ export default function ContentEditorSheet({ open, item, fields, title, onSave, 
                       const on = !!form[f.key]?.[o.key];
                       return (
                         <button key={o.key} type="button" onClick={() => set(f.key, { ...form[f.key], [o.key]: !on })}
-                          className={`px-2.5 py-1 rounded-full text-xs border ${on ? "bg-primary text-white border-primary" : "border-border text-foreground"}`}>
+                          className={`px-2.5 py-1 rounded-full text-xs border ${on ? "chip-on" : "border-border text-foreground"}`}>
                           {o.label}
                         </button>
                       );

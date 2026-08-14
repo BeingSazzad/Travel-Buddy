@@ -31,7 +31,7 @@ function Chip({ active, onClick, children }) {
       onClick={onClick}
       className={cn(
         "px-3.5 py-2 rounded-full text-sm border capitalize transition",
-        active ? "bg-primary text-white border-primary" : "border-border text-foreground"
+        active ? "chip-on" : "border-border text-foreground"
       )}
     >
       {children}

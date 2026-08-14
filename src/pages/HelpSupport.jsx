@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, HelpCircle, Mail, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Mail, ShieldAlert } from "lucide-react";
 import ScrollPage, { ScrollPageHeader, ScrollPageBody } from "@/components/common/ScrollPage";
 import {
   Accordion,
@@ -12,23 +12,25 @@ import {
 const FAQ = [
   {
     q: "How does matching work on Seluna?",
-    a: "Seluna matches women travelling to the same destination around the same dates. You can filter deck matches by age, dates, interests, and languages.",
+    a: "Seluna matches women travelling to the same city around the same dates. Open Discover and filter by destination, dates, interests, and languages.",
   },
   {
     q: "Is Seluna a dating app?",
-    a: "No. Seluna is strictly a women-only friendship, travel companion, and community platform. Dating solicitation is prohibited.",
+    a: "No. Seluna is a women-only friendship and travel companion app. Dating pitches are against the community guidelines.",
   },
   {
     q: "How do I verify my account?",
-    a: "Go to Profile → Verify Identity. You will need a valid government-issued ID and a selfie processed securely via Veriff.",
+    a: "Open Profile → Verify identity. You confirm you're 18+ with a government ID and a selfie (Veriff).",
+    to: "/profile/verify",
   },
   {
-    q: "How do I manage or cancel my subscription?",
-    a: "Go to Profile → Subscription to view your current plan, upgrade, or cancel your auto-renewal at any time.",
+    q: "How do I manage or cancel Plus?",
+    a: "Open Profile → Seluna Plus to see your plan, switch monthly/yearly, or open payment & cancel.",
+    to: "/subscription-management",
   },
   {
-    q: "What should I do if I feel unsafe or spot inappropriate content?",
-    a: "Use the Report button on any profile, message, or event card. Our moderation team reviews all reports 24/7.",
+    q: "What if I feel unsafe?",
+    a: "Use Report on a profile, chat, or event. The team reviews reports. In an emergency, contact local services first.",
   },
 ];
 
@@ -48,14 +50,6 @@ export default function HelpSupport() {
       </ScrollPageHeader>
 
       <ScrollPageBody className="space-y-6">
-        <div className="text-center mb-4">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
-            <HelpCircle className="w-6 h-6 text-primary" strokeWidth={1.5} />
-          </div>
-          <p className="font-display font-bold text-lg">How can we help you?</p>
-          <p className="text-sm text-muted-foreground mt-1">Frequently asked questions & member support</p>
-        </div>
-
         <div className="grid grid-cols-2 gap-3">
           <a
             href="mailto:support@seluna.app"
@@ -90,6 +84,15 @@ export default function HelpSupport() {
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-3.5">
                   {f.a}
+                  {f.to && (
+                    <button
+                      type="button"
+                      onClick={() => navigate(f.to)}
+                      className="block mt-2 text-primary font-semibold text-sm"
+                    >
+                      Open this page
+                    </button>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             ))}

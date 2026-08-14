@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { findMockDeal } from "@/lib/mock-deals";
 import { savedItemKey } from "@/lib/saved-item-key";
 import RedeemSheet from "@/components/deals/RedeemSheet";
+import { PageLoading, PageNotFound } from "@/components/common/PageStatus";
 
 const fmtDate = (d) =>
   d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
@@ -41,22 +42,11 @@ export default function DealDetail() {
     };
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center text-sm text-muted-foreground">
-        Loading deal…
-      </div>
-    );
-  }
+  if (loading) return <PageLoading />;
 
   if (!deal) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center gap-3 px-6 text-center">
-        <p className="font-display font-semibold">Deal not found</p>
-        <button onClick={() => navigate("/deals")} className="text-sm text-primary underline">
-          Back to deals
-        </button>
-      </div>
+      <PageNotFound title="Deal not found" backLabel="Back to deals" onBack={() => navigate("/deals")} />
     );
   }
 

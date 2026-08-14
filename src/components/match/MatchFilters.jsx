@@ -11,7 +11,7 @@ function ChipToggle({ label, active, onClick }) {
       type="button"
       onClick={onClick}
       className={`text-xs px-3 py-1.5 rounded-full border capitalize transition active:scale-95 ${
-        active ? "bg-primary text-white border-primary" : "bg-card text-muted-foreground border-border"
+        active ? "chip-on" : "bg-card text-muted-foreground border-border"
       }`}
     >
       {label}

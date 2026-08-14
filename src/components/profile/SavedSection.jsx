@@ -40,7 +40,7 @@ function SavedItemRow({ item, onRemove, onOpen }) {
   const locationLine = [item.location, item.country].filter(Boolean).join(', ');
 
   return (
-    <div className="flex items-center gap-3 bg-card border border-border/80 shadow-soft rounded-2xl p-3">
+    <div className="flex items-center gap-3 bg-card border border-border/60 shadow-soft rounded-3xl p-3">
       <button
         type="button"
         onClick={() => onOpen(item)}

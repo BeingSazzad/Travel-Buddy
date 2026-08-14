@@ -16,7 +16,7 @@ export default function Profile() {
   return (
     <div className="app-px safe-pt pb-4">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="font-display font-bold text-lg">Profile</h1>
+        <h1 className="page-title">Profile</h1>
       </div>
 
       <ProfileHeader />
@@ -25,7 +25,7 @@ export default function Profile() {
         <button
           type="button"
           onClick={() => navigate("/subscription-management")}
-          className="mt-4 w-full rounded-2xl gradient-brand-horizontal text-white p-3.5 flex items-center justify-between shadow-soft text-left"
+          className="mt-4 w-full rounded-2xl gradient-membership-card p-3.5 flex items-center justify-between text-left"
         >
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center shrink-0">

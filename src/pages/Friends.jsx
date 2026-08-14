@@ -58,7 +58,7 @@ export default function Friends() {
         .map((m) => ({
           memberId: m.user_id,
           name: m.name,
-          loc: `${m.current_city}, ${m.country}`,
+          loc: m.trip?.city ? `${m.current_city} → ${m.trip.city}` : m.current_city,
           img: m.avatar,
         })),
     [friendIds]
