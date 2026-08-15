@@ -4,6 +4,7 @@ import { MapPin, Plane, Compass, Flag, Ban, UserMinus } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { base44 } from "@/api/base44Client";
 import ReportSheet from "@/components/reports/ReportSheet";
+import BlockConfirmDialog from "@/components/common/BlockConfirmDialog";
 
 function ChipRow({ label, items, tone }) {
   if (!items?.length) return null;
@@ -29,12 +30,13 @@ export default function MemberProfileSheet({ open, data, loading, matchId, onClo
   const memberId = p?.user_id || p?.id || "";
   const [reportTarget, setReportTarget] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [blockOpen, setBlockOpen] = useState(false);
 
   const reportProfile = () =>
     setReportTarget({ type: "profile", id: memberId, title: p?.name || "Member", ownerId: memberId });
 
   const doBlock = async () => {
-    if (!memberId || !window.confirm(`Block ${p?.name || "this member"}? You won't see each other anymore.`)) return;
+    if (!memberId) return;
     try {
       setBusy(true);
       await base44.entities.BlockedMember.create({ blocked_user_id: memberId, reason: "block" });
@@ -134,7 +136,7 @@ export default function MemberProfileSheet({ open, data, loading, matchId, onClo
                     </button>
                   )}
                   <button
-                    onClick={doBlock}
+                    onClick={() => setBlockOpen(true)}
                     disabled={busy}
                     className="w-full flex items-center justify-center gap-2 py-2.5 rounded-full border border-border text-sm text-muted-foreground active:scale-95 transition disabled:opacity-50"
                   >
@@ -154,6 +156,15 @@ export default function MemberProfileSheet({ open, data, loading, matchId, onClo
       </Sheet>
 
       <ReportSheet open={!!reportTarget} onOpenChange={(o) => !o && setReportTarget(null)} target={reportTarget} />
+      <BlockConfirmDialog
+        open={blockOpen}
+        onOpenChange={setBlockOpen}
+        name={p?.name || "this member"}
+        onConfirm={() => {
+          setBlockOpen(false);
+          doBlock();
+        }}
+      />
     </>
   );
 }

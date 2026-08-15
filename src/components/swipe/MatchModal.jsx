@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
+import BlockConfirmDialog from "@/components/common/BlockConfirmDialog";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { MessageCircle, User, Compass, Ban, Flag, UserMinus, Users } from "lucide-react";
 
-export default function MatchModal({ open, myAvatar, theirAvatar, onMessage, onProfile, onKeepExploring, onUnmatch, onBlock, onReport }) {
+export default function MatchModal({ open, myAvatar, theirAvatar, theirName, onMessage, onProfile, onKeepExploring, onUnmatch, onBlock, onReport }) {
+  const [blockOpen, setBlockOpen] = useState(false);
+
   return (
+    <>
     <Dialog open={open} onOpenChange={(o) => !o && onKeepExploring()}>
       <DialogContent className="max-w-[340px] p-6 text-center rounded-3xl border-0 shadow-premium bg-card">
         <motion.div
@@ -62,7 +66,7 @@ export default function MatchModal({ open, myAvatar, theirAvatar, onMessage, onP
             <UserMinus className="w-3.5 h-3.5" strokeWidth={2} /> Remove connection
           </button>
           <span className="w-px h-3 bg-border" />
-          <button onClick={onBlock} className="flex items-center gap-1.5 active:scale-95 transition">
+          <button onClick={() => setBlockOpen(true)} className="flex items-center gap-1.5 active:scale-95 transition">
             <Ban className="w-3.5 h-3.5" strokeWidth={1.5} /> Block
           </button>
           <span className="w-px h-3 bg-border" />
@@ -72,5 +76,15 @@ export default function MatchModal({ open, myAvatar, theirAvatar, onMessage, onP
         </div>
       </DialogContent>
     </Dialog>
+    <BlockConfirmDialog
+      open={blockOpen}
+      onOpenChange={setBlockOpen}
+      name={theirName || "this member"}
+      onConfirm={() => {
+        setBlockOpen(false);
+        onBlock?.();
+      }}
+    />
+    </>
   );
 }

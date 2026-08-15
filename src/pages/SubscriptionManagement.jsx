@@ -2,12 +2,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Loader2, Crown, Check, Info, ArrowLeft, Settings2 } from "lucide-react";
+import { Loader2, Crown, Check, ArrowLeft, CreditCard } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { cn } from "@/lib/utils";
 
 const PLANS = [
-  { id: "monthly", name: "Monthly", price: "€5.29", period: "/month", blurb: "Flexible — cancel anytime" },
+  { id: "monthly", name: "Monthly", price: "€5.29", period: "/month", blurb: "Billed monthly" },
   { id: "yearly", name: "Yearly", price: "€44.49", period: "/year", blurb: "Best value", badge: "Save 30%" },
 ];
 
@@ -23,6 +23,14 @@ const fmtDate = (iso) =>
   iso
     ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
     : "—";
+
+function billingError(err, fallback) {
+  const raw = String(err?.message || err || "").toLowerCase();
+  if (raw.includes("network") || raw.includes("fetch") || raw.includes("timeout")) {
+    return "Couldn’t open billing. Check your connection and try again.";
+  }
+  return fallback;
+}
 
 function normalizePlanId(plan) {
   const raw = String(plan || "").toLowerCase();
@@ -104,9 +112,9 @@ export default function SubscriptionManagement() {
     try {
       const res = await base44.functions.invoke("manage-subscription", { action: "portal" });
       if (res?.data?.url) window.location.href = res.data.url;
-      else setError("Could not open subscription management.");
+      else setError("Couldn’t open billing. Try again.");
     } catch (e) {
-      setError(e?.message || "Could not open subscription management");
+      setError(billingError(e, "Couldn’t open billing. Try again."));
     } finally {
       setBusy(null);
     }
@@ -210,46 +218,37 @@ export default function SubscriptionManagement() {
         </div>
       </div>
 
-      <Button
-        className="w-full h-12 mt-5"
-        onClick={isActive ? switchPlan : () => navigate("/subscription")}
-        disabled={busy === "switch" || (isActive && isSelectedCurrent)}
-      >
-        {busy === "switch" ? (
-          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-        ) : null}
-        {!isActive
-          ? "Subscribe"
-          : isSelectedCurrent
-            ? "Current plan"
-            : `Switch to ${selectedPlan.name}`}
-      </Button>
+      {(!isActive || !isSelectedCurrent) && (
+        <Button
+          className="w-full h-12 mt-5"
+          onClick={isActive ? switchPlan : () => navigate("/subscription")}
+          disabled={busy === "switch"}
+        >
+          {busy === "switch" ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : null}
+          {!isActive ? "Subscribe" : `Switch to ${selectedPlan.name}`}
+        </Button>
+      )}
 
       {isActive && (
         <Button
           variant="outline"
-          className="w-full h-12 mt-3"
+          className={cn(
+            "w-full h-12",
+            !isActive || !isSelectedCurrent ? "mt-3" : "mt-5"
+          )}
           onClick={manage}
           disabled={busy === "manage"}
         >
           {busy === "manage" ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : (
-            <Settings2 className="w-4 h-4 mr-2" strokeWidth={1.5} />
+            <CreditCard className="w-4 h-4 mr-2" strokeWidth={1.5} />
           )}
           Payment & cancel
         </Button>
       )}
-
-      <div className="mt-5 rounded-2xl border border-border bg-primary/5 p-4">
-        <div className="flex items-start gap-2.5">
-          <Info className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} />
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Cancel anytime — Plus stays active until{" "}
-            {periodEnd ? fmtDate(periodEnd) : "your period ends"}.
-          </p>
-        </div>
-      </div>
 
       {info && <p className="text-sm text-primary mt-4 text-center">{info}</p>}
       {error && <p className="text-sm text-destructive mt-4 text-center">{error}</p>}

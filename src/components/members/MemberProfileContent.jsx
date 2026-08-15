@@ -103,7 +103,6 @@ export default function MemberProfileContent({
   };
 
   const handleBlockMember = () => {
-    if (!window.confirm(`Block ${p.name}? They won't be able to contact you.`)) return;
     onBlockMember?.(resolvedId);
     onBack?.();
   };
@@ -150,6 +149,7 @@ export default function MemberProfileContent({
             <MemberProfileMenu
               isConnected={isFriend}
               overlay
+              blockName={p?.name}
               onReport={reportMember}
               onRemoveFriend={isFriend && onRemoveFriend ? handleRemoveFriend : undefined}
               onBlockMember={onBlockMember ? handleBlockMember : undefined}

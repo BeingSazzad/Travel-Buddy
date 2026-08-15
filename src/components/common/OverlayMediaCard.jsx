@@ -5,7 +5,7 @@ import SaveButton from "@/components/common/SaveButton";
 import { cn } from "@/lib/utils";
 
 const FRAME =
-  "relative overflow-hidden rounded-3xl border border-border/60 shadow-soft interactive-card group text-left cursor-pointer";
+  "relative overflow-hidden rounded-2xl border border-border/60 shadow-soft interactive-card group text-left cursor-pointer";
 
 export default function OverlayMediaCard({
   image,

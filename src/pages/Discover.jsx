@@ -171,6 +171,7 @@ export default function Discover() {
         open={!!matched}
         myAvatar={myAvatar}
         theirAvatar={matched?.avatar || ""}
+        theirName={matched?.name}
         onMessage={() => matched?.conversation_id && navigate(`/conversations/${matched.conversation_id}`)}
         onProfile={handleProfile}
         onKeepExploring={handleKeepExploring}

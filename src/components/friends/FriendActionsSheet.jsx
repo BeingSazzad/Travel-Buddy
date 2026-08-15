@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { User, MessageCircle, UserMinus, Ban, Loader2 } from "lucide-react";
+import BlockConfirmDialog from "@/components/common/BlockConfirmDialog";
 
 export default function FriendActionsSheet({
   open,
@@ -13,6 +14,7 @@ export default function FriendActionsSheet({
   onBlock,
 }) {
   const [busy, setBusy] = useState(false);
+  const [blockOpen, setBlockOpen] = useState(false);
 
   if (!friend) return null;
 
@@ -27,6 +29,7 @@ export default function FriendActionsSheet({
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl pb-6">
         <SheetHeader>
@@ -69,10 +72,7 @@ export default function FriendActionsSheet({
           <button
             type="button"
             disabled={busy}
-            onClick={() => {
-              if (!window.confirm(`Block ${friend.name}? They won't be able to contact you.`)) return;
-              run(() => onBlock?.(friend));
-            }}
+            onClick={() => setBlockOpen(true)}
             className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-muted/40 text-left disabled:opacity-50"
           >
             <Ban className="w-5 h-5 text-primary" strokeWidth={1.5} />
@@ -92,5 +92,15 @@ export default function FriendActionsSheet({
         </Button>
       </SheetContent>
     </Sheet>
+      <BlockConfirmDialog
+        open={blockOpen}
+        onOpenChange={setBlockOpen}
+        name={friend.name}
+        onConfirm={() => {
+          setBlockOpen(false);
+          run(() => onBlock?.(friend));
+        }}
+      />
+    </>
   );
 }
