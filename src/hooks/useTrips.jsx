@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 
-import { getMockTrips } from "@/lib/mock-trips";
+import { getMockTrips, getLocalTrips, saveLocalTrip } from "@/lib/mock-trips";
 
 export function useTrips() {
   const { isAuthenticated, user } = useAuth();
@@ -15,9 +15,10 @@ export function useTrips() {
       const list = await base44.entities.Trip.list("-start_date", 200);
       const dbIds = new Set(list.map((t) => t.id));
       const mockToAdd = getMockTrips(user?.id).filter((m) => !dbIds.has(m.id));
-      setTrips([...list, ...mockToAdd]);
+      const localToAdd = getLocalTrips().filter((t) => !dbIds.has(t.id));
+      setTrips([...localToAdd, ...list, ...mockToAdd]);
     } catch {
-      setTrips(getMockTrips(user?.id));
+      setTrips([...getLocalTrips(), ...getMockTrips(user?.id)]);
     } finally {
       setLoading(false);
     }
@@ -34,7 +35,17 @@ export function useTrips() {
     return unsub;
   }, [isAuthenticated, load]);
 
-  const create = useCallback((data) => base44.entities.Trip.create(data), []);
+  const create = useCallback((data) => {
+    const localTrip = {
+      id: `trip_local_${Date.now()}`,
+      ...data,
+      created_by_id: user?.id || "demo_user",
+      created_by: { name: user?.profile_name || user?.full_name || "You" },
+    };
+    saveLocalTrip(localTrip);
+    setTrips((prev) => [localTrip, ...prev.filter((t) => t.id !== localTrip.id)]);
+    return Promise.resolve(localTrip);
+  }, [user]);
   const update = useCallback((id, data) => base44.entities.Trip.update(id, data), []);
   const remove = useCallback((id) => base44.entities.Trip.delete(id), []);
 

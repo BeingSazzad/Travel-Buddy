@@ -103,23 +103,21 @@ export default function CreateTrip() {
 
   const finish = async () => {
     setCreating(true);
-    try {
-      const createdTrip = await create({
-        name: data.name.trim() || `Trip to ${data.city.trim()}`,
-        city: data.city.trim(),
-        country: data.country,
-        start_date: data.start_date,
-        end_date: data.end_date,
-        travel_style: data.travel_style,
-        cover_image: data.cover_image || imageForCity(data.city),
-        description: data.description.trim(),
-        looking_for: data.looking_for,
-        visibility: data.visibility,
-      });
-      setCreated(createdTrip);
-    } finally {
-      setCreating(false);
-    }
+    const payload = {
+      name: data.name.trim() || `Trip to ${data.city.trim()}`,
+      city: data.city.trim(),
+      country: data.country,
+      start_date: data.start_date,
+      end_date: data.end_date,
+      travel_style: data.travel_style,
+      cover_image: data.cover_image || imageForCity(data.city),
+      description: data.description.trim(),
+      looking_for: data.looking_for,
+      visibility: data.visibility,
+    };
+    const createdTrip = await create(payload);
+    setCreated(createdTrip);
+    setCreating(false);
   };
 
   if (created) {

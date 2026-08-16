@@ -127,31 +127,34 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-app rounded-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{initial ? "Edit trip" : "New trip"}</DialogTitle>
+      <DialogContent
+        overlayClassName="z-[60]"
+        className="z-[60] flex flex-col gap-0 p-0 overflow-hidden rounded-2xl sm:rounded-2xl w-[calc(100%-1.5rem)] max-w-[min(24.5rem,calc(100%-1.5rem))] max-h-[min(90dvh,calc(100dvh-2rem))] min-w-0 shadow-premium"
+      >
+        <DialogHeader className="shrink-0 px-5 pt-5 pb-3 pr-12 text-left border-b border-border/60">
+          <DialogTitle className="font-display">{initial ? "Edit trip" : "New trip"}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain no-scrollbar px-5 py-4 space-y-4">
+          <div className="space-y-2 min-w-0">
             <Label>Trip name</Label>
             <Input
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
               placeholder={`Trip to ${form.city || "..."}`}
-              className="h-10"
+              className="h-10 min-w-0 max-w-full"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-3 min-w-0">
+            <div className="space-y-2 min-w-0">
               <Label>City *</Label>
-              <Input value={form.city} onChange={(e) => set("city", e.target.value)} placeholder="Lisbon" className="h-10" />
+              <Input value={form.city} onChange={(e) => set("city", e.target.value)} placeholder="Lisbon" className="h-10 min-w-0 max-w-full" />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 min-w-0">
               <Label>Country *</Label>
               <Select value={form.country} onValueChange={(v) => set("country", v)}>
-                <SelectTrigger className="h-10"><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectTrigger className="h-10 min-w-0 max-w-full"><SelectValue placeholder="Select" /></SelectTrigger>
                 <SelectContent>
                   {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                 </SelectContent>
@@ -159,28 +162,28 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-3 min-w-0">
+            <div className="space-y-2 min-w-0">
               <Label>Start date *</Label>
-              <Input type="date" value={form.start_date} onChange={(e) => set("start_date", e.target.value)} className="h-10" />
+              <Input type="date" value={form.start_date} onChange={(e) => set("start_date", e.target.value)} className="h-10 min-w-0 max-w-full" />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 min-w-0">
               <Label>End date *</Label>
-              <Input type="date" value={form.end_date} onChange={(e) => set("end_date", e.target.value)} className="h-10" />
+              <Input type="date" value={form.end_date} onChange={(e) => set("end_date", e.target.value)} className="h-10 min-w-0 max-w-full" />
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <Label>Travel style *</Label>
             <Select value={form.travel_style} onValueChange={(v) => set("travel_style", v)}>
-              <SelectTrigger className="h-10"><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectTrigger className="h-10 min-w-0 max-w-full"><SelectValue placeholder="Select" /></SelectTrigger>
               <SelectContent>
                 {TRAVEL_STYLES.map((s) => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <Label>Looking for</Label>
             <div className="flex flex-wrap gap-1.5">
               {LOOKING_FOR.map((o) => (
@@ -191,17 +194,18 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <Label>Description</Label>
             <Textarea
               value={form.description}
               onChange={(e) => set("description", e.target.value)}
               placeholder="Tell others about your trip…"
               rows={3}
+              className="min-w-0 max-w-full"
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <Label>Cover photo</Label>
             {form.cover_image ? (
               <div className="relative rounded-xl overflow-hidden h-28 border border-border">
@@ -228,8 +232,8 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
             )}
           </div>
 
-          <div className="flex items-center justify-between rounded-xl border border-border p-3">
-            <div>
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 min-w-0">
+            <div className="min-w-0">
               <p className="font-medium text-sm">
                 {form.visibility === "public" ? "Public trip" : "Hidden trip"}
               </p>
@@ -244,9 +248,9 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={submit} disabled={saving || !valid}>{saving ? "Saving…" : "Save trip"}</Button>
+        <DialogFooter className="shrink-0 flex-row justify-end gap-2 px-5 py-3 border-t border-border/60 bg-background sm:flex-row">
+          <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button className="flex-1" onClick={submit} disabled={saving || !valid}>{saving ? "Saving…" : "Save trip"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

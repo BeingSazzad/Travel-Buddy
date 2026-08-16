@@ -167,8 +167,30 @@ export function getMockTrips(userId = "demo_user") {
   ];
 }
 
+const LOCAL_TRIPS_KEY = "seluna_user_trips";
+
+export function getLocalTrips() {
+  try {
+    const raw = localStorage.getItem(LOCAL_TRIPS_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveLocalTrip(trip) {
+  if (!trip?.id) return trip;
+  const next = [trip, ...getLocalTrips().filter((t) => t.id !== trip.id)];
+  localStorage.setItem(LOCAL_TRIPS_KEY, JSON.stringify(next));
+  return trip;
+}
+
 export function findMockTrip(id, userId = "demo_user") {
-  return getMockTrips(userId).find((t) => t.id === id);
+  return (
+    getLocalTrips().find((t) => t.id === id) ||
+    getMockTrips(userId).find((t) => t.id === id)
+  );
 }
 
 export function cityKeyMatch(cityA, cityB) {

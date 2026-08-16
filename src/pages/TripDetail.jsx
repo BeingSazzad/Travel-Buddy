@@ -56,14 +56,22 @@ export default function TripDetail() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    const fromList = trips.find((t) => t.id === id);
+    const mock = findMockTrip(id, user?.id);
+    const found = fromList || mock;
+    if (found) {
+      setTrip(found);
+      setLoading(false);
+      return;
+    }
+
     let cancelled = false;
     (async () => {
       try {
         const t = await base44.entities.Trip.get(id);
         if (!cancelled) setTrip(t);
       } catch {
-        const mock = findMockTrip(id, user?.id);
-        if (!cancelled) setTrip(mock || null);
+        if (!cancelled) setTrip(null);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -71,7 +79,7 @@ export default function TripDetail() {
     return () => {
       cancelled = true;
     };
-  }, [id, user?.id]);
+  }, [id, user?.id, trips]);
 
   const overlapMatches = useMemo(() => {
     if (!trip) return [];
