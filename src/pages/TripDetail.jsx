@@ -24,7 +24,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { tripStatus, formatDates, imageForCity, tripsOverlap } from "@/lib/trip-utils";
-import { findMockTrip, memberIdForTripCreator } from "@/lib/mock-trips";
+import { findMockTrip, memberIdForTripCreator, cityKeyMatch } from "@/lib/mock-trips";
 import { getMockConversationId, findMockMember } from "@/lib/member-profile";
 import { eventsForCity, resolveEventId } from "@/lib/mock-events";
 import { isSameAppUser } from "@/lib/demo-user";
@@ -88,8 +88,7 @@ export default function TripDetail() {
       (t) => t.id !== trip.id && !isSameAppUser(t.created_by_id, trip.created_by_id)
     );
     others.forEach((t) => {
-      const sameCity = (t.city || "").toLowerCase() === (trip.city || "").toLowerCase();
-      if (sameCity && tripsOverlap(trip, t)) {
+      if (cityKeyMatch(t.city, trip.city) && tripsOverlap(trip, t)) {
         const key = t.created_by_id;
         if (!byWoman[key]) {
           const mockMember = findMockMember(memberIdForTripCreator(key));

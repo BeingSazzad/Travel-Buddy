@@ -115,9 +115,14 @@ export default function CreateTrip() {
       looking_for: data.looking_for,
       visibility: data.visibility,
     };
-    const createdTrip = await create(payload);
-    setCreated(createdTrip);
-    setCreating(false);
+    try {
+      const createdTrip = await create(payload);
+      setCreated(createdTrip);
+    } catch {
+      alert("Couldn’t create trip. Try again.");
+    } finally {
+      setCreating(false);
+    }
   };
 
   if (created) {

@@ -63,8 +63,8 @@ export function getMockTrips(userId = "demo_user") {
       visibility: "public",
       created_by_id: "other_user_1",
       created_by: {
-        name: findMockMember("mock_4").name,
-        main_photo: findMockMember("mock_4").avatar,
+        name: findMockMember("mock_4")?.name || "Traveler",
+        main_photo: findMockMember("mock_4")?.avatar,
       },
       cover_image: imageForCity("Paris"),
     },
@@ -81,8 +81,8 @@ export function getMockTrips(userId = "demo_user") {
       visibility: "public",
       created_by_id: "other_user_2",
       created_by: {
-        name: findMockMember("mock_1").name,
-        main_photo: findMockMember("mock_1").avatar,
+        name: findMockMember("mock_1")?.name || "Traveler",
+        main_photo: findMockMember("mock_1")?.avatar,
       },
       cover_image: imageForCity("Bali"),
     },
@@ -99,8 +99,8 @@ export function getMockTrips(userId = "demo_user") {
       visibility: "public",
       created_by_id: "other_user_3",
       created_by: {
-        name: findMockMember("mock_2").name,
-        main_photo: findMockMember("mock_2").avatar,
+        name: findMockMember("mock_2")?.name || "Traveler",
+        main_photo: findMockMember("mock_2")?.avatar,
       },
       cover_image: imageForCity("Copenhagen"),
     },
@@ -186,6 +186,26 @@ export function saveLocalTrip(trip) {
   return trip;
 }
 
+export function updateLocalTrip(id, data) {
+  const list = getLocalTrips();
+  const idx = list.findIndex((t) => t.id === id);
+  if (idx < 0) return null;
+  const next = { ...list[idx], ...data, id };
+  const updated = [...list];
+  updated[idx] = next;
+  localStorage.setItem(LOCAL_TRIPS_KEY, JSON.stringify(updated));
+  return next;
+}
+
+export function removeLocalTrip(id) {
+  const next = getLocalTrips().filter((t) => t.id !== id);
+  localStorage.setItem(LOCAL_TRIPS_KEY, JSON.stringify(next));
+}
+
+export function isLocalTripId(id) {
+  return typeof id === "string" && id.startsWith("trip_local_");
+}
+
 export function findMockTrip(id, userId = "demo_user") {
   return (
     getLocalTrips().find((t) => t.id === id) ||
@@ -244,10 +264,10 @@ export function demoVisitorsForCity(city, userId = "demo_user") {
   }).map((m) => ({
     id: `visit_${m.user_id}`,
     created_by_id: m.user_id,
-    start_date: m.trip.start_date,
-    end_date: m.trip.end_date,
-    city: m.trip.city,
-    country: m.trip.country,
+    start_date: m.trip?.start_date,
+    end_date: m.trip?.end_date,
+    city: m.trip?.city || city,
+    country: m.trip?.country,
   }));
   if (fromProfiles.length) return fromProfiles;
 

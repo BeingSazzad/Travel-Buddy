@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import SuccessCheck from "@/components/common/SuccessCheck";
 import TripCard from "@/components/trips/TripCard";
 import { tripsOverlap, imageForCity, formatDates } from "@/lib/trip-utils";
-import { memberIdForTripCreator } from "@/lib/mock-trips";
+import { memberIdForTripCreator, cityKeyMatch } from "@/lib/mock-trips";
 import { isSameAppUser } from "@/lib/demo-user";
 
 export default function TripMatches({ trip, allTrips, userId, onDone }) {
@@ -28,8 +28,7 @@ export default function TripMatches({ trip, allTrips, userId, onDone }) {
 
   const byWoman = {};
   others.forEach((t) => {
-    const sameCity = (t.city || "").toLowerCase() === (trip.city || "").toLowerCase();
-    if (sameCity && tripsOverlap(trip, t)) {
+    if (cityKeyMatch(t.city, trip.city) && tripsOverlap(trip, t)) {
       const key = t.created_by_id;
       if (!byWoman[key]) {
         byWoman[key] = {
