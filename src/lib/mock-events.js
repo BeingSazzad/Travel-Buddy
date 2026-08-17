@@ -26,7 +26,7 @@ function goingAttendees(ids) {
 /**
  * Mock events match CreateEvent payload fields:
  * title, category, description, date, time, end_time, city, country, location,
- * image, max_attendees, visibility, pricing, external_link, age_min, age_max, languages
+ * lat, lng, image, max_attendees, visibility, pricing, external_link, age_min, age_max, languages
  */
 export const MOCK_EVENTS = [
   {
@@ -36,6 +36,8 @@ export const MOCK_EVENTS = [
     city: "Santorini",
     country: "Greece",
     location: "Oia Caldera viewpoint",
+    lat: 36.4618,
+    lng: 25.3753,
     date: "2026-08-10",
     time: "08:00",
     end_time: "09:30",
@@ -58,6 +60,8 @@ export const MOCK_EVENTS = [
     city: "Santorini",
     country: "Greece",
     location: "Ammoudi Bay",
+    lat: 36.4047,
+    lng: 25.4309,
     date: "2026-08-12",
     time: "18:00",
     end_time: "21:00",
@@ -83,6 +87,8 @@ export const MOCK_EVENTS = [
     city: "Lisbon",
     country: "Portugal",
     location: "Alfama Studio",
+    lat: 38.7129,
+    lng: -9.1307,
     date: "2026-08-15",
     time: "18:30",
     end_time: "21:00",
@@ -105,6 +111,8 @@ export const MOCK_EVENTS = [
     city: "Zermatt",
     country: "Switzerland",
     location: "Matterhorn Trail meet point",
+    lat: 45.9763,
+    lng: 7.6586,
     date: "2026-09-05",
     time: "10:00",
     end_time: "14:00",
@@ -127,6 +135,8 @@ export const MOCK_EVENTS = [
     city: "Copenhagen",
     country: "Denmark",
     location: "Nyhavn",
+    lat: 55.6797,
+    lng: 12.5918,
     date: "2026-08-16",
     time: "10:30",
     end_time: "12:00",
@@ -149,6 +159,8 @@ export const MOCK_EVENTS = [
     city: "Bali",
     country: "Indonesia",
     location: "Tirta Empul",
+    lat: -8.4152,
+    lng: 115.3153,
     date: "2026-08-21",
     time: "08:00",
     end_time: "11:00",
@@ -171,6 +183,8 @@ export const MOCK_EVENTS = [
     city: "Paris",
     country: "France",
     location: "Café de Flore, Saint-Germain",
+    lat: 48.8542,
+    lng: 2.3326,
     date: "2026-08-20",
     time: "10:30",
     end_time: "12:30",

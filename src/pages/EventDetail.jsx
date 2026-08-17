@@ -6,7 +6,6 @@ import {
   MapPin,
   Globe,
   ShieldCheck,
-  Share2,
   MessageCircle,
   Bookmark,
   Pencil,
@@ -16,6 +15,7 @@ import {
   Users,
   UserRound,
   Navigation,
+  ChevronRight,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -127,9 +127,17 @@ export default function EventDetail() {
   const locationLine = [event.location, event.city, event.country].filter(Boolean).join(", ");
   const areaLine = [event.city, event.country].filter(Boolean).join(", ");
   const meetingPoint = event.location || areaLine;
-  const directionsUrl = locationLine
-    ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(locationLine)}`
-    : null;
+  const eventLat = event.lat != null ? Number(event.lat) : null;
+  const eventLng =
+    event.lng != null ? Number(event.lng) : event.lon != null ? Number(event.lon) : null;
+  const hasSavedCoords =
+    Number.isFinite(eventLat) && Number.isFinite(eventLng);
+  const mapCoords = hasSavedCoords ? [eventLat, eventLng] : null;
+  const directionsUrl = hasSavedCoords
+    ? `https://www.google.com/maps/dir/?api=1&destination=${eventLat},${eventLng}`
+    : locationLine
+      ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(locationLine)}`
+      : null;
 
   const savedItem = {
     type: "event",
@@ -148,7 +156,7 @@ export default function EventDetail() {
   const goingAvatars =
     going.length > 0
       ? going.slice(0, 3).map((a) => a.avatar || FALLBACK_AVATAR)
-      : [host?.avatar || event.host_avatar].filter(Boolean);
+      : [];
 
   const rsvp = async (action, extra = {}) => {
     const join = action === "join";
@@ -206,20 +214,6 @@ export default function EventDetail() {
     navigate(`/conversations/${getMockConversationId(uid)}`);
   };
 
-  const share = async () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: event.title, url });
-      } catch {
-        /* ignore */
-      }
-    } else {
-      navigator.clipboard?.writeText(url);
-      alert("Link copied");
-    }
-  };
-
   const cancelEvent = async () => {
     if (!window.confirm("Cancel this event? This can't be undone.")) return;
     await base44.functions.invoke("rsvp-event", { action: "cancel", event_id: event.id });
@@ -231,7 +225,7 @@ export default function EventDetail() {
     if (myAtt?.status === "pending") return "Request sent";
     if (full) return "Event full";
     if (event.visibility === "approval") return "Request to join";
-    return "I'm interested";
+    return "Join event";
   };
 
   return (
@@ -251,9 +245,6 @@ export default function EventDetail() {
             <ArrowLeft className="w-5 h-5" strokeWidth={2} />
           </button>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={share} className={HERO_BTN} aria-label="Share">
-              <Share2 className="w-4.5 h-4.5" strokeWidth={2} />
-            </button>
             <button
               type="button"
               onClick={() => toggle(savedItem)}
@@ -297,7 +288,11 @@ export default function EventDetail() {
             </Meta>
             <Meta icon={Users}>
               {event.max_attendees != null
-                ? `${goingCount} of ${event.max_attendees} spots filled`
+                ? goingCount > 0
+                  ? goingCount >= event.max_attendees
+                    ? `${goingCount} going · full (max ${event.max_attendees})`
+                    : `${goingCount} going · max ${event.max_attendees}`
+                  : `Max ${event.max_attendees} people`
                 : goingCount > 0
                   ? `${goingCount} going`
                   : null}
@@ -319,18 +314,33 @@ export default function EventDetail() {
           <button
             type="button"
             onClick={isHost ? () => setManageOpen(true) : undefined}
-            className={cn("w-full text-left", isHost && "tap-feedback")}
+            className={cn(
+              "w-full text-left rounded-2xl border border-border bg-card/50 p-4",
+              isHost && "tap-feedback"
+            )}
           >
-            <p className="section-header mb-2">
-              {isHost && pending.length > 0 ? "Join requests" : "Who’s going"}
-              <span className="font-sans font-medium text-muted-foreground text-xs ml-2">
-                {isHost && pending.length > 0
-                  ? `${pending.length} to review`
-                  : goingCount > 0
-                    ? `${goingCount}`
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="min-w-0">
+                <p className="section-header mb-0.5">
+                  {isHost && pending.length > 0 ? "Join requests & who’s coming" : "Who’s coming"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {goingCount > 0
+                    ? `${goingCount} going${
+                        event.max_attendees != null ? ` · max ${event.max_attendees}` : ""
+                      }`
+                    : event.max_attendees != null
+                      ? `No one yet · max ${event.max_attendees}`
+                      : "No one has joined yet"}
+                  {isHost && pending.length > 0
+                    ? ` · ${pending.length} interested`
                     : ""}
-              </span>
-            </p>
+                </p>
+              </div>
+              {isHost && (
+                <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
+              )}
+            </div>
             {goingAvatars.length > 0 || (isHost && pending.length > 0) ? (
               <div className="flex items-center gap-3">
                 <div className="flex items-center">
@@ -348,16 +358,27 @@ export default function EventDetail() {
                 </div>
                 <p className="text-sm text-muted-foreground flex-1 min-w-0">
                   {isHost && pending.length > 0
-                    ? "Tap to approve or decline"
+                    ? "Tap to approve or decline requests"
                     : (() => {
                         const names = going.slice(0, 2).map((a) => a.name).filter(Boolean);
-                        if (!names.length) return goingCount ? `${goingCount} going` : "Be the first";
+                        if (!names.length) {
+                          return isHost ? "Tap to see who’s coming" : goingCount ? `${goingCount} going` : "Be the first";
+                        }
                         return names.join(", ") + (goingCount > 2 ? ` +${goingCount - 2}` : "");
                       })()}
                 </p>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">No one has joined yet.</p>
+              <p className="text-sm text-muted-foreground">
+                {isHost ? "Tap to manage attendees when people join." : "Be the first to join."}
+              </p>
+            )}
+            {isHost && (
+              <p className="text-xs font-medium text-primary mt-3">
+                {pending.length > 0
+                  ? `Review ${pending.length} interested`
+                  : "See names & manage attendees"}
+              </p>
             )}
           </button>
 
@@ -392,7 +413,12 @@ export default function EventDetail() {
             )}
           </div>
 
-          <EventMap compact query={locationLine || meetingPoint} label={meetingPoint} />
+          <EventMap
+            compact
+            coords={mapCoords}
+            query={locationLine || meetingPoint}
+            label={meetingPoint}
+          />
 
           {event.pricing === "paid_external" && event.external_link && (
             <a
@@ -454,7 +480,7 @@ export default function EventDetail() {
                 </Button>
                 <Button variant="outline" className="justify-start gap-2" onClick={() => setManageOpen(true)}>
                   <UserCheck className="w-4 h-4" strokeWidth={1.5} />
-                  Attendees{pending.length > 0 ? ` (${pending.length})` : ""}
+                  Who’s coming{pending.length > 0 ? ` (${pending.length})` : ""}
                 </Button>
                 <Button
                   variant="outline"
@@ -486,7 +512,7 @@ export default function EventDetail() {
         {isHost ? (
           <Button className="flex-1" onClick={() => setManageOpen(true)}>
             <UserCheck className="w-4 h-4" strokeWidth={1.5} />
-            {pending.length > 0 ? `Requests (${pending.length})` : "Attendees"}
+            {pending.length > 0 ? `Requests (${pending.length})` : "Who’s coming"}
           </Button>
         ) : myAtt?.status === "going" ? (
           <Button variant="outline" className="flex-1" onClick={() => rsvp("leave")} disabled={busy}>
@@ -503,7 +529,13 @@ export default function EventDetail() {
         )}
       </div>
 
-      <ManageAttendees open={manageOpen} onOpenChange={setManageOpen} event={event} onChange={load} />
+      <ManageAttendees
+        open={manageOpen}
+        onOpenChange={setManageOpen}
+        event={event}
+        initialAttendees={attendees}
+        onChange={load}
+      />
       <ReportSheet
         open={reportOpen}
         onOpenChange={setReportOpen}

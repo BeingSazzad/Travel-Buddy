@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { useRecentReviews } from '@/hooks/useRecentReviews';
 import { pathForReview } from '@/lib/review-place';
+import ScreenHeader from '@/components/common/ScreenHeader';
 
 export default function Reviews() {
   const navigate = useNavigate();
@@ -10,18 +11,11 @@ export default function Reviews() {
 
   return (
     <div className="page-shell pb-8">
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4"
-      >
-        <ArrowLeft className="w-4 h-4" /> Back
-      </button>
-
-      <h1 className="font-display font-bold text-lg mb-1">Member reviews</h1>
-      <p className="text-sm text-muted-foreground mb-5">
-        Recent places women in the community reviewed
-      </p>
+      <ScreenHeader
+        title="Member reviews"
+        subtitle="Recent places women in the community reviewed"
+        showBack
+      />
 
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading reviews…</p>
@@ -48,15 +42,13 @@ export default function Reviews() {
                       {r.item_type} · {r.author_name}
                     </p>
                   </div>
-                  <span className="flex items-center gap-0.5 text-xs font-semibold text-primary shrink-0">
-                    <Star className="w-3.5 h-3.5 fill-primary text-primary" strokeWidth={0} />
+                  <div className="flex items-center gap-0.5 shrink-0 text-sm font-medium">
+                    <Star className="w-3.5 h-3.5 fill-brand-gold text-brand-gold" strokeWidth={1.5} />
                     {r.rating}
-                  </span>
+                  </div>
                 </div>
-                {r.text && (
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
-                    {r.text}
-                  </p>
+                {r.body && (
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{r.body}</p>
                 )}
               </button>
             );

@@ -18,8 +18,14 @@ export default function ScreenHeader({
         {showBack && (
           <button
             type="button"
-            onClick={onBack || (() => navigate(-1))}
-            className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition shrink-0"
+            onClick={
+              onBack ||
+              (() => {
+                if (window.history.length > 1) navigate(-1);
+                else navigate("/");
+              })
+            }
+            className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition shrink-0 -ml-1"
             aria-label="Back"
           >
             <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />

@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Send, Plus, Smile, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Send, Smile, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { useConversation } from "@/hooks/useConversation";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import MessageBubble from "@/components/messages/MessageBubble";
 import EmojiPicker from "@/components/messages/EmojiPicker";
-import ShareSheet from "@/components/messages/ShareSheet";
 import ConversationMenu from "@/components/messages/ConversationMenu";
 
 export default function Conversation() {
@@ -17,7 +16,6 @@ export default function Conversation() {
   const { conversation, messages, loading, sending, send, deleteMessage, setTyping } = useConversation(id);
   const [text, setText] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [, setNow] = useState(Date.now());
   const fileRef = useRef(null);
@@ -94,11 +92,6 @@ export default function Conversation() {
     } catch {
       /* ignore */
     }
-  };
-
-  const onShare = async (payload) => {
-    setShareOpen(false);
-    await send(payload);
   };
 
   const onDeleteMsg = async (msg) => {
@@ -184,9 +177,6 @@ export default function Conversation() {
       )}
 
       <form onSubmit={onSubmit} className="px-3 pt-3 safe-pb border-t border-border bg-card flex items-center gap-1.5">
-        <button type="button" onClick={() => setShareOpen(true)} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground">
-          <Plus className="w-5 h-5" strokeWidth={1.5} />
-        </button>
         <button
           type="button"
           onClick={() => setShowEmoji((s) => !s)}
@@ -212,8 +202,6 @@ export default function Conversation() {
           <Send className="w-4 h-4" strokeWidth={1.5} />
         </button>
       </form>
-
-      <ShareSheet open={shareOpen} onOpenChange={setShareOpen} onShare={onShare} />
     </div>
   );
 }

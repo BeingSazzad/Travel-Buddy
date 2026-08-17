@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, MapPin, Clock, Share2, Bookmark, Tag } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Bookmark, Tag } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
@@ -63,19 +63,6 @@ export default function DealDetail() {
   const expired =
     deal.expiration_date && new Date(deal.expiration_date) < new Date(new Date().toDateString());
 
-  const onShare = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: deal.title, text: `${deal.discount} at ${deal.partner}`, url: window.location.href });
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        alert("Link copied");
-      }
-    } catch {
-      /* dismissed */
-    }
-  };
-
   return (
     <div className="max-w-app mx-auto min-h-dvh flex flex-col bg-background">
       <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
@@ -83,9 +70,6 @@ export default function DealDetail() {
           <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
         </button>
         <div className="flex items-center gap-2">
-          <button onClick={onShare} className="w-9 h-9 rounded-full flex items-center justify-center tap-feedback" aria-label="Share">
-            <Share2 className="w-5 h-5" strokeWidth={1.5} />
-          </button>
           <button
             onClick={() => toggle(saveItem)}
             className="w-9 h-9 rounded-full flex items-center justify-center tap-feedback"

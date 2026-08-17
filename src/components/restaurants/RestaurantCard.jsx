@@ -1,18 +1,23 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import OverlayMediaCard from "@/components/common/OverlayMediaCard";
-import { PRICE_LABELS } from "@/lib/restaurants";
 
 export default function RestaurantCard({ restaurant }) {
   const navigate = useNavigate();
   const r = restaurant;
+  const place = [r.city, r.distance != null ? `${r.distance} km` : null]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <OverlayMediaCard
       image={r.image}
       title={r.name}
-      location={r.city}
-      meta={`★ ${r.rating.toFixed(1)}`}
-      badge={PRICE_LABELS[r.price]}
+      location={place}
+      rating={r.rating}
+      reviews={r.reviews}
+      className="w-full h-48"
+      titleClassName="text-[17px]"
       saveItem={{
         type: "restaurant",
         title: r.name,

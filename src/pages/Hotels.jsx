@@ -67,7 +67,7 @@ export default function Hotels() {
   if (loading) {
     return (
       <div className="page-shell">
-        <ScreenHeader title="Hotels" subtitle="Stays curated for women who travel" className="mb-4" />
+        <ScreenHeader title="Hotels" subtitle="Stays curated for women who travel" showBack className="mb-4" />
         <ListSkeleton count={4} />
       </div>
     );
@@ -75,7 +75,7 @@ export default function Hotels() {
 
   return (
     <div className="page-shell">
-      <ScreenHeader title="Hotels" subtitle="Stays curated for women who travel" />
+      <ScreenHeader title="Hotels" subtitle="Stays curated for women who travel" showBack />
 
       <VenueListToolbar
         resultLabel={`${filtered.length} hotels`}

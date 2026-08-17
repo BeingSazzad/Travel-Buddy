@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, MapPin, Star, Globe, Navigation, Share2, Bookmark, ShieldCheck, Compass, CalendarCheck, Flag } from "lucide-react";
+import { ArrowLeft, MapPin, Star, Globe, Navigation, Bookmark, ShieldCheck, Compass, CalendarCheck, Flag } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
@@ -11,7 +11,7 @@ import ReviewSection from "@/components/reviews/ReviewSection";
 import ReportSheet from "@/components/reports/ReportSheet";
 import { useHotels } from "@/lib/useContent";
 import { PageLoading, PageNotFound } from "@/components/common/PageStatus";
-import { venueGallery, formatRating, siteLabel, shareOrCopy } from "@/lib/venue-detail";
+import { venueGallery, formatRating, siteLabel } from "@/lib/venue-detail";
 
 function HotelStars({ stars }) {
   return (
@@ -47,14 +47,11 @@ export default function HotelDetail() {
   const facilities = Object.entries(h.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]).filter(Boolean);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([h.address, h.city, h.country].filter(Boolean).join(", "))}`;
 
-  const onShare = () => shareOrCopy({ title: h.name, text: h.description });
-
   return (
     <div className="max-w-app mx-auto min-h-dvh flex flex-col bg-background">
       <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-2">
-          <button onClick={onShare} className="w-9 h-9 rounded-full flex items-center justify-center"><Share2 className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={() => toggle({ type: "hotel", title: h.name, location: h.city, country: h.country, image: h.image, rating: h.memberRating })} className="w-9 h-9 rounded-full flex items-center justify-center">
             <Bookmark className={cn("w-5 h-5", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
           </button>
@@ -64,7 +61,6 @@ export default function HotelDetail() {
       <div className="flex-1 overflow-y-auto pb-6">
         <div className="relative h-64">
           <Image src={gallery[0]} alt={h.name} fittingType="fill" className="w-full h-full" />
-          <span className="absolute top-3 left-3 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-primary font-medium">€{h.pricePerNight}/night</span>
         </div>
         <div className="flex gap-2 app-px -mt-6 relative">
           {gallery.map((g, i) => (
@@ -82,7 +78,14 @@ export default function HotelDetail() {
           <h1 className="page-title mt-1">{h.name}</h1>
           <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground min-w-0">
             <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
-            <span className="truncate">{[h.city, h.country].filter(Boolean).join(", ")}{h.distance != null ? ` · ${h.distance} km from centre` : ""}</span>
+            <span className="truncate">
+              {[
+                h.address || [h.city, h.country].filter(Boolean).join(", "),
+                h.distance != null ? `${h.distance} km from centre` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
           </div>
 
           {rating && (
@@ -104,7 +107,6 @@ export default function HotelDetail() {
             <EventMap
               compact
               query={[h.address, h.city, h.country].filter(Boolean).join(", ")}
-              label={h.address}
             />
             <div className="space-y-2">
               {h.website && <a href={h.website} target="_blank" rel="noreferrer" className="flex items-start gap-2 text-sm text-primary"><Globe className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={1.5} /><span className="underline">{siteLabel(h.website)}</span></a>}

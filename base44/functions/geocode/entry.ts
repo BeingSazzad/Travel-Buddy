@@ -10,14 +10,18 @@ Deno.serve(async (req) => {
     const q = (body.query || "").trim();
     if (!q) return Response.json({ results: [] });
 
-    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=3&q=${encodeURIComponent(q)}`;
     const res = await fetch(url, {
       headers: { "User-Agent": "Seluna/1.0 (contact@seluna.app)" },
     });
     const data = await res.json();
     if (!data || !data.length) return Response.json({ results: [] });
     return Response.json({
-      results: [{ lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), display: data[0].display_name }],
+      results: data.slice(0, 3).map((row) => ({
+        lat: parseFloat(row.lat),
+        lon: parseFloat(row.lon),
+        display: row.display_name,
+      })),
     });
   } catch (error) {
     console.error("geocode error", error);

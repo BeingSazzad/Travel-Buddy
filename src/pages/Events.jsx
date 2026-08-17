@@ -5,7 +5,6 @@ import EmptyState from "@/components/common/EmptyState";
 import { useEvents } from "@/hooks/useEvents";
 import { onRefresh } from "@/lib/refresh-bus";
 import EventList from "@/components/events/EventList";
-import EventRow from "@/components/events/EventRow";
 import ListSkeleton from "@/components/common/ListSkeleton";
 import ScreenHeader from "@/components/common/ScreenHeader";
 import { EVENT_CATEGORIES, capitalize } from "@/lib/event-options";
@@ -21,7 +20,7 @@ export default function Events() {
   const Section = ({ title, events }) => (
     <section className="mt-6">
       <h2 className="section-header mb-3">{title}</h2>
-      <EventRow events={events} />
+      <EventList events={events} />
     </section>
   );
 

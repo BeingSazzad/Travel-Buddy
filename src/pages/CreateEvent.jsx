@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Upload, ShieldCheck, Loader2, MapPin, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +15,9 @@ import { EVENT_CATEGORIES, defaultEventImage, capitalize, fmtEventDate, fmtEvent
 import { COUNTRIES, LANGUAGES } from "@/lib/profile-options";
 import InterestPicker from "@/components/profile/InterestPicker";
 import EventCard from "@/components/events/EventCard";
+import EventMap from "@/components/events/EventMap";
 import { findMockEvent } from "@/lib/mock-events";
+import { searchPlaces } from "@/lib/geo-coords";
 
 /** 3 steps — only what a host must decide to publish a meetup. */
 const TOTAL = 3;
@@ -30,11 +32,12 @@ const EMPTY = {
   city: "",
   country: "",
   location: "",
+  lat: null,
+  lng: null,
   image: "",
   max_attendees: 12,
   visibility: "public",
   agreed_rules: false,
-  // Kept for edit preserve — not shown in simplified create UI
   pricing: "free",
   external_link: "",
   age_min: "",
@@ -68,6 +71,8 @@ function fromEntity(e) {
     city: e.city || "",
     country: e.country || "",
     location: e.location || "",
+    lat: e.lat != null ? Number(e.lat) : null,
+    lng: e.lng != null ? Number(e.lng) : e.lon != null ? Number(e.lon) : null,
     image: e.image || "",
     max_attendees: e.max_attendees || 12,
     visibility: e.visibility || "public",
@@ -86,6 +91,9 @@ export default function CreateEvent() {
   const [step, setStep] = useState(1);
   const [data, setData] = useState(EMPTY);
   const [creating, setCreating] = useState(false);
+  const [placeResults, setPlaceResults] = useState([]);
+  const [searchingPlace, setSearchingPlace] = useState(false);
+  const [placeError, setPlaceError] = useState("");
   const editId = new URLSearchParams(window.location.search).get("edit");
 
   useEffect(() => {
@@ -103,6 +111,74 @@ export default function CreateEvent() {
 
   const set = (k, v) => setData((d) => ({ ...d, [k]: v }));
 
+  const setMeetingPoint = (value) => {
+    setData((d) => ({ ...d, location: value, lat: null, lng: null }));
+    setPlaceResults([]);
+    setPlaceError("");
+  };
+
+  const setCityOrCountry = (k, v) => {
+    setData((d) => ({ ...d, [k]: v, lat: null, lng: null }));
+    setPlaceResults([]);
+    setPlaceError("");
+  };
+
+  const placeConfirmed =
+    data.lat != null &&
+    data.lng != null &&
+    Number.isFinite(Number(data.lat)) &&
+    Number.isFinite(Number(data.lng));
+
+  const searchMeetingPlace = async () => {
+    const meeting = data.location.trim();
+    const city = data.city.trim();
+    const country = data.country;
+    if (!meeting || !city || !country) {
+      setPlaceError("Add city, country, and meeting point first.");
+      return;
+    }
+
+    setSearchingPlace(true);
+    setPlaceError("");
+    setPlaceResults([]);
+
+    const query = `${meeting}, ${city}, ${country}`;
+    let results = [];
+
+    try {
+      const res = await base44.functions.invoke("geocode", { query });
+      results = (res.data?.results || [])
+        .filter((r) => r?.lat != null && r?.lon != null)
+        .map((r) => ({
+          lat: Number(r.lat),
+          lon: Number(r.lon),
+          display: r.display || query,
+        }));
+    } catch {
+      /* demo / offline fallback below */
+    }
+
+    if (!results.length) {
+      results = searchPlaces(meeting, { city, country });
+    }
+
+    setSearchingPlace(false);
+
+    if (!results.length) {
+      setPlaceError("Couldn’t find that place — try a clearer name or nearby landmark.");
+      return;
+    }
+
+    setPlaceResults(results);
+    const first = results[0];
+    setData((d) => ({ ...d, lat: first.lat, lng: first.lon }));
+  };
+
+  const pickPlace = (r) => {
+    setData((d) => ({ ...d, lat: r.lat, lng: r.lon }));
+    setPlaceError("");
+  };
+
   const valid = useMemo(() => {
     if (step === 1) return data.title.trim() && data.category && data.description.trim();
     if (step === 2) {
@@ -110,11 +186,17 @@ export default function CreateEvent() {
         data.date &&
         data.start_time &&
         (!data.end_time || data.end_time > data.start_time);
-      return timesOk && data.city.trim() && data.country && data.location.trim();
+      return (
+        timesOk &&
+        data.city.trim() &&
+        data.country &&
+        data.location.trim() &&
+        placeConfirmed
+      );
     }
     if (step === 3) return data.agreed_rules;
     return true;
-  }, [step, data]);
+  }, [step, data, placeConfirmed]);
 
   const back = () => (step === 1 ? navigate(-1) : setStep((s) => s - 1));
   const next = () => setStep((s) => s + 1);
@@ -145,11 +227,12 @@ export default function CreateEvent() {
         city: data.city.trim(),
         country: data.country,
         location: data.location.trim(),
+        lat: Number(data.lat),
+        lng: Number(data.lng),
         image: data.image || defaultEventImage(data.category),
         max_attendees: Number(data.max_attendees) || 12,
         visibility: data.visibility || "public",
         agreed_rules: true,
-        // Create defaults; edit preserves existing extended fields
         pricing: data.pricing || "free",
         external_link: data.pricing === "paid_external" ? (data.external_link || "").trim() : "",
         age_min: data.age_min !== "" && data.age_min != null ? Number(data.age_min) : null,
@@ -181,6 +264,9 @@ export default function CreateEvent() {
     attendees_count: 0,
     host_name: user?.full_name || "You",
   };
+
+  const canSearchPlace =
+    data.location.trim() && data.city.trim() && data.country && !searchingPlace;
 
   return (
     <div className="max-w-app mx-auto min-h-screen flex flex-col bg-background">
@@ -260,11 +346,16 @@ export default function CreateEvent() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>City *</Label>
-                  <Input value={data.city} onChange={(e) => set("city", e.target.value)} placeholder="Lisbon" className="h-12" />
+                  <Input
+                    value={data.city}
+                    onChange={(e) => setCityOrCountry("city", e.target.value)}
+                    placeholder="Lisbon"
+                    className="h-12"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Country *</Label>
-                  <Select value={data.country} onValueChange={(v) => set("country", v)}>
+                  <Select value={data.country} onValueChange={(v) => setCityOrCountry("country", v)}>
                     <SelectTrigger className="h-12"><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent>
                       {COUNTRIES.map((c) => (
@@ -278,10 +369,119 @@ export default function CreateEvent() {
                 <Label>Meeting point *</Label>
                 <Input
                   value={data.location}
-                  onChange={(e) => set("location", e.target.value)}
-                  placeholder="Café name, park gate, museum steps…"
+                  onChange={(e) => setMeetingPoint(e.target.value)}
+                  onBlur={() => {
+                    if (
+                      data.location.trim() &&
+                      data.city.trim() &&
+                      data.country &&
+                      !placeConfirmed &&
+                      !searchingPlace
+                    ) {
+                      searchMeetingPlace();
+                    }
+                  }}
+                  placeholder="e.g. Café de Flore, park gate, museum steps"
                   className="h-12"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Type a café or landmark, then find it on the map — no coordinates needed.
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-11"
+                onClick={searchMeetingPlace}
+                disabled={!canSearchPlace}
+              >
+                {searchingPlace ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Searching map…
+                  </>
+                ) : (
+                  <>
+                    <MapPin className="w-4 h-4 mr-2" strokeWidth={1.5} /> Find on map
+                  </>
+                )}
+              </Button>
+
+              {placeError && (
+                <p className="text-sm text-destructive">{placeError}</p>
+              )}
+
+              {placeResults.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Pick the right pin
+                  </p>
+                  {placeResults.map((r, i) => {
+                    const selected =
+                      placeConfirmed &&
+                      Number(data.lat) === Number(r.lat) &&
+                      Number(data.lng) === Number(r.lon);
+                    return (
+                      <button
+                        key={`${r.lat}-${r.lon}-${i}`}
+                        type="button"
+                        onClick={() => pickPlace(r)}
+                        className={cn(
+                          "w-full text-left rounded-2xl border p-3 transition",
+                          selected
+                            ? "border-primary bg-primary/8"
+                            : "border-border bg-card hover:bg-muted/40"
+                        )}
+                      >
+                        <div className="flex items-start gap-2">
+                          {selected ? (
+                            <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" strokeWidth={2.5} />
+                          ) : (
+                            <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
+                          )}
+                          <span className="text-sm leading-snug line-clamp-2">{r.display}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {placeConfirmed && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-primary flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
+                    Meeting point pinned — Directions will use this spot
+                  </p>
+                  <EventMap
+                    compact
+                    coords={[Number(data.lat), Number(data.lng)]}
+                    query={[data.location, data.city, data.country].filter(Boolean).join(", ")}
+                    label={data.location}
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label>Max people *</Label>
+                <Select
+                  value={String(data.max_attendees || 12)}
+                  onValueChange={(v) => set("max_attendees", Number(v))}
+                >
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="How many can join?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[4, 6, 8, 10, 12, 15, 20].map((n) => (
+                      <SelectItem key={n} value={String(n)}>
+                        Max {n} people
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Guests will see “X going · max {data.max_attendees || 12}”.
+                </p>
               </div>
             </div>
           </>
@@ -310,25 +510,6 @@ export default function CreateEvent() {
                     <input type="file" accept="image/*" onChange={onImage} className="hidden" />
                   </label>
                 )}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Group size</Label>
-                <Select
-                  value={String(data.max_attendees || 12)}
-                  onValueChange={(v) => set("max_attendees", Number(v))}
-                >
-                  <SelectTrigger className="h-12">
-                    <SelectValue placeholder="Up to…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[4, 6, 8, 10, 12, 15, 20].map((n) => (
-                      <SelectItem key={n} value={String(n)}>
-                        Up to {n} attendees
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="space-y-2">

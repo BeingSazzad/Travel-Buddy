@@ -6,6 +6,7 @@ import { Tag } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import ListSkeleton from "@/components/common/ListSkeleton";
+import ScreenHeader from "@/components/common/ScreenHeader";
 import { MOCK_DEALS } from "@/lib/mock-deals";
 import { useDemoFallbacks } from "@/lib/demo-fallbacks";
 
@@ -44,11 +45,14 @@ export default function Deals() {
 
   return (
     <div className="page-shell">
-      <div className="flex items-center gap-1.5 text-primary mb-1">
-        <span className="text-xs font-medium uppercase tracking-wide">Seluna members only</span>
-      </div>
-      <h1 className="font-display font-bold text-lg">Deals</h1>
-      <p className="text-sm text-muted-foreground mt-0.5 mb-4">Exclusive perks from partners who welcome women who travel.</p>
+      <ScreenHeader
+        title="Deals"
+        subtitle="Exclusive perks from partners who welcome women who travel."
+        showBack
+      />
+      <p className="text-xs font-medium uppercase tracking-wide text-primary -mt-2 mb-4">
+        Seluna members only
+      </p>
 
       <ScrollFilterChips
         items={["All", ...DEAL_CATEGORIES].map((c) => ({

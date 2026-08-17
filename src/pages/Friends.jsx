@@ -84,6 +84,7 @@ export default function Friends() {
       <ScreenHeader
         title="Friends"
         subtitle="Women you've connected with"
+        showBack
         extraActions={
           <Link to="/discover" className="text-sm font-medium text-primary shrink-0">
             Match

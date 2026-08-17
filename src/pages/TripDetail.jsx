@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   Calendar,
   MapPin,
-  Share2,
   User,
   MessageCircle,
   Sparkles,
@@ -157,19 +156,6 @@ export default function TripDetail() {
     ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapLabel)}`
     : null;
 
-  const share = async () => {
-    const url = window.location.href;
-    try {
-      if (navigator.share) await navigator.share({ title: trip.name, url });
-      else {
-        await navigator.clipboard.writeText(url);
-        alert("Link copied");
-      }
-    } catch {
-      /* dismissed */
-    }
-  };
-
   const del = async () => {
     if (!window.confirm(`Delete "${trip.name}"?`)) return;
     setBusy(true);
@@ -240,9 +226,6 @@ export default function TripDetail() {
               <Flag className="w-5 h-5" strokeWidth={1.5} />
             </button>
           )}
-          <button onClick={share} className="w-9 h-9 rounded-full flex items-center justify-center tap-feedback" aria-label="Share">
-            <Share2 className="w-5 h-5" strokeWidth={1.5} />
-          </button>
         </div>
       </header>
 

@@ -23,16 +23,36 @@ function Recenter({ center, zoom }) {
   return null;
 }
 
+function parseCoords(coords) {
+  if (!coords) return null;
+  if (Array.isArray(coords) && coords.length >= 2) {
+    const lat = Number(coords[0]);
+    const lon = Number(coords[1]);
+    if (Number.isFinite(lat) && Number.isFinite(lon)) return [lat, lon];
+  }
+  return null;
+}
+
 /**
  * Interactive location map with instant demo coords + optional geocode refine.
- * Works offline via city fallbacks — no API key required.
+ * Pass `coords={[lat, lng]}` to pin a confirmed meeting point (skips city fallback).
  */
-export default function EventMap({ query, compact = false, label, zoom = 14 }) {
-  const fallback = useMemo(() => resolveCoordinates(query), [query]);
+export default function EventMap({ query, coords: coordsProp, compact = false, label, zoom = 14 }) {
+  const fixed = useMemo(() => parseCoords(coordsProp), [coordsProp]);
+  const fallback = useMemo(
+    () => fixed || resolveCoordinates(query),
+    [fixed, query]
+  );
   const [coords, setCoords] = useState(fallback);
   const [ready, setReady] = useState(Boolean(fallback));
 
   useEffect(() => {
+    if (fixed) {
+      setCoords(fixed);
+      setReady(true);
+      return;
+    }
+
     const local = resolveCoordinates(query);
     if (local) {
       setCoords(local);
@@ -64,7 +84,7 @@ export default function EventMap({ query, compact = false, label, zoom = 14 }) {
     return () => {
       active = false;
     };
-  }, [query]);
+  }, [query, fixed]);
 
   const heightClass = compact ? "h-36" : "h-44";
   const displayLabel = label;

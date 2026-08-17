@@ -68,7 +68,7 @@ export default function Destinations() {
   if (loading) {
     return (
       <div className="page-shell">
-        <ScreenHeader title="Destinations" subtitle="Cities loved by women who travel" className="mb-4" />
+        <ScreenHeader title="Destinations" subtitle="Cities loved by women who travel" showBack className="mb-4" />
         <ListSkeleton count={4} />
       </div>
     );
@@ -76,7 +76,7 @@ export default function Destinations() {
 
   return (
     <div className="page-shell">
-      <ScreenHeader title="Destinations" subtitle="Cities loved by women who travel" />
+      <ScreenHeader title="Destinations" subtitle="Cities loved by women who travel" showBack />
 
       <ScrollFilterChips
         items={CONTINENTS.map((c) => ({ key: c, label: c }))}

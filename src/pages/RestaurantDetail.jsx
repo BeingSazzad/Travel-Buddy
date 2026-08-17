@@ -1,17 +1,17 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, MapPin, Star, Clock, Phone, Globe, Navigation, Share2, Bookmark, UtensilsCrossed, CalendarCheck, Flag } from "lucide-react";
+import { ArrowLeft, MapPin, Star, Clock, Phone, Globe, Navigation, Bookmark, UtensilsCrossed, CalendarCheck, Flag } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
-import { PRICE_LABELS, FACILITY_LABELS } from "@/lib/restaurants";
+import { FACILITY_LABELS } from "@/lib/restaurants";
 import { cn } from "@/lib/utils";
 import { useSaved } from "@/lib/SavedContext";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import ReportSheet from "@/components/reports/ReportSheet";
 import { useRestaurants } from "@/lib/useContent";
 import { PageLoading, PageNotFound } from "@/components/common/PageStatus";
-import { venueGallery, formatRating, siteLabel, shareOrCopy } from "@/lib/venue-detail";
+import { venueGallery, formatRating, siteLabel } from "@/lib/venue-detail";
 
 export default function RestaurantDetail() {
   const { name } = useParams();
@@ -37,14 +37,11 @@ export default function RestaurantDetail() {
   const facilities = Object.entries(r.tags || {}).filter(([, v]) => v).map(([k]) => FACILITY_LABELS[k]).filter(Boolean);
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent([r.address, r.city, r.country].filter(Boolean).join(", "))}`;
 
-  const onShare = () => shareOrCopy({ title: r.name, text: r.description });
-
   return (
     <div className="max-w-app mx-auto min-h-dvh flex flex-col bg-background">
       <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-2">
-          <button onClick={onShare} className="w-9 h-9 rounded-full flex items-center justify-center"><Share2 className="w-5 h-5" strokeWidth={1.5} /></button>
           <button onClick={() => toggle({ type: "restaurant", title: r.name, location: r.city, country: r.country, image: r.image, rating: r.rating })} className="w-9 h-9 rounded-full flex items-center justify-center">
             <Bookmark className={cn("w-5 h-5", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
           </button>
@@ -54,8 +51,11 @@ export default function RestaurantDetail() {
       <div className="flex-1 overflow-y-auto pb-6">
         <div className="relative h-64">
           <Image src={gallery[0]} alt={r.name} fittingType="fill" className="w-full h-full" />
-          <span className="absolute top-3 left-3 text-xs px-2 py-0.5 rounded-full bg-white/90 backdrop-blur text-primary font-medium">{PRICE_LABELS[r.price]}</span>
-          <span className="absolute bottom-3 left-3 text-xs px-2 py-0.5 rounded-full bg-primary text-white">{r.cuisine}</span>
+          {r.cuisine ? (
+            <span className="absolute bottom-3 left-3 text-xs px-2 py-0.5 rounded-full bg-primary text-white">
+              {r.cuisine}
+            </span>
+          ) : null}
         </div>
         <div className="flex gap-2 app-px -mt-6 relative">
           {gallery.map((g, i) => (
@@ -69,7 +69,11 @@ export default function RestaurantDetail() {
           <h1 className="page-title">{r.name}</h1>
           <div className="flex items-center gap-1.5 mt-1.5 text-xs text-muted-foreground min-w-0">
             <MapPin className="w-3.5 h-3.5 shrink-0 text-primary/80" strokeWidth={1.5} />
-            <span className="truncate">{[r.city, r.country].filter(Boolean).join(", ")}{r.distance != null ? ` · ${r.distance} km` : ""}</span>
+            <span className="truncate">
+              {[r.address || [r.city, r.country].filter(Boolean).join(", "), r.distance != null ? `${r.distance} km` : null]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
           </div>
 
           {rating && (
@@ -91,7 +95,6 @@ export default function RestaurantDetail() {
             <EventMap
               compact
               query={[r.address, r.city, r.country].filter(Boolean).join(", ")}
-              label={r.address}
             />
             <div className="space-y-2">
               {r.hours && <div className="flex items-start gap-2 text-sm"><Clock className="w-4 h-4 text-primary mt-0.5 shrink-0" strokeWidth={1.5} /><span>{r.hours}</span></div>}
@@ -126,16 +129,12 @@ export default function RestaurantDetail() {
             <Navigation className="w-4 h-4" strokeWidth={1.5} /> Directions
           </Button>
         </a>
-        {r.reservationUrl ? (
+        {r.reservationUrl && (
           <a href={r.reservationUrl} target="_blank" rel="noreferrer" className="flex-1">
             <Button className="w-full bg-primary text-primary-foreground">
               <CalendarCheck className="w-4 h-4" strokeWidth={1.5} /> Reserve
             </Button>
           </a>
-        ) : (
-          <Button className="flex-1 bg-primary text-primary-foreground" onClick={onShare}>
-            <Share2 className="w-4 h-4" strokeWidth={1.5} /> Share
-          </Button>
         )}
       </div>
     </div>

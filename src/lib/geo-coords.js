@@ -45,6 +45,23 @@ const CITY_COORDS = {
   seminyak: [-8.6905, 115.1682],
 };
 
+/** Venue-level pins for demo search / directions (meeting point, not city center). */
+const PLACE_COORDS = {
+  "cafe de flore": [48.8542, 2.3326],
+  flore: [48.8542, 2.3326],
+  "saint-germain": [48.8534, 2.3335],
+  "tirta empul": [-8.4152, 115.3153],
+  "ammoudi bay": [36.4047, 25.4309],
+  ammoudi: [36.4047, 25.4309],
+  "oia caldera": [36.4618, 25.3753],
+  "oia caldera viewpoint": [36.4618, 25.3753],
+  nyhavn: [55.6797, 12.5918],
+  "alfama studio": [38.7129, -9.1307],
+  alfama: [38.7129, -9.1307],
+  "matterhorn trail": [45.9763, 7.6586],
+  matterhorn: [45.9763, 7.6586],
+};
+
 /** Neutral ocean fallback — never imply a wrong city (old default was Paris). */
 const DEFAULT_CENTER = [20, 0];
 
@@ -79,6 +96,13 @@ export function resolveCoordinates(query) {
   if (!query || typeof query !== "string") return null;
   const q = normalizePlaceQuery(query);
 
+  const placeKeys = Object.keys(PLACE_COORDS).sort((a, b) => b.length - a.length);
+  for (const key of placeKeys) {
+    if (q.includes(normalizePlaceQuery(key))) {
+      return PLACE_COORDS[key];
+    }
+  }
+
   // Prefer longer / more specific keys first
   const keys = Object.keys(CITY_COORDS).sort((a, b) => b.length - a.length);
   for (const key of keys) {
@@ -87,6 +111,40 @@ export function resolveCoordinates(query) {
     }
   }
   return null;
+}
+
+/**
+ * Offline / demo place search for meeting points (up to 3 hits).
+ */
+export function searchPlaces(meetingPoint, { city = "", country = "" } = {}) {
+  const needle = normalizePlaceQuery(meetingPoint || "");
+  if (!needle) return [];
+
+  const hits = [];
+  const keys = Object.keys(PLACE_COORDS).sort((a, b) => b.length - a.length);
+  for (const key of keys) {
+    const nk = normalizePlaceQuery(key);
+    if (needle.includes(nk) || nk.includes(needle)) {
+      const [lat, lon] = PLACE_COORDS[key];
+      const label = [meetingPoint.trim() || key, city, country].filter(Boolean).join(", ");
+      hits.push({ lat, lon, display: label });
+    }
+    if (hits.length >= 3) break;
+  }
+
+  if (hits.length) return hits;
+
+  const cityPin = resolveCoordinates([city, country].filter(Boolean).join(", ") || meetingPoint);
+  if (cityPin) {
+    return [
+      {
+        lat: cityPin[0],
+        lon: cityPin[1],
+        display: [meetingPoint.trim(), city, country].filter(Boolean).join(", "),
+      },
+    ];
+  }
+  return [];
 }
 
 export function defaultMapCenter() {

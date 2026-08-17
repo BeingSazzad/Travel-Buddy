@@ -269,9 +269,14 @@ export default function DestinationDetail() {
             {events.length === 0 ? (
               <p className="text-sm text-muted-foreground">No events listed yet for {dest.city}.</p>
             ) : (
-              <div className="space-y-4">
-                {events.slice(0, 3).map((e) => (
-                  <EventCard key={e.id} event={e} />
+              <div className="grid grid-cols-2 gap-3">
+                {events.slice(0, 4).map((e) => (
+                  <EventCard
+                    key={e.id}
+                    event={e}
+                    className="h-40"
+                    titleClassName="text-[13px] line-clamp-2"
+                  />
                 ))}
               </div>
             )}

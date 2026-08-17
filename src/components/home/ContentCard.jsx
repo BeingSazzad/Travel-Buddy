@@ -7,7 +7,7 @@ import { fmtEventDate } from "@/lib/event-options";
 
 const FRAME = {
   destination: "w-[148px] h-[196px] shrink-0",
-  event: "w-[232px] h-[172px] shrink-0",
+  event: "w-[178px] h-[168px] shrink-0",
   member: "w-[136px] h-[176px] shrink-0",
   recommended: "w-[148px] h-[196px] shrink-0",
 };

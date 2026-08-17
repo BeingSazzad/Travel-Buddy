@@ -13,15 +13,3 @@ export function siteLabel(url) {
   if (!url) return "";
   return String(url).replace(/^https?:\/\//i, "");
 }
-
-export async function shareOrCopy({ title, text }) {
-  try {
-    if (navigator.share) {
-      await navigator.share({ title, text, url: window.location.href });
-    } else {
-      await navigator.clipboard.writeText(window.location.href);
-    }
-  } catch (e) {
-    if (e?.name === "AbortError") return;
-  }
-}

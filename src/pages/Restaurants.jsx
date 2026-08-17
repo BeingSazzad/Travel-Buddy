@@ -53,7 +53,7 @@ export default function Restaurants() {
   if (loading) {
     return (
       <div className="page-shell">
-        <ScreenHeader title="Restaurants" subtitle="Where to eat, curated for travelers" className="mb-4" />
+        <ScreenHeader title="Restaurants" subtitle="Where to eat, curated for travelers" showBack className="mb-4" />
         <ListSkeleton count={4} />
       </div>
     );
@@ -61,7 +61,7 @@ export default function Restaurants() {
 
   return (
     <div className="page-shell">
-      <ScreenHeader title="Restaurants" subtitle="Where to eat, curated for travelers" />
+      <ScreenHeader title="Restaurants" subtitle="Where to eat, curated for travelers" showBack />
 
       <VenueListToolbar
         resultLabel={`${filtered.length} restaurants`}

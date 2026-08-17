@@ -50,7 +50,7 @@ export default function Cafes() {
   if (loading) {
     return (
       <div className="page-shell">
-        <ScreenHeader title="Cafés" subtitle="Coffee spots for women who travel" className="mb-4" />
+        <ScreenHeader title="Cafés" subtitle="Coffee spots for women who travel" showBack className="mb-4" />
         <ListSkeleton count={4} />
       </div>
     );
@@ -58,7 +58,7 @@ export default function Cafes() {
 
   return (
     <div className="page-shell">
-      <ScreenHeader title="Cafés" subtitle="Coffee spots for women who travel" />
+      <ScreenHeader title="Cafés" subtitle="Coffee spots for women who travel" showBack />
 
       <VenueListToolbar
         resultLabel={`${filtered.length} cafés`}
