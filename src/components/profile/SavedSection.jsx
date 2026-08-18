@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import {
   Bookmark,
-  Trash2,
   MapPin,
   Star,
   Calendar,
@@ -16,6 +15,7 @@ import { pathForSavedItem } from '@/lib/saved-item-key';
 import { Image } from '@/components/ui/image';
 import EmptyState from '@/components/common/EmptyState';
 import ScrollFilterChips from '@/components/common/ScrollFilterChips';
+import SaveButton from '@/components/common/SaveButton';
 
 const PLACE_TYPES = ['cafe', 'restaurant', 'hotel', 'destination'];
 
@@ -35,7 +35,7 @@ const FILTERS = [
   { key: 'deals', label: 'Deals' },
 ];
 
-function SavedItemRow({ item, onRemove, onOpen }) {
+function SavedItemRow({ item, onOpen }) {
   const typeLabel = TYPE_LABELS[item.type] || item.type;
   const locationLine = [item.location, item.country].filter(Boolean).join(', ');
 
@@ -88,21 +88,14 @@ function SavedItemRow({ item, onRemove, onOpen }) {
         </div>
         <ChevronRight className="w-4 h-4 text-muted-foreground/60 shrink-0" strokeWidth={1.5} aria-hidden />
       </button>
-      <button
-        type="button"
-        onClick={() => onRemove(item.id)}
-        className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 active:scale-90 transition shrink-0"
-        aria-label={`Remove ${item.title} from saved`}
-      >
-        <Trash2 className="w-4 h-4" strokeWidth={1.5} />
-      </button>
+      <SaveButton item={item} variant="ghost" className="w-9 h-9 shrink-0" />
     </div>
   );
 }
 
 export default function SavedSection({ embedded = false }) {
   const navigate = useNavigate();
-  const { items, loading, remove } = useSaved();
+  const { items, loading } = useSaved();
   const [filter, setFilter] = useState('all');
 
   const filtered = useMemo(() => {
@@ -162,7 +155,6 @@ export default function SavedSection({ embedded = false }) {
                 <SavedItemRow
                   key={item.id || item.item_key}
                   item={item}
-                  onRemove={remove}
                   onOpen={openItem}
                 />
               ))}

@@ -17,7 +17,7 @@ import InterestPicker from "@/components/profile/InterestPicker";
 import EventCard from "@/components/events/EventCard";
 import EventMap from "@/components/events/EventMap";
 import { findMockEvent } from "@/lib/mock-events";
-import { searchPlaces } from "@/lib/geo-coords";
+import { findMeetingPlaces } from "@/lib/place-search";
 
 /** 3 steps — only what a host must decide to publish a meetup. */
 const TOTAL = 3;
@@ -140,32 +140,14 @@ export default function CreateEvent() {
 
     setSearchingPlace(true);
     setPlaceError("");
-    setPlaceResults([]);
 
-    const query = `${meeting}, ${city}, ${country}`;
-    let results = [];
-
-    try {
-      const res = await base44.functions.invoke("geocode", { query });
-      results = (res.data?.results || [])
-        .filter((r) => r?.lat != null && r?.lon != null)
-        .map((r) => ({
-          lat: Number(r.lat),
-          lon: Number(r.lon),
-          display: r.display || query,
-        }));
-    } catch {
-      /* demo / offline fallback below */
-    }
-
-    if (!results.length) {
-      results = searchPlaces(meeting, { city, country });
-    }
+    const results = await findMeetingPlaces(meeting, { city, country });
 
     setSearchingPlace(false);
 
     if (!results.length) {
-      setPlaceError("Couldn’t find that place — try a clearer name or nearby landmark.");
+      setPlaceResults([]);
+      setPlaceError("Couldn’t find that place — try a café or landmark name, then tap the map pin.");
       return;
     }
 
@@ -175,9 +157,32 @@ export default function CreateEvent() {
   };
 
   const pickPlace = (r) => {
-    setData((d) => ({ ...d, lat: r.lat, lng: r.lon }));
+    setData((d) => ({
+      ...d,
+      lat: r.lat,
+      lng: r.lon,
+      location: r.name && r.name.length < 80 ? r.name : d.location,
+    }));
     setPlaceError("");
   };
+
+  const pickMapPin = ([lat, lng]) => {
+    setData((d) => ({ ...d, lat, lng }));
+    setPlaceError("");
+  };
+
+  useEffect(() => {
+    const meeting = data.location.trim();
+    const city = data.city.trim();
+    if (!meeting || meeting.length < 3 || !city || !data.country) return;
+    if (placeConfirmed) return;
+
+    const t = setTimeout(() => {
+      searchMeetingPlace();
+    }, 450);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- search when typed query changes
+  }, [data.location, data.city, data.country]);
 
   const valid = useMemo(() => {
     if (step === 1) return data.title.trim() && data.category && data.description.trim();
@@ -186,8 +191,11 @@ export default function CreateEvent() {
         data.date &&
         data.start_time &&
         (!data.end_time || data.end_time > data.start_time);
+      const maxPeople = Number(data.max_attendees);
+      const peopleOk = Number.isFinite(maxPeople) && maxPeople >= 2 && maxPeople <= 200;
       return (
         timesOk &&
+        peopleOk &&
         data.city.trim() &&
         data.country &&
         data.location.trim() &&
@@ -370,22 +378,11 @@ export default function CreateEvent() {
                 <Input
                   value={data.location}
                   onChange={(e) => setMeetingPoint(e.target.value)}
-                  onBlur={() => {
-                    if (
-                      data.location.trim() &&
-                      data.city.trim() &&
-                      data.country &&
-                      !placeConfirmed &&
-                      !searchingPlace
-                    ) {
-                      searchMeetingPlace();
-                    }
-                  }}
-                  placeholder="e.g. Café de Flore, park gate, museum steps"
+                  placeholder="e.g. Café de Flore"
                   className="h-12"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Type a café or landmark, then find it on the map — no coordinates needed.
+                  Type a café or landmark — we’ll search the map as you type. Tap the pin to fine-tune.
                 </p>
               </div>
 
@@ -414,7 +411,7 @@ export default function CreateEvent() {
               {placeResults.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Pick the right pin
+                    Pick the right place
                   </p>
                   {placeResults.map((r, i) => {
                     const selected =
@@ -447,40 +444,43 @@ export default function CreateEvent() {
                 </div>
               )}
 
-              {placeConfirmed && (
+              {data.city.trim() && data.country && (
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-primary flex items-center gap-1.5">
-                    <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
-                    Meeting point pinned — Directions will use this spot
-                  </p>
+                  {placeConfirmed ? (
+                    <p className="text-xs font-medium text-primary flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5" strokeWidth={2.5} />
+                      Meeting point pinned — Directions will use this spot
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Tap the map to drop the meeting pin.
+                    </p>
+                  )}
                   <EventMap
                     compact
-                    coords={[Number(data.lat), Number(data.lng)]}
+                    coords={placeConfirmed ? [Number(data.lat), Number(data.lng)] : undefined}
                     query={[data.location, data.city, data.country].filter(Boolean).join(", ")}
-                    label={data.location}
+                    label={data.location || [data.city, data.country].join(", ")}
+                    onPick={pickMapPin}
+                    zoom={placeConfirmed ? 16 : 13}
                   />
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label>Max people *</Label>
-                <Select
-                  value={String(data.max_attendees || 12)}
-                  onValueChange={(v) => set("max_attendees", Number(v))}
-                >
-                  <SelectTrigger className="h-12">
-                    <SelectValue placeholder="How many can join?" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[4, 6, 8, 10, 12, 15, 20].map((n) => (
-                      <SelectItem key={n} value={String(n)}>
-                        Max {n} people
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>How many can join? *</Label>
+                <Input
+                  type="number"
+                  min="2"
+                  max="200"
+                  inputMode="numeric"
+                  value={data.max_attendees}
+                  onChange={(e) => set("max_attendees", e.target.value === "" ? "" : Number(e.target.value))}
+                  placeholder="e.g. 8"
+                  className="h-12"
+                />
                 <p className="text-xs text-muted-foreground">
-                  Guests will see “X going · max {data.max_attendees || 12}”.
+                  Your number — guests will see “X going · max {Number(data.max_attendees) || "…" }”.
                 </p>
               </div>
             </div>

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
-} from "@/components/ui/dialog";
+import { ArrowLeft, Upload, Loader2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectTrigger, SelectContent, SelectItem, SelectValue,
 } from "@/components/ui/select";
-import { Upload, Loader2, X } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { base44 } from "@/api/base44Client";
@@ -46,30 +43,29 @@ function Chip({ active, onClick, children }) {
   );
 }
 
-export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
+export default function TripForm({ initial, onCancel, onSubmit }) {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
 
   useEffect(() => {
-    if (!open) return;
-    setForm(
-      initial
-        ? {
-            name: initial.name || "",
-            city: initial.city || "",
-            country: initial.country || "",
-            start_date: initial.start_date || "",
-            end_date: initial.end_date || "",
-            travel_style: initial.travel_style || "",
-            description: initial.description || "",
-            looking_for: initial.looking_for || [],
-            visibility: initial.visibility || "public",
-            cover_image: initial.cover_image || "",
-          }
-        : EMPTY
-    );
-  }, [open, initial]);
+    if (!initial) {
+      setForm(EMPTY);
+      return;
+    }
+    setForm({
+      name: initial.name || "",
+      city: initial.city || "",
+      country: initial.country || "",
+      start_date: initial.start_date || "",
+      end_date: initial.end_date || "",
+      travel_style: initial.travel_style || "",
+      description: initial.description || "",
+      looking_for: initial.looking_for || [],
+      visibility: initial.visibility || "public",
+      cover_image: initial.cover_image || "",
+    });
+  }, [initial]);
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const toggleLooking = (v) =>
@@ -119,140 +115,145 @@ export default function TripForm({ open, onOpenChange, initial, onSubmit }) {
         visibility: form.visibility,
         cover_image: form.cover_image || imageForCity(form.city),
       });
-      onOpenChange(false);
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        overlayClassName="z-[60]"
-        className="z-[60] flex flex-col gap-0 p-0 overflow-hidden rounded-2xl sm:rounded-2xl w-[calc(100%-1.5rem)] max-w-[min(24.5rem,calc(100%-1.5rem))] max-h-[min(90dvh,calc(100dvh-2rem))] min-w-0 shadow-premium"
-      >
-        <DialogHeader className="shrink-0 px-5 pt-5 pb-3 pr-12 text-left border-b border-border/60">
-          <DialogTitle className="font-display">{initial ? "Edit trip" : "New trip"}</DialogTitle>
-        </DialogHeader>
+    <div className="max-w-app mx-auto min-h-dvh flex flex-col bg-background">
+      <header className="sticky top-0 z-20 px-5 safe-pt pb-3 flex items-center gap-3 bg-background/90 backdrop-blur border-b border-border/60">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="w-9 h-9 rounded-full flex items-center justify-center tap-feedback"
+          aria-label="Back"
+        >
+          <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
+        </button>
+        <h1 className="font-display font-semibold text-lg">
+          {initial ? "Edit trip" : "New trip"}
+        </h1>
+      </header>
 
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain no-scrollbar px-5 py-4 space-y-4">
+      <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4 pb-6">
+        <div className="space-y-2">
+          <Label>Trip name</Label>
+          <Input
+            value={form.name}
+            onChange={(e) => set("name", e.target.value)}
+            placeholder={`Trip to ${form.city || "..."}`}
+            className="h-12"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2 min-w-0">
-            <Label>Trip name</Label>
-            <Input
-              value={form.name}
-              onChange={(e) => set("name", e.target.value)}
-              placeholder={`Trip to ${form.city || "..."}`}
-              className="h-10 min-w-0 max-w-full"
-            />
+            <Label>City *</Label>
+            <Input value={form.city} onChange={(e) => set("city", e.target.value)} placeholder="Lisbon" className="h-12" />
           </div>
-
-          <div className="grid grid-cols-2 gap-3 min-w-0">
-            <div className="space-y-2 min-w-0">
-              <Label>City *</Label>
-              <Input value={form.city} onChange={(e) => set("city", e.target.value)} placeholder="Lisbon" className="h-10 min-w-0 max-w-full" />
-            </div>
-            <div className="space-y-2 min-w-0">
-              <Label>Country *</Label>
-              <Select value={form.country} onValueChange={(v) => set("country", v)}>
-                <SelectTrigger className="h-10 min-w-0 max-w-full"><SelectValue placeholder="Select" /></SelectTrigger>
-                <SelectContent>
-                  {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 min-w-0">
-            <div className="space-y-2 min-w-0">
-              <Label>Start date *</Label>
-              <Input type="date" value={form.start_date} onChange={(e) => set("start_date", e.target.value)} className="h-10 min-w-0 max-w-full" />
-            </div>
-            <div className="space-y-2 min-w-0">
-              <Label>End date *</Label>
-              <Input type="date" value={form.end_date} onChange={(e) => set("end_date", e.target.value)} className="h-10 min-w-0 max-w-full" />
-            </div>
-          </div>
-
           <div className="space-y-2 min-w-0">
-            <Label>Travel style *</Label>
-            <Select value={form.travel_style} onValueChange={(v) => set("travel_style", v)}>
-              <SelectTrigger className="h-10 min-w-0 max-w-full"><SelectValue placeholder="Select" /></SelectTrigger>
+            <Label>Country *</Label>
+            <Select value={form.country} onValueChange={(v) => set("country", v)}>
+              <SelectTrigger className="h-12"><SelectValue placeholder="Select" /></SelectTrigger>
               <SelectContent>
-                {TRAVEL_STYLES.map((s) => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
+                {COUNTRIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
+        </div>
 
+        <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2 min-w-0">
-            <Label>Looking for</Label>
-            <div className="flex flex-wrap gap-1.5">
-              {LOOKING_FOR.map((o) => (
-                <Chip key={o} active={form.looking_for.includes(o)} onClick={() => toggleLooking(o)}>
-                  {o}
-                </Chip>
-              ))}
-            </div>
+            <Label>Start date *</Label>
+            <Input type="date" value={form.start_date} onChange={(e) => set("start_date", e.target.value)} className="h-12" />
           </div>
-
           <div className="space-y-2 min-w-0">
-            <Label>Description</Label>
-            <Textarea
-              value={form.description}
-              onChange={(e) => set("description", e.target.value)}
-              placeholder="Tell others about your trip…"
-              rows={3}
-              className="min-w-0 max-w-full"
-            />
-          </div>
-
-          <div className="space-y-2 min-w-0">
-            <Label>Cover photo</Label>
-            {form.cover_image ? (
-              <div className="relative rounded-xl overflow-hidden h-28 border border-border">
-                <Image src={form.cover_image} alt="Cover" fittingType="fill" className="w-full h-full" />
-                <button
-                  type="button"
-                  onClick={() => set("cover_image", "")}
-                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-background/90 flex items-center justify-center"
-                  aria-label="Remove cover"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ) : uploadingCover ? (
-              <div className="flex items-center justify-center h-24 rounded-xl border border-dashed border-border text-muted-foreground text-xs">
-                <Loader2 className="w-4 h-4 animate-spin mr-2" /> Uploading…
-              </div>
-            ) : (
-              <label className="flex flex-col items-center justify-center h-24 rounded-xl border border-dashed border-border cursor-pointer text-muted-foreground hover:bg-muted/30 transition">
-                <Upload className="w-4 h-4 mb-1" strokeWidth={1.5} />
-                <span className="text-xs">Upload cover photo</span>
-                <input type="file" accept="image/*" onChange={onCoverImage} className="hidden" />
-              </label>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-border p-3 min-w-0">
-            <div className="min-w-0">
-              <p className="font-medium text-sm">
-                {form.visibility === "public" ? "Public trip" : "Hidden trip"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {form.visibility === "public" ? "Visible to the community" : "Only you can see this trip"}
-              </p>
-            </div>
-            <Switch
-              checked={form.visibility === "public"}
-              onCheckedChange={(c) => set("visibility", c ? "public" : "hidden")}
-            />
+            <Label>End date *</Label>
+            <Input type="date" value={form.end_date} onChange={(e) => set("end_date", e.target.value)} className="h-12" />
           </div>
         </div>
 
-        <DialogFooter className="shrink-0 flex-row justify-end gap-2 px-5 py-3 border-t border-border/60 bg-background sm:flex-row">
-          <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button className="flex-1" onClick={submit} disabled={saving || !valid}>{saving ? "Saving…" : "Save trip"}</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <div className="space-y-2">
+          <Label>Travel style *</Label>
+          <Select value={form.travel_style} onValueChange={(v) => set("travel_style", v)}>
+            <SelectTrigger className="h-12"><SelectValue placeholder="Select" /></SelectTrigger>
+            <SelectContent>
+              {TRAVEL_STYLES.map((s) => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Looking for</Label>
+          <div className="flex flex-wrap gap-1.5">
+            {LOOKING_FOR.map((o) => (
+              <Chip key={o} active={form.looking_for.includes(o)} onClick={() => toggleLooking(o)}>
+                {o}
+              </Chip>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Description</Label>
+          <Textarea
+            value={form.description}
+            onChange={(e) => set("description", e.target.value)}
+            placeholder="Tell others about your trip…"
+            rows={4}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Cover photo</Label>
+          {form.cover_image ? (
+            <div className="relative rounded-2xl overflow-hidden h-36 border border-border">
+              <Image src={form.cover_image} alt="Cover" fittingType="fill" className="w-full h-full" />
+              <button
+                type="button"
+                onClick={() => set("cover_image", "")}
+                className="absolute top-2 right-2 w-8 h-8 rounded-full bg-background/90 flex items-center justify-center"
+                aria-label="Remove cover"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : uploadingCover ? (
+            <div className="flex items-center justify-center h-28 rounded-2xl border border-dashed border-border text-muted-foreground text-xs">
+              <Loader2 className="w-4 h-4 animate-spin mr-2" /> Uploading…
+            </div>
+          ) : (
+            <label className="flex flex-col items-center justify-center h-28 rounded-2xl border border-dashed border-border cursor-pointer text-muted-foreground hover:bg-muted/30 transition">
+              <Upload className="w-5 h-5 mb-1" strokeWidth={1.5} />
+              <span className="text-xs">Upload cover photo</span>
+              <input type="file" accept="image/*" onChange={onCoverImage} className="hidden" />
+            </label>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-border p-4">
+          <div className="min-w-0">
+            <p className="font-medium text-sm">
+              {form.visibility === "public" ? "Public trip" : "Hidden trip"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {form.visibility === "public" ? "Visible to the community" : "Only you can see this trip"}
+            </p>
+          </div>
+          <Switch
+            checked={form.visibility === "public"}
+            onCheckedChange={(c) => set("visibility", c ? "public" : "hidden")}
+          />
+        </div>
+      </div>
+
+      <div className="sticky bottom-0 px-5 py-4 bg-background/90 backdrop-blur border-t border-border flex gap-3">
+        <Button variant="outline" className="flex-1" onClick={onCancel}>Cancel</Button>
+        <Button className="flex-1" onClick={submit} disabled={saving || !valid}>
+          {saving ? "Saving…" : "Save trip"}
+        </Button>
+      </div>
+    </div>
   );
 }

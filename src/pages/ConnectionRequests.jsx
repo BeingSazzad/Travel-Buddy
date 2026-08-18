@@ -1,12 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { UserPlus, MapPin, Plane, Loader2 } from "lucide-react";
-import { CONNECT_STROKE } from "@/components/common/ConnectIconButton";
+import { UserPlus, Loader2, X } from "lucide-react";
 import ScreenHeader from "@/components/common/ScreenHeader";
 import EmptyState from "@/components/common/EmptyState";
 import { useConnectionRequests } from "@/hooks/useConnectionRequests";
 import { base44 } from "@/api/base44Client";
-import moment from "moment";
 
 export default function ConnectionRequests() {
   const navigate = useNavigate();
@@ -53,63 +51,51 @@ export default function ConnectionRequests() {
           onAction={() => navigate("/discover")}
         />
       ) : (
-        <div className="space-y-3">
+        <div className="-mx-1">
           {requests.map((m) => (
-            <div
-              key={m.user_id}
-              className="rounded-2xl border border-border/80 bg-card p-4 shadow-soft flex gap-3"
-            >
+            <div key={m.user_id} className="flex gap-3 px-1 py-3">
               <button
                 type="button"
                 onClick={() => navigate(`/members/${m.user_id}`)}
-                className="shrink-0"
+                className="shrink-0 self-start"
               >
                 <img
                   src={m.avatar}
-                  alt={m.name}
-                  className="w-14 h-14 rounded-2xl object-cover border border-border"
+                  alt=""
+                  className="w-[68px] h-[68px] rounded-full object-cover"
                 />
               </button>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 pt-0.5">
                 <button
                   type="button"
                   onClick={() => navigate(`/members/${m.user_id}`)}
-                  className="font-display font-semibold text-base text-left truncate w-full"
+                  className="block w-full text-left"
                 >
-                  {m.name}
+                  <p className="font-semibold text-[15px] leading-tight truncate">{m.name}</p>
+                  {(m.current_city || m.country) && (
+                    <p className="text-[13px] text-muted-foreground truncate mt-0.5">
+                      {[m.current_city, m.country].filter(Boolean).join(", ")}
+                    </p>
+                  )}
                 </button>
-                {(m.current_city || m.country) && (
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                    <MapPin className="w-3 h-3 text-primary" strokeWidth={1.5} />
-                    {[m.current_city, m.country].filter(Boolean).join(", ")}
-                  </p>
-                )}
-                {m.trip && (
-                  <p className="text-xs text-primary flex items-center gap-1 mt-1">
-                    <Plane className="w-3 h-3" strokeWidth={1.5} />
-                    {m.trip.city}{m.trip.country ? `, ${m.trip.country}` : ""}
-                  </p>
-                )}
-                <p className="text-[10px] text-muted-foreground mt-1">
-                  {moment(m.created_date).fromNow()}
-                </p>
-              </div>
-              <div className="shrink-0 flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={() => accept(m)}
-                  className="h-10 px-4 rounded-full gradient-brand-accent text-white text-xs font-bold shadow-md active:scale-95 transition flex items-center justify-center gap-1.5"
-                >
-                  <UserPlus className="w-3.5 h-3.5" strokeWidth={CONNECT_STROKE} />
-                  Connect
-                </button>
-                <button
-                  type="button"
-                  onClick={() => decline(m)}
-                  className="h-8 px-3 rounded-full border border-border text-xs text-muted-foreground active:scale-95 transition"
-                >
-                  Decline
-                </button>
+                <div className="flex gap-2 mt-2.5">
+                  <button
+                    type="button"
+                    onClick={() => accept(m)}
+                    className="flex-1 h-9 rounded-lg gradient-brand-button text-white text-[13px] font-semibold active:opacity-90 transition inline-flex items-center justify-center gap-1.5"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" strokeWidth={2} />
+                    Connect
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => decline(m)}
+                    className="flex-1 h-9 rounded-lg bg-white/15 text-white text-[13px] font-semibold active:bg-white/20 transition inline-flex items-center justify-center gap-1.5"
+                  >
+                    <X className="w-3.5 h-3.5" strokeWidth={2} />
+                    Decline
+                  </button>
+                </div>
               </div>
             </div>
           ))}

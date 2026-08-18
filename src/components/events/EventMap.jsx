@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapPin } from "lucide-react";
@@ -23,6 +23,16 @@ function Recenter({ center, zoom }) {
   return null;
 }
 
+function ClickToPin({ onPick }) {
+  useMapEvents({
+    click(e) {
+      if (!onPick) return;
+      onPick([e.latlng.lat, e.latlng.lng]);
+    },
+  });
+  return null;
+}
+
 function parseCoords(coords) {
   if (!coords) return null;
   if (Array.isArray(coords) && coords.length >= 2) {
@@ -37,7 +47,14 @@ function parseCoords(coords) {
  * Interactive location map with instant demo coords + optional geocode refine.
  * Pass `coords={[lat, lng]}` to pin a confirmed meeting point (skips city fallback).
  */
-export default function EventMap({ query, coords: coordsProp, compact = false, label, zoom = 14 }) {
+export default function EventMap({
+  query,
+  coords: coordsProp,
+  compact = false,
+  label,
+  zoom = 14,
+  onPick,
+}) {
   const fixed = useMemo(() => parseCoords(coordsProp), [coordsProp]);
   const fallback = useMemo(
     () => fixed || resolveCoordinates(query),
@@ -120,12 +137,16 @@ export default function EventMap({ query, coords: coordsProp, compact = false, l
           <TileLayer url={TILE_URL} attribution="&copy; OpenStreetMap · &copy; CARTO" />
           <Marker position={coords} icon={pinIcon} />
           <Recenter center={coords} zoom={zoom} />
+          {onPick ? <ClickToPin onPick={onPick} /> : null}
         </MapContainer>
       </div>
       {displayLabel && (
         <div className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground leading-snug">
           <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" strokeWidth={1.5} />
-          <span className="line-clamp-2">{displayLabel}</span>
+          <span className="line-clamp-2">
+            {displayLabel}
+            {onPick ? " · Tap the map to move the pin" : ""}
+          </span>
         </div>
       )}
     </div>

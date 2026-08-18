@@ -32,8 +32,8 @@ export default function EventCard({ event, className, titleClassName }) {
         item_key: `event:${event.id}`,
       }}
       onClick={() => navigate(`/events/${event.id}`)}
-      className={cn("w-full h-[9.5rem]", className)}
-      titleClassName={cn("text-[13px] leading-snug", titleClassName)}
+      className={cn("w-full h-48", className)}
+      titleClassName={cn("text-[17px] leading-snug", titleClassName)}
       endSlot={going > 0 ? <GoingFaces count={going} avatars={avatars} /> : undefined}
     />
   );

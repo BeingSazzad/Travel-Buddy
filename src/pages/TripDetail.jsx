@@ -13,6 +13,7 @@ import {
   CalendarDays,
   ChevronRight,
   Navigation,
+  X,
 } from "lucide-react";
 import { CONNECT_STROKE } from "@/components/common/ConnectIconButton";
 import TripActionsMenu from "@/components/trips/TripActionsMenu";
@@ -31,7 +32,6 @@ import { cn } from "@/lib/utils";
 import { useTrips } from "@/hooks/useTrips";
 import { useFriends } from "@/hooks/useFriends";
 import { useConnectionRequests } from "@/hooks/useConnectionRequests";
-import TripForm from "@/components/trips/TripForm";
 import ReportSheet from "@/components/reports/ReportSheet";
 import { fmtEventDate, fmtEventTime } from "@/lib/event-options";
 
@@ -45,12 +45,11 @@ export default function TripDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { trips, update, remove } = useTrips();
+  const { trips, remove } = useTrips();
   const { friends, reload: reloadFriends } = useFriends();
   const { requests, reload: reloadRequests } = useConnectionRequests();
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [formOpen, setFormOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -167,12 +166,6 @@ export default function TripDetail() {
     }
   };
 
-  const submitEdit = async (data) => {
-    await update(trip.id, data);
-    setTrip((prev) => ({ ...prev, ...data }));
-    setFormOpen(false);
-  };
-
   const openProfile = () => {
     if (isOwner) navigate("/profile");
     else if (memberId) navigate(`/members/${memberId}`);
@@ -199,6 +192,20 @@ export default function TripDetail() {
     await reloadRequests();
   };
 
+  const handleDecline = async () => {
+    if (!memberId) return;
+    try {
+      await base44.functions.invoke("record-like", {
+        liked_user_id: memberId,
+        action: "pass",
+      });
+    } catch {
+      /* demo */
+    }
+    await reloadRequests();
+    navigate(-1);
+  };
+
   return (
     <div className="max-w-app mx-auto min-h-dvh flex flex-col bg-background">
       <header className="sticky top-0 z-20 px-app safe-pt pb-3 flex items-center justify-between bg-background/90 backdrop-blur">
@@ -212,7 +219,7 @@ export default function TripDetail() {
         <div className="flex items-center gap-1">
           {isOwner ? (
             <TripActionsMenu
-              onEdit={() => setFormOpen(true)}
+              onEdit={() => navigate(`/trips/${trip.id}/edit`)}
               onDelete={del}
               disabled={busy}
               align="end"
@@ -407,22 +414,36 @@ export default function TripDetail() {
           </Button>
         </a>
         {isOwner ? (
-          <Button className="flex-1" onClick={() => setFormOpen(true)}>
+          <Button className="flex-1" onClick={() => navigate(`/trips/${trip.id}/edit`)}>
             <Pencil className="w-4 h-4" strokeWidth={1.5} /> Edit trip
           </Button>
         ) : isFriend ? (
           <Button className="flex-1" onClick={openMessage}>
             <MessageCircle className="w-4 h-4" strokeWidth={1.5} /> Message
           </Button>
+        ) : pendingRequest ? (
+          <div className="flex-1 flex gap-2">
+            <Button className="flex-1 gradient-brand-button text-white gap-1.5" onClick={handleConnect}>
+              <UserPlus className="w-4 h-4" strokeWidth={CONNECT_STROKE} />
+              Connect
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex-1 bg-white/15 text-white hover:bg-white/20 hover:text-white gap-1.5"
+              onClick={handleDecline}
+            >
+              <X className="w-4 h-4" strokeWidth={2} />
+              Decline
+            </Button>
+          </div>
         ) : (
           <Button className="flex-1" onClick={handleConnect}>
             <UserPlus className="w-4 h-4" strokeWidth={CONNECT_STROKE} />
-            {pendingRequest ? "Connect back" : "Connect"}
+            Connect
           </Button>
         )}
       </div>
 
-      <TripForm open={formOpen} onOpenChange={setFormOpen} initial={trip} onSubmit={submitEdit} />
       {!isOwner && (
         <ReportSheet
           open={reportOpen}

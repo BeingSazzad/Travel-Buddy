@@ -8,6 +8,7 @@ import {
   MessageCircle,
   BadgeCheck,
   Globe,
+  X,
 } from "lucide-react";
 import { ConnectIcon, CONNECT_STROKE } from "@/components/common/ConnectIconButton";
 import { Image } from "@/components/ui/image";
@@ -65,6 +66,7 @@ export default function MemberProfileContent({
   isFriend = false,
   pendingRequest,
   onConnect,
+  onDecline,
   friendRecord,
   onRemoveFriend,
   onBlockMember,
@@ -284,18 +286,36 @@ export default function MemberProfileContent({
           {isFriend ? (
             <Button
               onClick={handleMessage}
-              className="w-full h-12 rounded-2xl font-bold shadow-md flex items-center justify-center gap-2"
+              className="w-full h-11 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2"
             >
               <MessageCircle className="w-5 h-5" strokeWidth={2} />
               <span>Send message</span>
             </Button>
+          ) : pendingRequest ? (
+            <div className="flex gap-2">
+              <Button
+                onClick={() => onConnect?.()}
+                className="flex-1 h-11 rounded-xl font-semibold gradient-brand-button text-white gap-1.5"
+              >
+                <ConnectIcon className="w-4 h-4" strokeWidth={CONNECT_STROKE} />
+                Connect
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => onDecline?.()}
+                className="flex-1 h-11 rounded-xl font-semibold bg-white/15 text-white hover:bg-white/20 hover:text-white gap-1.5"
+              >
+                <X className="w-4 h-4" strokeWidth={2} />
+                Decline
+              </Button>
+            </div>
           ) : (
             <Button
               onClick={() => onConnect?.()}
-              className="w-full h-12 rounded-2xl font-bold shadow-md flex items-center justify-center gap-2"
+              className="w-full h-11 rounded-xl font-semibold shadow-md flex items-center justify-center gap-2"
             >
               <ConnectIcon className="w-5 h-5" strokeWidth={CONNECT_STROKE} />
-              <span>{pendingRequest ? "Connect back" : "Connect"}</span>
+              <span>Connect</span>
             </Button>
           )}
         </div>

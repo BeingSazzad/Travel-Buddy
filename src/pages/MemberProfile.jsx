@@ -31,6 +31,19 @@ export default function MemberProfile() {
     await reloadRequests();
   };
 
+  const handleDecline = async () => {
+    try {
+      await base44.functions.invoke("record-like", {
+        liked_user_id: id,
+        action: "pass",
+      });
+    } catch {
+      /* demo fallback */
+    }
+    await reloadRequests();
+    navigate(-1);
+  };
+
   if (loading) {
     return (
       <div className="h-full min-h-0 flex items-center justify-center text-sm text-muted-foreground bg-background">
@@ -60,6 +73,7 @@ export default function MemberProfile() {
           isFriend={isFriend}
           pendingRequest={pendingRequest}
           onConnect={handleConnect}
+          onDecline={handleDecline}
           friendRecord={friendRecord}
           onRemoveFriend={isFriend ? removeFriend : undefined}
           onBlockMember={blockFriend}

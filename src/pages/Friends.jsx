@@ -12,11 +12,11 @@ import { base44 } from '@/api/base44Client';
 
 function SuggestedRow({ member, onConnect, connecting, requested, onViewProfile }) {
   return (
-    <div className="flex items-center gap-3 py-2.5">
+    <div className="flex items-center gap-2 rounded-2xl border border-border/80 bg-card px-3 py-2.5 shadow-soft">
       <button
         type="button"
         onClick={() => onViewProfile(member.memberId)}
-        className="flex flex-1 min-w-0 items-center gap-3 text-left active:bg-muted/40 rounded-2xl py-1 pr-1 transition"
+        className="flex flex-1 min-w-0 items-center gap-3 text-left rounded-xl py-0.5 pr-1 tap-feedback"
       >
         <img
           src={member.img}
@@ -106,13 +106,13 @@ export default function Friends() {
           onAction={() => navigate('/discover')}
         />
       ) : (
-        <div className="space-y-1">
+        <div className="space-y-2.5">
           {friends.map((f) => (
             <button
               key={f.memberId}
               type="button"
               onClick={() => navigate(`/members/${f.memberId}`)}
-              className="w-full flex items-center gap-3 py-3 rounded-2xl text-left active:bg-muted/40 transition"
+              className="w-full flex items-center gap-3 rounded-2xl border border-border/80 bg-card px-3 py-3 text-left shadow-soft tap-feedback"
             >
               <img
                 src={f.avatar}
@@ -135,7 +135,7 @@ export default function Friends() {
           <p className="text-xs text-muted-foreground mb-3">
             Use the connect button, or tap a row to view their profile
           </p>
-          <div className="space-y-1">
+          <div className="space-y-2.5">
             {suggestions.map((member) => (
               <SuggestedRow
                 key={member.memberId}

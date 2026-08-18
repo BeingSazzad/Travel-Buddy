@@ -30,6 +30,7 @@ import AccountPending from '@/pages/AccountPending';
 import ProfileSetup from '@/pages/ProfileSetup';
 import Search from '@/pages/Search';
 import CreateTrip from '@/pages/CreateTrip';
+import EditTrip from '@/pages/EditTrip';
 import TripDetail from '@/pages/TripDetail';
 import DealDetail from '@/pages/DealDetail';
 import CreateEvent from '@/pages/CreateEvent';
@@ -248,6 +249,7 @@ const AuthenticatedApp = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
 
       <Route path="/trips/new" element={<PageTransition><CreateTrip /></PageTransition>} />
+      <Route path="/trips/:id/edit" element={<PageTransition><EditTrip /></PageTransition>} />
       <Route path="/trips/:id" element={<PageTransition><TripDetail /></PageTransition>} />
       <Route path="/deals/:id" element={<PageTransition><DealDetail /></PageTransition>} />
       <Route path="/events/new" element={<PageTransition><CreateEvent /></PageTransition>} />

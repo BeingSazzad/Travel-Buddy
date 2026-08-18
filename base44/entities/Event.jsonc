@@ -42,6 +42,14 @@
       "type": "string",
       "description": "Venue or meeting spot name"
     },
+    "lat": {
+      "type": "number",
+      "description": "Confirmed meeting-point latitude"
+    },
+    "lng": {
+      "type": "number",
+      "description": "Confirmed meeting-point longitude"
+    },
     "city": {
       "type": "string"
     },
