@@ -2,15 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { CalendarHeart, Users } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
-import { useAuth } from "@/lib/AuthContext";
 
 const fmt = (d) => d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "";
 
 export default function ProfileEvents({ embedded = false }) {
-  const { events, joined } = useEvents();
-  const { user } = useAuth();
+  const { hosted, joined } = useEvents();
   const navigate = useNavigate();
-  const hosted = events.filter((e) => e.host_id === user?.id || e.created_by_id === user?.id);
 
   const Row = ({ e }) => (
     <button onClick={() => navigate(`/events/${e.id}`)} className="w-full text-left flex items-center gap-3 bg-card border border-border shadow-soft rounded-2xl p-3">

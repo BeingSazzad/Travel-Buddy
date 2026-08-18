@@ -1,4 +1,4 @@
-import { findMockMember } from "@/lib/member-profile";
+import { findMockMember, MOCK_MEMBERS } from "@/lib/member-profile";
 import { memberAvatar, eventImageFor } from "@/lib/images";
 
 function hostFields(id) {
@@ -10,17 +10,57 @@ function hostFields(id) {
   };
 }
 
-function goingAttendees(ids) {
-  return ids.map((id) => {
-    const m = findMockMember(id);
-    return {
-      user_id: id,
-      name: m?.name || "Member",
-      avatar: memberAvatar(id),
-      status: "going",
-      attendance_id: `att_${id}`,
-    };
-  });
+function attendeeFromMember(id) {
+  const m = findMockMember(id);
+  return {
+    user_id: id,
+    name: m?.name || "Member",
+    avatar: m?.avatar || memberAvatar(id),
+    city: m?.current_city,
+    status: "going",
+    attendance_id: `att_${id}`,
+  };
+}
+
+function goingAttendees(ids, count) {
+  const target = count ?? ids.length;
+  const seen = new Set(ids);
+  const extra = [];
+  for (const m of MOCK_MEMBERS) {
+    if (ids.length + extra.length >= target) break;
+    if (seen.has(m.user_id)) continue;
+    seen.add(m.user_id);
+    extra.push(m.user_id);
+  }
+  return [...ids, ...extra].slice(0, target).map(attendeeFromMember);
+}
+
+/** Fill unnamed +N slots with member profiles so Who's coming is a real list. */
+export function padGoingAttendees(attendees, totalCount) {
+  const list = Array.isArray(attendees) ? [...attendees] : [];
+  const going = list.filter((a) => a.status === "going" || !a.status);
+  const target = Math.max(Number(totalCount) || 0, going.length);
+  if (going.length >= target) return list;
+  const used = new Set(list.map((a) => a.user_id).filter(Boolean));
+  for (const m of MOCK_MEMBERS) {
+    if (going.length >= target) break;
+    if (used.has(m.user_id)) continue;
+    used.add(m.user_id);
+    const extra = attendeeFromMember(m.user_id);
+    list.push(extra);
+    going.push(extra);
+  }
+  return list;
+}
+
+export function isDemoEventId(id) {
+  const s = String(id || "");
+  return s.startsWith("event_local_") || s.startsWith("event_mock") || s.startsWith("event_demo_");
+}
+
+export function padDemoAttendees(eventId, attendees, totalCount) {
+  if (!isDemoEventId(eventId) && !findMockEvent(eventId)) return attendees || [];
+  return padGoingAttendees(attendees, totalCount);
 }
 
 /**
@@ -51,7 +91,7 @@ export const MOCK_EVENTS = [
     visibility: "public",
     pricing: "free",
     languages: ["English"],
-    attendees: goingAttendees(["mock_1", "mock_2", "mock_4"]),
+    attendees: goingAttendees(["mock_1", "mock_2", "mock_4"], 3),
   },
   {
     id: "event_mock_2",
@@ -78,7 +118,7 @@ export const MOCK_EVENTS = [
     languages: ["English", "Greek"],
     age_min: 21,
     age_max: 45,
-    attendees: goingAttendees(["mock_4", "mock_1", "mock_2"]),
+    attendees: goingAttendees(["mock_4", "mock_1", "mock_2"], 12),
   },
   {
     id: "event_mock_3",
@@ -102,7 +142,7 @@ export const MOCK_EVENTS = [
     visibility: "public",
     pricing: "free",
     languages: ["English", "Portuguese"],
-    attendees: goingAttendees(["mock_2", "mock_1"]),
+    attendees: goingAttendees(["mock_2", "mock_1"], 6),
   },
   {
     id: "event_mock_4",
@@ -126,7 +166,7 @@ export const MOCK_EVENTS = [
     visibility: "approval",
     pricing: "free",
     languages: ["English", "German"],
-    attendees: goingAttendees(["mock_4", "mock_1"]),
+    attendees: goingAttendees(["mock_4", "mock_1"], 4),
   },
   {
     id: "event_mock_5",
@@ -150,7 +190,7 @@ export const MOCK_EVENTS = [
     visibility: "public",
     pricing: "free",
     languages: ["English", "Danish"],
-    attendees: goingAttendees(["mock_2", "mock_4", "mock_1"]),
+    attendees: goingAttendees(["mock_2", "mock_4", "mock_1"], 7),
   },
   {
     id: "event_mock_6",
@@ -174,7 +214,7 @@ export const MOCK_EVENTS = [
     visibility: "public",
     pricing: "free",
     languages: ["English"],
-    attendees: goingAttendees(["mock_1", "mock_2", "mock_4"]),
+    attendees: goingAttendees(["mock_1", "mock_2", "mock_4"], 9),
   },
   {
     id: "event_mock_7",
@@ -198,7 +238,7 @@ export const MOCK_EVENTS = [
     visibility: "public",
     pricing: "free",
     languages: ["English", "French"],
-    attendees: goingAttendees(["mock_3", "mock_4", "mock_2"]),
+    attendees: goingAttendees(["mock_3", "mock_4", "mock_2"], 7),
   },
 ];
 
@@ -217,8 +257,47 @@ export const EVENT_TITLE_TO_ID = {
   "Paris café crawl": "event_mock_7",
 };
 
+const LOCAL_EVENTS_KEY = "seluna_user_events";
+
+export function getLocalEvents() {
+  try {
+    const raw = localStorage.getItem(LOCAL_EVENTS_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveLocalEvent(event) {
+  if (!event?.id) return event;
+  const next = [event, ...getLocalEvents().filter((e) => e.id !== event.id)];
+  localStorage.setItem(LOCAL_EVENTS_KEY, JSON.stringify(next));
+  return event;
+}
+
+export function updateLocalEvent(id, data) {
+  const list = getLocalEvents();
+  const idx = list.findIndex((e) => e.id === id);
+  if (idx < 0) return null;
+  const next = { ...list[idx], ...data, id };
+  const updated = [...list];
+  updated[idx] = next;
+  localStorage.setItem(LOCAL_EVENTS_KEY, JSON.stringify(updated));
+  return next;
+}
+
+export function removeLocalEvent(id) {
+  const next = getLocalEvents().filter((e) => e.id !== id);
+  localStorage.setItem(LOCAL_EVENTS_KEY, JSON.stringify(next));
+}
+
+export function isLocalEventId(id) {
+  return typeof id === "string" && id.startsWith("event_local_");
+}
+
 export function findMockEvent(id) {
-  return MOCK_EVENTS.find((e) => e.id === id) || null;
+  return getLocalEvents().find((e) => e.id === id) || MOCK_EVENTS.find((e) => e.id === id) || null;
 }
 
 export function eventsForCity(city, country) {
@@ -249,7 +328,7 @@ export function eventsForCity(city, country) {
       visibility: "public",
       pricing: "free",
       languages: ["English"],
-      attendees: goingAttendees([hostA.user_id, "mock_1"]),
+      attendees: goingAttendees([hostA.user_id, "mock_1"], 6),
     },
     {
       id: `event_demo_${key}_dinner`,
@@ -270,7 +349,7 @@ export function eventsForCity(city, country) {
       visibility: "public",
       pricing: "free",
       languages: ["English"],
-      attendees: goingAttendees([hostB.user_id, "mock_2"]),
+      attendees: goingAttendees([hostB.user_id, "mock_2"], 8),
     },
   ];
 }

@@ -22,12 +22,13 @@ import { useAuth } from "@/lib/AuthContext";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
-import ManageAttendees from "@/components/events/ManageAttendees";
+import ManageAttendees, { AttendeeProfileRow } from "@/components/events/ManageAttendees";
 import ReportSheet from "@/components/reports/ReportSheet";
 import { capitalize, fmtEventWhen } from "@/lib/event-options";
 import { useSaved } from "@/lib/SavedContext";
 import { savedItemKey } from "@/lib/saved-item-key";
-import { findMockEvent } from "@/lib/mock-events";
+import { findMockEvent, isLocalEventId, padDemoAttendees } from "@/lib/mock-events";
+import { isSameAppUser } from "@/lib/demo-user";
 import { getMockConversationId } from "@/lib/member-profile";
 import { cn } from "@/lib/utils";
 import { FALLBACK_AVATAR_URL } from "@/lib/images";
@@ -63,16 +64,77 @@ export default function EventDetail() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    const applyRecord = (record) => {
+      if (!record) {
+        setEvent(null);
+        setAttendees([]);
+        setHost(null);
+        return false;
+      }
+      setEvent(record);
+      setAttendees(padDemoAttendees(record.id, record.attendees || [], record.attendees_count));
+      const mine =
+        isSameAppUser(record.host_id, user?.id) ||
+        isSameAppUser(record.created_by_id, user?.id) ||
+        isSameAppUser(record.created_by?.id, user?.id);
+      if (record.host_id && !mine) {
+        setHost({
+          name: record.host_name,
+          avatar: record.host_avatar,
+          user_id: record.host_id,
+        });
+      } else {
+        setHost(null);
+      }
+      return true;
+    };
+
+    if (isLocalEventId(id)) {
+      applyRecord(findMockEvent(id));
+      setLoading(false);
+      return;
+    }
+
+    const overlayLocal = (e) => {
+      const local = findMockEvent(id);
+      if (!local) return e;
+      return {
+        ...e,
+        host_id: e.host_id || local.host_id,
+        created_by_id: e.created_by_id || local.created_by_id,
+        host_name: e.host_name || local.host_name,
+        lat: e.lat ?? local.lat,
+        lng: e.lng ?? local.lng,
+        attendees: padDemoAttendees(
+          e.id,
+          e.attendees?.length ? e.attendees : local.attendees,
+          e.attendees_count || local.attendees_count
+        ),
+      };
+    };
+
     try {
-      const e = await base44.entities.Event.get(id);
+      const e = overlayLocal(await base44.entities.Event.get(id));
       setEvent(e);
       try {
         const res = await base44.functions.invoke("event-attendees", { event_id: id });
-        setAttendees(res.data?.attendees || []);
+        const res = await base44.functions.invoke("event-attendees", { event_id: id });
+        const remote = res.data?.attendees;
+        setAttendees(
+          padDemoAttendees(
+            e.id,
+            remote?.length ? remote : e.attendees || [],
+            e.attendees_count
+          )
+        );
       } catch {
-        setAttendees(e.attendees || []);
+        setAttendees(padDemoAttendees(e.id, e.attendees || [], e.attendees_count));
       }
-      if (e?.host_id && e.host_id !== user?.id) {
+      const mine =
+        isSameAppUser(e.host_id, user?.id) ||
+        isSameAppUser(e.created_by_id, user?.id) ||
+        isSameAppUser(e.created_by?.id, user?.id);
+      if (e?.host_id && !mine) {
         try {
           const hp = await base44.functions.invoke("member-profile", { user_id: e.host_id });
           setHost(hp.data?.profile || null);
@@ -83,24 +145,7 @@ export default function EventDetail() {
         setHost(null);
       }
     } catch {
-      const mock = findMockEvent(id);
-      if (mock) {
-        setEvent(mock);
-        setAttendees(mock.attendees || []);
-        if (mock.host_id) {
-          setHost({
-            name: mock.host_name,
-            avatar: mock.host_avatar,
-            user_id: mock.host_id,
-          });
-        } else {
-          setHost(null);
-        }
-      } else {
-        setEvent(null);
-        setAttendees([]);
-        setHost(null);
-      }
+      applyRecord(findMockEvent(id));
     } finally {
       setLoading(false);
     }
@@ -118,7 +163,10 @@ export default function EventDetail() {
     );
   }
 
-  const isHost = event.host_id === user?.id;
+  const isHost =
+    isSameAppUser(event.host_id, user?.id) ||
+    isSameAppUser(event.created_by_id, user?.id) ||
+    isSameAppUser(event.created_by?.id, user?.id);
   const myAtt = attendees.find((a) => a.user_id === user?.id);
   const going = attendees.filter((a) => a.status === "going");
   const pending = attendees.filter((a) => a.status === "pending");
@@ -153,11 +201,6 @@ export default function EventDetail() {
 
   const dateLine = fmtEventWhen(event);
 
-  const goingAvatars =
-    going.length > 0
-      ? going.slice(0, 3).map((a) => a.avatar || FALLBACK_AVATAR)
-      : [];
-
   const rsvp = async (action, extra = {}) => {
     const join = action === "join";
     const prevAttendees = attendees;
@@ -165,7 +208,17 @@ export default function EventDetail() {
 
     if (join && !myAtt) {
       const status = event.visibility === "approval" ? "pending" : "going";
-      setAttendees((prev) => [...prev, { user_id: user?.id, status }]);
+      setAttendees((prev) => [
+        ...prev,
+        {
+          user_id: user?.id,
+          status,
+          name: user?.profile_name || [user?.first_name, user?.last_name].filter(Boolean).join(" ") || "You",
+          avatar: user?.main_photo || user?.profile_photos?.[0] || FALLBACK_AVATAR,
+          city: user?.current_city,
+          attendance_id: `att_${user?.id}`,
+        },
+      ]);
       if (status === "going") {
         setEvent((e) => ({ ...e, attendees_count: (e.attendees_count || 0) + 1 }));
       }
@@ -311,15 +364,12 @@ export default function EventDetail() {
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={isHost ? () => setManageOpen(true) : undefined}
-            className={cn(
-              "w-full text-left rounded-2xl border border-border bg-card/50 p-4",
-              isHost && "tap-feedback"
-            )}
-          >
-            <div className="flex items-start justify-between gap-2 mb-2">
+          <section className="rounded-2xl border border-border bg-card/50 p-4">
+            <button
+              type="button"
+              onClick={() => setManageOpen(true)}
+              className="w-full text-left flex items-start justify-between gap-2 tap-feedback"
+            >
               <div className="min-w-0">
                 <p className="section-header mb-0.5">
                   {isHost && pending.length > 0 ? "Join requests & who’s coming" : "Who’s coming"}
@@ -337,50 +387,35 @@ export default function EventDetail() {
                     : ""}
                 </p>
               </div>
-              {isHost && (
-                <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
-              )}
-            </div>
-            {goingAvatars.length > 0 || (isHost && pending.length > 0) ? (
-              <div className="flex items-center gap-3">
-                <div className="flex items-center">
-                  {(isHost && pending.length > 0
-                    ? pending.slice(0, 3).map((a) => a.avatar || FALLBACK_AVATAR)
-                    : goingAvatars
-                  ).map((src, i) => (
-                    <img
-                      key={i}
-                      src={src}
-                      alt=""
-                      className="w-8 h-8 rounded-full object-cover border-2 border-background -ml-1.5 first:ml-0"
-                    />
-                  ))}
-                </div>
-                <p className="text-sm text-muted-foreground flex-1 min-w-0">
-                  {isHost && pending.length > 0
-                    ? "Tap to approve or decline requests"
-                    : (() => {
-                        const names = going.slice(0, 2).map((a) => a.name).filter(Boolean);
-                        if (!names.length) {
-                          return isHost ? "Tap to see who’s coming" : goingCount ? `${goingCount} going` : "Be the first";
-                        }
-                        return names.join(", ") + (goingCount > 2 ? ` +${goingCount - 2}` : "");
-                      })()}
-                </p>
+              <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
+            </button>
+
+            {going.length > 0 ? (
+              <div className="space-y-2 mt-3">
+                {going.map((a) => (
+                  <AttendeeProfileRow
+                    key={a.attendance_id || a.user_id}
+                    attendee={a}
+                    onOpen={(uid) => navigate(`/members/${uid}`)}
+                  />
+                ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                {isHost ? "Tap to manage attendees when people join." : "Be the first to join."}
+              <p className="text-sm text-muted-foreground mt-3">
+                {isHost ? "People who join will show up here." : "Be the first to join."}
               </p>
             )}
-            {isHost && (
-              <p className="text-xs font-medium text-primary mt-3">
-                {pending.length > 0
-                  ? `Review ${pending.length} interested`
-                  : "See names & manage attendees"}
-              </p>
+
+            {isHost && pending.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setManageOpen(true)}
+                className="text-xs font-medium text-primary mt-3 tap-feedback"
+              >
+                Review {pending.length} interested
+              </button>
             )}
-          </button>
+          </section>
 
           <div className="flex items-center gap-3">
             <button
@@ -535,6 +570,7 @@ export default function EventDetail() {
         event={event}
         initialAttendees={attendees}
         onChange={load}
+        isHost={isHost}
       />
       <ReportSheet
         open={reportOpen}

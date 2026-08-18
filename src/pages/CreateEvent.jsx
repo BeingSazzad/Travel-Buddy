@@ -16,7 +16,12 @@ import { COUNTRIES, LANGUAGES } from "@/lib/profile-options";
 import InterestPicker from "@/components/profile/InterestPicker";
 import EventCard from "@/components/events/EventCard";
 import EventMap from "@/components/events/EventMap";
-import { findMockEvent } from "@/lib/mock-events";
+import {
+  findMockEvent,
+  isLocalEventId,
+  saveLocalEvent,
+  updateLocalEvent,
+} from "@/lib/mock-events";
 import { findMeetingPlaces } from "@/lib/place-search";
 
 /** 3 steps — only what a host must decide to publish a meetup. */
@@ -99,6 +104,11 @@ export default function CreateEvent() {
   useEffect(() => {
     if (!editId) return;
     (async () => {
+      const local = isLocalEventId(editId) ? findMockEvent(editId) : null;
+      if (local) {
+        setData(fromEntity(local));
+        return;
+      }
       try {
         const e = await base44.entities.Event.get(editId);
         setData(fromEntity(e));
@@ -224,40 +234,72 @@ export default function CreateEvent() {
   const finish = async () => {
     if (!valid) return;
     setCreating(true);
+    const hostId = user?.id;
+    const hostName = user?.full_name || user?.profile_name || "You";
+    const payload = {
+      title: data.title.trim(),
+      category: data.category,
+      description: data.description.trim(),
+      date: data.date,
+      time: data.start_time,
+      end_time: data.end_time || "",
+      city: data.city.trim(),
+      country: data.country,
+      location: data.location.trim(),
+      lat: Number(data.lat),
+      lng: Number(data.lng),
+      image: data.image || defaultEventImage(data.category),
+      max_attendees: Number(data.max_attendees) || 12,
+      visibility: data.visibility || "public",
+      agreed_rules: true,
+      pricing: data.pricing || "free",
+      external_link: data.pricing === "paid_external" ? (data.external_link || "").trim() : "",
+      age_min: data.age_min !== "" && data.age_min != null ? Number(data.age_min) : null,
+      age_max: data.age_max !== "" && data.age_max != null ? Number(data.age_max) : null,
+      languages: data.languages || [],
+      host_id: hostId,
+      host_name: hostName,
+    };
+    const withHost = (event) => ({
+      ...event,
+      name: event.title || payload.title,
+      host_id: event.host_id || hostId,
+      created_by_id: event.created_by_id || hostId,
+      host_name: event.host_name || hostName,
+    });
     try {
-      const payload = {
-        title: data.title.trim(),
-        category: data.category,
-        description: data.description.trim(),
-        date: data.date,
-        time: data.start_time,
-        end_time: data.end_time || "",
-        city: data.city.trim(),
-        country: data.country,
-        location: data.location.trim(),
-        lat: Number(data.lat),
-        lng: Number(data.lng),
-        image: data.image || defaultEventImage(data.category),
-        max_attendees: Number(data.max_attendees) || 12,
-        visibility: data.visibility || "public",
-        agreed_rules: true,
-        pricing: data.pricing || "free",
-        external_link: data.pricing === "paid_external" ? (data.external_link || "").trim() : "",
-        age_min: data.age_min !== "" && data.age_min != null ? Number(data.age_min) : null,
-        age_max: data.age_max !== "" && data.age_max != null ? Number(data.age_max) : null,
-        languages: data.languages || [],
-      };
       if (editId) {
-        await base44.entities.Event.update(editId, payload);
+        if (isLocalEventId(editId)) {
+          updateLocalEvent(editId, withHost({ ...payload, id: editId })) || saveLocalEvent(withHost({ ...payload, id: editId }));
+        } else {
+          try {
+            await base44.entities.Event.update(editId, payload);
+          } catch {
+            /* keep a local copy so the edit still shows */
+          }
+          const localPatch = withHost({ ...payload, id: editId });
+          updateLocalEvent(editId, localPatch) || saveLocalEvent(localPatch);
+        }
         navigate(`/events/${editId}`);
       } else {
-        const created = await base44.entities.Event.create({
-          ...payload,
-          host_name: user?.full_name || "Seluna host",
-          host_id: user?.id,
-          attendees_count: 0,
-        });
-        navigate(created?.id ? `/events/${created.id}` : "/events");
+        let created = null;
+        try {
+          created = await base44.entities.Event.create({
+            ...payload,
+            attendees_count: 0,
+          });
+        } catch {
+          created = null;
+        }
+        const event = created?.id
+          ? withHost({ attendees_count: 0, ...created })
+          : withHost({
+              ...payload,
+              id: `event_local_${Date.now()}`,
+              attendees_count: 0,
+            });
+        saveLocalEvent(event);
+        navigate(`/events/${event.id}`);
       }
     } finally {
       setCreating(false);

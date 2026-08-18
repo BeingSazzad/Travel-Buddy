@@ -10,12 +10,14 @@ import ScreenHeader from "@/components/common/ScreenHeader";
 import { EVENT_CATEGORIES, capitalize } from "@/lib/event-options";
 
 export default function Events() {
-  const { loading, reload, byCategory, nearby, popular, joined, saved, atTrips } = useEvents();
+  const { loading, reload, byCategory, nearby, popular, hosted, joined, saved, atTrips } = useEvents();
   const [category, setCategory] = useState("All");
   const navigate = useNavigate();
   useEffect(() => onRefresh("/events", reload), [reload]);
 
   const filtered = category === "All" ? null : byCategory(category);
+  const hostedIds = new Set(hosted.map((e) => e.id));
+  const upcomingFeed = nearby.filter((e) => !hostedIds.has(e.id));
 
   const Section = ({ title, events }) => (
     <section className="mt-6">
@@ -61,17 +63,23 @@ export default function Events() {
         )
       ) : (
         <>
-          {nearby.length > 0 && (
+          {hosted.length > 0 && (
             <section className="mt-5">
+              <h2 className="font-display font-semibold text-base mb-3">Hosting</h2>
+              <EventList events={hosted} />
+            </section>
+          )}
+          {upcomingFeed.length > 0 && (
+            <section className={hosted.length > 0 ? "mt-6" : "mt-5"}>
               <h2 className="font-display font-semibold text-base mb-3">Upcoming events</h2>
-              <EventList events={nearby.slice(0, 5)} />
+              <EventList events={upcomingFeed.slice(0, 5)} />
             </section>
           )}
           {atTrips.length > 0 && <Section title="At your trip destinations" events={atTrips} />}
           {popular.length > 0 && <Section title="Popular" events={popular} />}
           {joined.length > 0 && <Section title="Joined by you" events={joined} />}
           {saved.length > 0 && <Section title="Saved events" events={saved} />}
-          {nearby.length === 0 && atTrips.length === 0 && (
+          {hosted.length === 0 && nearby.length === 0 && atTrips.length === 0 && (
             <EmptyState
               className="mt-6"
               icon={CalendarHeart}
