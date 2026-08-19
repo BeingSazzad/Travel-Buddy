@@ -8,6 +8,7 @@ import { Image } from "@/components/ui/image";
 import MessageBubble from "@/components/messages/MessageBubble";
 import EmojiPicker from "@/components/messages/EmojiPicker";
 import ConversationMenu from "@/components/messages/ConversationMenu";
+import { resolveMemberAvatar } from "@/lib/member-profile";
 
 export default function Conversation() {
   const { id } = useParams();
@@ -54,7 +55,7 @@ export default function Conversation() {
   const resolvedIndex = otherIndex !== -1 ? otherIndex : 1;
   const otherId = conversation.participant_ids[resolvedIndex];
   const otherName = conversation.participant_names?.[resolvedIndex] || "Travel friend";
-  const otherAvatar = conversation.participant_avatars?.[resolvedIndex] || "";
+  const otherAvatar = conversation.participant_avatars?.[resolvedIndex] || resolveMemberAvatar(otherId);
   const otherTyping = conversation.typing?.[otherId] && Date.now() - conversation.typing[otherId] < 3000;
 
   const onType = (val) => {
@@ -121,7 +122,7 @@ export default function Conversation() {
           className="flex-1 flex items-center gap-2 cursor-pointer min-w-0 hover:opacity-90 active:scale-[0.99] transition"
         >
           <div className="w-10 h-10 rounded-full overflow-hidden border border-border shrink-0">
-            <Image src={otherAvatar} alt={otherName} fittingType="fill" className="w-full h-full object-cover" />
+            <Image src={otherAvatar} alt={otherName} fittingType="fill" className="w-full h-full object-cover object-top" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-display font-semibold leading-tight truncate">{otherName}</p>

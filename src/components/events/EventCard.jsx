@@ -3,16 +3,14 @@ import { useNavigate } from "react-router-dom";
 import OverlayMediaCard from "@/components/common/OverlayMediaCard";
 import GoingFaces from "@/components/common/GoingFaces";
 import { fmtEventDate } from "@/lib/event-options";
+import { eventGoingAvatars } from "@/lib/mock-events";
 import { cn } from "@/lib/utils";
 
 /** Compact discovery card — date, title, city + going faces. */
 export default function EventCard({ event, className, titleClassName }) {
   const navigate = useNavigate();
   const going = event.attendees_count || event.attendees?.length || 0;
-  const avatars = (event.attendees || [])
-    .slice(0, 3)
-    .map((a) => a.avatar)
-    .filter(Boolean);
+  const avatars = eventGoingAvatars(event);
   const city = event.city || "";
 
   return (

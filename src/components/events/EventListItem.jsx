@@ -3,14 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { fmtEventDate, fmtEventTime } from "@/lib/event-options";
-
-function attendeeAvatars(event) {
-  if (event.attendees?.length) {
-    return event.attendees.slice(0, 3).map((a) => a.avatar).filter(Boolean);
-  }
-  // Only real host avatar — don't invent fake going faces
-  return event.host_avatar ? [event.host_avatar] : [];
-}
+import { eventGoingAvatars } from "@/lib/mock-events";
 
 function formatMeta(event) {
   const parts = [];
@@ -35,7 +28,7 @@ function formatMeta(event) {
 export default function EventListItem({ event }) {
   const navigate = useNavigate();
   const going = event.attendees_count || 0;
-  const avatars = attendeeAvatars(event);
+  const avatars = eventGoingAvatars(event);
   const meta = formatMeta(event);
 
   return (
@@ -68,7 +61,7 @@ export default function EventListItem({ event }) {
                   key={i}
                   src={src}
                   alt=""
-                  className="w-5 h-5 rounded-full object-cover border-2 border-card -ml-1.5 first:ml-0"
+                    className="w-6 h-6 rounded-full object-cover object-top border-2 border-card -ml-1.5 first:ml-0"
                 />
               ))}
             </div>

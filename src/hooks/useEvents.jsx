@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useSaved } from "@/lib/SavedContext";
-import { MOCK_EVENTS, getLocalEvents } from "@/lib/mock-events";
+import { MOCK_EVENTS, getLocalEvents, isLocalEventId, stampDemoMineHost, hydrateEventPeople } from "@/lib/mock-events";
 import { useDemoFallbacks } from "@/lib/demo-fallbacks";
 import { isSameAppUser } from "@/lib/demo-user";
 
@@ -35,25 +35,32 @@ export function useEvents() {
         } else {
           dbById.set(local.id, {
             ...existing,
-            host_id: existing.host_id || local.host_id,
-            created_by_id: existing.created_by_id || local.created_by_id,
-            host_name: existing.host_name || local.host_name,
+            host_id: local.host_id || existing.host_id,
+            created_by_id: local.created_by_id || existing.created_by_id,
+            host_name: local.host_name || existing.host_name,
+            created_locally: true,
             lat: existing.lat ?? local.lat,
             lng: existing.lng ?? local.lng,
           });
         }
       }
-      setEvents([...dbById.values(), ...mockToAdd]);
+      setEvents(
+        [...dbById.values(), ...mockToAdd].map((e) => hydrateEventPeople(stampDemoMineHost(e, user)))
+      );
       setAttendance(att);
       const upcoming = trips.filter((t) => (t.end_date || t.start_date || "") >= today());
       setTripCities(new Set(upcoming.map((t) => t.city).filter(Boolean)));
     } catch {
-      setEvents([...getLocalEvents(), ...(useDemoFallbacks ? MOCK_EVENTS : [])]);
+      setEvents(
+        [...getLocalEvents(), ...(useDemoFallbacks ? MOCK_EVENTS : [])].map((e) =>
+          hydrateEventPeople(stampDemoMineHost(e, user))
+        )
+      );
       setAttendance([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (isAuthenticated) load();
@@ -115,20 +122,29 @@ export function useEvents() {
     () => [...events].sort((a, b) => (b.attendees_count || 0) - (a.attendees_count || 0)).slice(0, 10),
     [events]
   );
-  const hosted = useMemo(
-    () =>
-      events.filter(
-        (e) =>
-          isSameAppUser(e.host_id, user?.id) ||
-          isSameAppUser(e.created_by_id, user?.id) ||
-          isSameAppUser(e.created_by?.id, user?.id)
-      ),
-    [events, user?.id]
-  );
+  const hosted = useMemo(() => {
+    const localIds = new Set(getLocalEvents().map((e) => e.id));
+    return events.filter((e) => {
+      if (localIds.has(e.id) || isLocalEventId(e.id) || e.created_locally || e.demo_mine) return true;
+      return (
+        isSameAppUser(e.host_id, user?.id) ||
+        isSameAppUser(e.created_by_id, user?.id) ||
+        isSameAppUser(e.created_by?.id, user?.id)
+      );
+    });
+  }, [events, user?.id]);
   const hostedIds = useMemo(() => new Set(hosted.map((e) => e.id)), [hosted]);
   const joined = useMemo(
-    () => events.filter((e) => joinedIds.has(e.id) && !hostedIds.has(e.id)),
-    [events, joinedIds, hostedIds]
+    () =>
+      events.filter((e) => {
+        if (hostedIds.has(e.id)) return false;
+        if (e.demo_going) return true;
+        if (joinedIds.has(e.id)) return true;
+        return (e.attendees || []).some(
+          (a) => a.status === "going" && isSameAppUser(a.user_id, user?.id)
+        );
+      }),
+    [events, joinedIds, hostedIds, user?.id]
   );
   const saved = useMemo(() => events.filter((e) => savedEventTitles.has(e.title)), [events, savedEventTitles]);
   const atTrips = useMemo(() => events.filter((e) => tripCities.has(e.city)), [events, tripCities]);

@@ -16,6 +16,8 @@ import { Image } from '@/components/ui/image';
 import EmptyState from '@/components/common/EmptyState';
 import ScrollFilterChips from '@/components/common/ScrollFilterChips';
 import SaveButton from '@/components/common/SaveButton';
+import { findMockEvent, eventGoingAvatars, EVENT_TITLE_TO_ID } from '@/lib/mock-events';
+import { FALLBACK_AVATAR_URL } from '@/lib/images';
 
 const PLACE_TYPES = ['cafe', 'restaurant', 'hotel', 'destination'];
 
@@ -38,6 +40,12 @@ const FILTERS = [
 function SavedItemRow({ item, onOpen }) {
   const typeLabel = TYPE_LABELS[item.type] || item.type;
   const locationLine = [item.location, item.country].filter(Boolean).join(', ');
+  const savedEvent =
+    item.type === 'event'
+      ? findMockEvent(item.eventId) || findMockEvent(EVENT_TITLE_TO_ID[item.title])
+      : null;
+  const eventFaces = savedEvent ? eventGoingAvatars(savedEvent) : [];
+  const eventGoing = savedEvent ? savedEvent.attendees_count || savedEvent.attendees?.length || 0 : 0;
 
   return (
     <div className="flex items-center gap-3 bg-card border border-border/60 shadow-soft rounded-3xl p-3">
@@ -85,6 +93,21 @@ function SavedItemRow({ item, onOpen }) {
               <span className="text-xs text-muted-foreground truncate">{item.info}</span>
             )}
           </div>
+          {eventGoing > 0 && (
+            <div className="flex items-center gap-1.5 mt-1.5">
+              <div className="flex items-center">
+                {eventFaces.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src || FALLBACK_AVATAR_URL}
+                    alt=""
+                    className="w-6 h-6 rounded-full object-cover object-top border-2 border-card -ml-1.5 first:ml-0"
+                  />
+                ))}
+              </div>
+              <span className="text-xs text-muted-foreground">{eventGoing} going</span>
+            </div>
+          )}
         </div>
         <ChevronRight className="w-4 h-4 text-muted-foreground/60 shrink-0" strokeWidth={1.5} aria-hidden />
       </button>

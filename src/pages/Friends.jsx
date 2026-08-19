@@ -8,6 +8,7 @@ import { useFriends } from '@/hooks/useFriends';
 import { useConnectionRequests } from '@/hooks/useConnectionRequests';
 import ConnectionRequestsPrompt from '@/components/friends/ConnectionRequestsPrompt';
 import { getDiscoverDeckMembers } from '@/lib/member-profile';
+import { FALLBACK_AVATAR_URL } from '@/lib/images';
 import { base44 } from '@/api/base44Client';
 
 function SuggestedRow({ member, onConnect, connecting, requested, onViewProfile }) {
@@ -19,9 +20,9 @@ function SuggestedRow({ member, onConnect, connecting, requested, onViewProfile 
         className="flex flex-1 min-w-0 items-center gap-3 text-left rounded-xl py-0.5 pr-1 tap-feedback"
       >
         <img
-          src={member.img}
+          src={member.img || FALLBACK_AVATAR_URL}
           alt={member.name}
-          className="w-12 h-12 rounded-full object-cover border border-border shrink-0"
+          className="w-12 h-12 rounded-full object-cover object-top border border-border shrink-0"
         />
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm">{member.name}</p>
@@ -115,9 +116,9 @@ export default function Friends() {
               className="w-full flex items-center gap-3 rounded-2xl border border-border/80 bg-card px-3 py-3 text-left shadow-soft tap-feedback"
             >
               <img
-                src={f.avatar}
+                src={f.avatar || FALLBACK_AVATAR_URL}
                 alt={f.name}
-                className="w-12 h-12 rounded-full object-cover border border-border shrink-0"
+                className="w-12 h-12 rounded-full object-cover object-top border border-border shrink-0"
               />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm">{f.name}</p>

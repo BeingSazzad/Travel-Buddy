@@ -1,4 +1,4 @@
-import { memberAvatar, memberPhotos } from "@/lib/images";
+import { memberAvatar, memberPhotos, FALLBACK_AVATAR_URL } from "@/lib/images";
 import { normalizeProfileRecord, profilePhotos } from "@/lib/profile-display";
 
 export const MOCK_MEMBERS = [
@@ -197,6 +197,13 @@ export function findMockMember(userId) {
 export function memberDisplayName(userId) {
   const m = findMockMember(userId);
   return m?.name || "Seluna member";
+}
+
+/** Photo for a member id — mock profile first, then curated Unsplash, then fallback. */
+export function resolveMemberAvatar(userId, extra) {
+  if (typeof extra === "string" && extra) return extra;
+  const m = findMockMember(userId);
+  return m?.avatar || m?.main_photo || (userId ? memberAvatar(userId) : FALLBACK_AVATAR_URL);
 }
 
 const MOCK_CHAT_SUMMARIES = [

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { MOCK_MEMBERS, memberDisplayName, DEMO_INCOMING_REQUEST_IDS } from "@/lib/member-profile";
+import { MOCK_MEMBERS, memberDisplayName, DEMO_INCOMING_REQUEST_IDS, resolveMemberAvatar } from "@/lib/member-profile";
 import { useDemoFallbacks } from "@/lib/demo-fallbacks";
 
 const MOCK_REQUESTS = DEMO_INCOMING_REQUEST_IDS.map((id) => {
@@ -44,7 +44,7 @@ export function useConnectionRequests() {
             ? {
                 user_id: mock.user_id,
                 name: mock.name,
-                avatar: mock.avatar || mock.main_photo,
+                avatar: resolveMemberAvatar(mock.user_id, mock.avatar || mock.main_photo),
                 current_city: mock.current_city,
                 country: mock.country,
                 trip: mock.trip,
@@ -53,7 +53,7 @@ export function useConnectionRequests() {
             : {
                 user_id: l.created_by_id,
                 name: memberDisplayName(l.created_by_id),
-                avatar: "",
+                avatar: resolveMemberAvatar(l.created_by_id),
                 created_date: l.created_date,
               };
         });

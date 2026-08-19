@@ -3,6 +3,7 @@ import { motion, useMotionValue, useTransform } from "framer-motion";
 import { MapPin, Plane, X, Info, BadgeCheck } from "lucide-react";
 import { ConnectIconButton } from "@/components/common/ConnectIconButton";
 import { Image } from "@/components/ui/image";
+import { resolveMemberAvatar } from "@/lib/member-profile";
 
 export default function SwipeCard({ member, onSwipe, onProfile }) {
   const x = useMotionValue(0);
@@ -38,10 +39,10 @@ export default function SwipeCard({ member, onSwipe, onProfile }) {
         className="relative flex-1 min-h-0 w-full rounded-[28px] overflow-hidden border border-border/80 shadow-premium bg-card cursor-grab active:cursor-grabbing select-none"
       >
         <Image
-          src={member.avatar || member.main_photo}
+          src={member.avatar || member.main_photo || resolveMemberAvatar(member.user_id)}
           alt={member.name}
           fittingType="fill"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-top"
         />
         <div className="gradient-overlay-card" />
 

@@ -1,96 +1,158 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus, CalendarOff, CalendarHeart } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Plus, CalendarHeart, Compass, UserCheck } from "lucide-react";
 import EmptyState from "@/components/common/EmptyState";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEvents } from "@/hooks/useEvents";
 import { onRefresh } from "@/lib/refresh-bus";
 import EventList from "@/components/events/EventList";
+import ScrollFilterChips from "@/components/common/ScrollFilterChips";
 import ListSkeleton from "@/components/common/ListSkeleton";
 import ScreenHeader from "@/components/common/ScreenHeader";
 import { EVENT_CATEGORIES, capitalize } from "@/lib/event-options";
 
+const CATEGORY_CHIPS = [
+  { key: "all", label: "All" },
+  ...EVENT_CATEGORIES.map((c) => ({ key: c, label: capitalize(c) })),
+];
+
+const TABS = ["discover", "going", "mine"];
+
+function filterCategory(list, category) {
+  if (!category || category === "all") return list;
+  return list.filter((e) => e.category === category);
+}
+
 export default function Events() {
-  const { loading, reload, byCategory, nearby, popular, hosted, joined, saved, atTrips } = useEvents();
-  const [category, setCategory] = useState("All");
+  const { loading, reload, nearby, hosted, joined, atTrips } = useEvents();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [category, setCategory] = useState("all");
   const navigate = useNavigate();
   useEffect(() => onRefresh("/events", reload), [reload]);
 
-  const filtered = category === "All" ? null : byCategory(category);
-  const hostedIds = new Set(hosted.map((e) => e.id));
-  const upcomingFeed = nearby.filter((e) => !hostedIds.has(e.id));
+  const tab = TABS.includes(searchParams.get("tab")) ? searchParams.get("tab") : "discover";
+  const setTab = (value) => {
+    const next = new URLSearchParams(searchParams);
+    if (value === "discover") next.delete("tab");
+    else next.set("tab", value);
+    setSearchParams(next, { replace: true });
+  };
 
-  const Section = ({ title, events }) => (
-    <section className="mt-6">
-      <h2 className="section-header mb-3">{title}</h2>
-      <EventList events={events} />
-    </section>
+  const hostedIds = useMemo(() => new Set(hosted.map((e) => e.id)), [hosted]);
+  const goingIds = useMemo(() => new Set(joined.map((e) => e.id)), [joined]);
+
+  const discoverFeed = useMemo(
+    () =>
+      filterCategory(
+        nearby.filter((e) => !hostedIds.has(e.id) && !goingIds.has(e.id)),
+        category
+      ),
+    [nearby, hostedIds, goingIds, category]
+  );
+  const tripFeed = useMemo(
+    () =>
+      filterCategory(
+        atTrips.filter((e) => !hostedIds.has(e.id) && !goingIds.has(e.id)),
+        category
+      ),
+    [atTrips, hostedIds, goingIds, category]
   );
 
   return (
     <div className="page-shell">
       <ScreenHeader
         title="Events"
-        subtitle="Join or host a meetup"
+        subtitle="Find a meetup, or host one"
         extraActions={
           <button
+            type="button"
             onClick={() => navigate("/events/new")}
             className="w-10 h-10 rounded-full fab-primary"
+            aria-label="Host an event"
           >
             <Plus className="w-5 h-5" strokeWidth={1.5} />
           </button>
         }
       />
 
-      <div className="flex gap-2 h-scroll pb-3 -mx-0">
-        {["All", ...EVENT_CATEGORIES].map((c) => (
-          <button
-            key={c}
-            onClick={() => setCategory(c)}
-            className={`px-3 py-1.5 rounded-full text-xs whitespace-nowrap border ${category === c ? "chip-active" : "chip-inactive"}`}
-          >
-            {c === "All" ? "All" : capitalize(c)}
-          </button>
-        ))}
-      </div>
+      <Tabs value={tab} onValueChange={setTab} className="mt-1">
+        <TabsList className="grid grid-cols-3 w-full h-11 bg-muted/50 p-1 rounded-2xl gap-1">
+          <TabsTrigger value="discover" className="rounded-xl text-xs font-semibold px-2">
+            Discover
+          </TabsTrigger>
+          <TabsTrigger value="going" className="rounded-xl text-xs font-semibold px-2">
+            Going
+          </TabsTrigger>
+          <TabsTrigger value="mine" className="rounded-xl text-xs font-semibold px-2">
+            My events
+          </TabsTrigger>
+        </TabsList>
 
-      {loading ? (
-        <ListSkeleton className="mt-5" count={3} />
-      ) : filtered ? (
-        filtered.length === 0 ? (
-          <EmptyState className="mt-6" icon={CalendarOff} title={`No ${capitalize(category)} events yet`} description={`Be the first to host a ${capitalize(category)} meetup in your area.`} />
-        ) : (
-          <EventList events={filtered} className="mt-5" />
-        )
-      ) : (
-        <>
-          {hosted.length > 0 && (
-            <section className="mt-5">
-              <h2 className="font-display font-semibold text-base mb-3">Hosting</h2>
-              <EventList events={hosted} />
-            </section>
-          )}
-          {upcomingFeed.length > 0 && (
-            <section className={hosted.length > 0 ? "mt-6" : "mt-5"}>
-              <h2 className="font-display font-semibold text-base mb-3">Upcoming events</h2>
-              <EventList events={upcomingFeed.slice(0, 5)} />
-            </section>
-          )}
-          {atTrips.length > 0 && <Section title="At your trip destinations" events={atTrips} />}
-          {popular.length > 0 && <Section title="Popular" events={popular} />}
-          {joined.length > 0 && <Section title="Joined by you" events={joined} />}
-          {saved.length > 0 && <Section title="Saved events" events={saved} />}
-          {hosted.length === 0 && nearby.length === 0 && atTrips.length === 0 && (
+        <TabsContent value="discover" className="mt-4">
+          <div className="mb-4">
+            <ScrollFilterChips items={CATEGORY_CHIPS} active={category} onSelect={setCategory} />
+          </div>
+
+          {loading ? (
+            <ListSkeleton count={3} />
+          ) : discoverFeed.length === 0 && tripFeed.length === 0 ? (
             <EmptyState
-              className="mt-6"
-              icon={CalendarHeart}
-              title="No events nearby"
-              description="Be the first to host a meetup in your city."
+              icon={Compass}
+              title={category === "all" ? "No events to discover" : `No ${capitalize(category)} events`}
+              description="Host a meetup, or check back as more women publish plans."
               actionLabel="Host an event"
               onAction={() => navigate("/events/new")}
             />
+          ) : (
+            <>
+              {tripFeed.length > 0 && (
+                <section className="mb-6">
+                  <h2 className="section-header mb-3">Near your trips</h2>
+                  <EventList events={tripFeed} />
+                </section>
+              )}
+              {discoverFeed.length > 0 && (
+                <section>
+                  {tripFeed.length > 0 && <h2 className="section-header mb-3">Upcoming</h2>}
+                  <EventList events={discoverFeed} />
+                </section>
+              )}
+            </>
           )}
-        </>
-      )}
+        </TabsContent>
+
+        <TabsContent value="going" className="mt-5">
+          {loading ? (
+            <ListSkeleton count={3} />
+          ) : joined.length === 0 ? (
+            <EmptyState
+              icon={UserCheck}
+              title="You’re not going to any events yet"
+              description="Join a meetup from Discover — it will land here."
+              actionLabel="Discover events"
+              onAction={() => setTab("discover")}
+            />
+          ) : (
+            <EventList events={joined} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="mine" className="mt-5">
+          {loading ? (
+            <ListSkeleton count={3} />
+          ) : hosted.length === 0 ? (
+            <EmptyState
+              icon={CalendarHeart}
+              title="No events you’re hosting"
+              description="Create a meetup and manage it from this tab."
+              actionLabel="Host an event"
+              onAction={() => navigate("/events/new")}
+            />
+          ) : (
+            <EventList events={hosted} />
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

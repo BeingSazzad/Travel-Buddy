@@ -22,12 +22,12 @@ import { useAuth } from "@/lib/AuthContext";
 import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
-import ManageAttendees, { AttendeeProfileRow } from "@/components/events/ManageAttendees";
+import { AttendeeProfileRow } from "@/components/events/ManageAttendees";
 import ReportSheet from "@/components/reports/ReportSheet";
 import { capitalize, fmtEventWhen } from "@/lib/event-options";
 import { useSaved } from "@/lib/SavedContext";
 import { savedItemKey } from "@/lib/saved-item-key";
-import { findMockEvent, isLocalEventId, padDemoAttendees } from "@/lib/mock-events";
+import { findMockEvent, isLocalEventId, hydrateEventPeople } from "@/lib/mock-events";
 import { isSameAppUser } from "@/lib/demo-user";
 import { getMockConversationId } from "@/lib/member-profile";
 import { cn } from "@/lib/utils";
@@ -58,7 +58,6 @@ export default function EventDetail() {
   const [host, setHost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
-  const [manageOpen, setManageOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [safetyOpen, setSafetyOpen] = useState(false);
 
@@ -71,17 +70,18 @@ export default function EventDetail() {
         setHost(null);
         return false;
       }
-      setEvent(record);
-      setAttendees(padDemoAttendees(record.id, record.attendees || [], record.attendees_count));
+      const people = hydrateEventPeople(record);
+      setEvent(people);
+      setAttendees(people.attendees || []);
       const mine =
-        isSameAppUser(record.host_id, user?.id) ||
-        isSameAppUser(record.created_by_id, user?.id) ||
-        isSameAppUser(record.created_by?.id, user?.id);
-      if (record.host_id && !mine) {
+        isSameAppUser(people.host_id, user?.id) ||
+        isSameAppUser(people.created_by_id, user?.id) ||
+        isSameAppUser(people.created_by?.id, user?.id);
+      if (people.host_id && !mine) {
         setHost({
-          name: record.host_name,
-          avatar: record.host_avatar,
-          user_id: record.host_id,
+          name: people.host_name,
+          avatar: people.host_avatar,
+          user_id: people.host_id,
         });
       } else {
         setHost(null);
@@ -97,49 +97,60 @@ export default function EventDetail() {
 
     const overlayLocal = (e) => {
       const local = findMockEvent(id);
-      if (!local) return e;
-      return {
+      if (!local) return hydrateEventPeople(e);
+      return hydrateEventPeople({
         ...e,
         host_id: e.host_id || local.host_id,
         created_by_id: e.created_by_id || local.created_by_id,
         host_name: e.host_name || local.host_name,
+        host_avatar: e.host_avatar || local.host_avatar,
         lat: e.lat ?? local.lat,
         lng: e.lng ?? local.lng,
-        attendees: padDemoAttendees(
-          e.id,
-          e.attendees?.length ? e.attendees : local.attendees,
-          e.attendees_count || local.attendees_count
-        ),
-      };
+        attendees: e.attendees?.length ? e.attendees : local.attendees,
+        attendees_count: e.attendees_count || local.attendees_count,
+      });
     };
 
     try {
       const e = overlayLocal(await base44.entities.Event.get(id));
       setEvent(e);
       try {
-        const res = await base44.functions.invoke("event-attendees", { event_id: id });
-        const res = await base44.functions.invoke("event-attendees", { event_id: id });
-        const remote = res.data?.attendees;
+        const attendeesRes = await base44.functions.invoke("event-attendees", { event_id: id });
+        const remote = attendeesRes.data?.attendees;
         setAttendees(
-          padDemoAttendees(
-            e.id,
-            remote?.length ? remote : e.attendees || [],
-            e.attendees_count
-          )
+          hydrateEventPeople({
+            ...e,
+            attendees: remote?.length ? remote : e.attendees,
+          }).attendees
         );
       } catch {
-        setAttendees(padDemoAttendees(e.id, e.attendees || [], e.attendees_count));
+        setAttendees(hydrateEventPeople(e).attendees || []);
       }
       const mine =
         isSameAppUser(e.host_id, user?.id) ||
         isSameAppUser(e.created_by_id, user?.id) ||
         isSameAppUser(e.created_by?.id, user?.id);
       if (e?.host_id && !mine) {
+        const fallbackHost = {
+          name: e.host_name,
+          avatar: e.host_avatar,
+          user_id: e.host_id,
+        };
         try {
           const hp = await base44.functions.invoke("member-profile", { user_id: e.host_id });
-          setHost(hp.data?.profile || null);
+          const profile = hp.data?.profile;
+          setHost(
+            profile
+              ? {
+                  ...profile,
+                  name: profile.name || e.host_name,
+                  avatar: profile.avatar || profile.main_photo || e.host_avatar,
+                  user_id: profile.user_id || e.host_id,
+                }
+              : fallbackHost
+          );
         } catch {
-          setHost(null);
+          setHost(fallbackHost);
         }
       } else {
         setHost(null);
@@ -367,7 +378,7 @@ export default function EventDetail() {
           <section className="rounded-2xl border border-border bg-card/50 p-4">
             <button
               type="button"
-              onClick={() => setManageOpen(true)}
+              onClick={() => navigate(`/events/${event.id}/attendees`)}
               className="w-full text-left flex items-start justify-between gap-2 tap-feedback"
             >
               <div className="min-w-0">
@@ -409,7 +420,7 @@ export default function EventDetail() {
             {isHost && pending.length > 0 && (
               <button
                 type="button"
-                onClick={() => setManageOpen(true)}
+                onClick={() => navigate(`/events/${event.id}/attendees`)}
                 className="text-xs font-medium text-primary mt-3 tap-feedback"
               >
                 Review {pending.length} interested
@@ -429,7 +440,7 @@ export default function EventDetail() {
               <img
                 src={host?.avatar || event.host_avatar || FALLBACK_AVATAR}
                 alt=""
-                className="w-10 h-10 rounded-full object-cover shrink-0"
+                className="w-10 h-10 rounded-full object-cover object-top shrink-0"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">Hosted by</p>
@@ -513,7 +524,7 @@ export default function EventDetail() {
                 >
                   <Pencil className="w-4 h-4" strokeWidth={1.5} /> Edit
                 </Button>
-                <Button variant="outline" className="justify-start gap-2" onClick={() => setManageOpen(true)}>
+                <Button variant="outline" className="justify-start gap-2" onClick={() => navigate(`/events/${event.id}/attendees`)}>
                   <UserCheck className="w-4 h-4" strokeWidth={1.5} />
                   Who’s coming{pending.length > 0 ? ` (${pending.length})` : ""}
                 </Button>
@@ -545,7 +556,7 @@ export default function EventDetail() {
           </Button>
         </a>
         {isHost ? (
-          <Button className="flex-1" onClick={() => setManageOpen(true)}>
+          <Button className="flex-1" onClick={() => navigate(`/events/${event.id}/attendees`)}>
             <UserCheck className="w-4 h-4" strokeWidth={1.5} />
             {pending.length > 0 ? `Requests (${pending.length})` : "Who’s coming"}
           </Button>
@@ -564,14 +575,6 @@ export default function EventDetail() {
         )}
       </div>
 
-      <ManageAttendees
-        open={manageOpen}
-        onOpenChange={setManageOpen}
-        event={event}
-        initialAttendees={attendees}
-        onChange={load}
-        isHost={isHost}
-      />
       <ReportSheet
         open={reportOpen}
         onOpenChange={setReportOpen}

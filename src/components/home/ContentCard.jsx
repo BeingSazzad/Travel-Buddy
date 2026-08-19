@@ -1,8 +1,8 @@
 import React from "react";
 import OverlayMediaCard from "@/components/common/OverlayMediaCard";
 import GoingFaces from "@/components/common/GoingFaces";
-import { countTravellersHere, travellingHereLabel } from "@/lib/destination-stats";
-import { findMockEvent } from "@/lib/mock-events";
+import { countTravellersHere, travellingHereLabel, travellerAvatarsForCity } from "@/lib/destination-stats";
+import { findMockEvent, eventGoingAvatars } from "@/lib/mock-events";
 import { fmtEventDate } from "@/lib/event-options";
 
 const FRAME = {
@@ -12,11 +12,10 @@ const FRAME = {
   recommended: "w-[148px] h-[196px] shrink-0",
 };
 
-function eventGoing(eventId) {
-  const ev = findMockEvent(eventId);
+function eventGoing(item) {
+  const ev = findMockEvent(item.eventId) || item;
   const count = ev?.attendees_count || ev?.attendees?.length || 0;
-  const faces = (ev?.attendees || []).slice(0, 3).map((a) => a.avatar).filter(Boolean);
-  return { count, faces };
+  return { count, faces: eventGoingAvatars(ev) };
 }
 
 export default function ContentCard({ item, onClick, variant = "destination" }) {
@@ -28,7 +27,10 @@ export default function ContentCard({ item, onClick, variant = "destination" }) 
         : undefined;
   const eventDate =
     item.type === "event" ? fmtEventDate(findMockEvent(item.eventId)?.date) : "";
-  const going = item.type === "event" ? eventGoing(item.eventId) : null;
+  const going = item.type === "event" ? eventGoing(item) : null;
+  const destCity = item.city || item.title;
+  const destCount = item.type === "destination" ? countTravellersHere(destCity) : 0;
+  const destFaces = destCount > 0 ? travellerAvatarsForCity(destCity) : [];
 
   return (
     <OverlayMediaCard
@@ -42,7 +44,13 @@ export default function ContentCard({ item, onClick, variant = "destination" }) 
       className={FRAME[variant] || FRAME.destination}
       titleClassName="text-sm truncate"
       imageClassName={item.type === "member" ? "object-top" : undefined}
-      endSlot={going?.count > 0 ? <GoingFaces count={going.count} avatars={going.faces} /> : undefined}
+      endSlot={
+        going?.count > 0
+          ? <GoingFaces count={going.count} avatars={going.faces} />
+          : destCount > 0
+            ? <GoingFaces count={destCount} avatars={destFaces} label="" />
+            : undefined
+      }
     />
   );
 }

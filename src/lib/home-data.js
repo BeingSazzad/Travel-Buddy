@@ -75,10 +75,12 @@ export const SECTIONS = [
     title: "Popular events",
     seeAllPath: "/events",
     items: [
-      { type: "event", eventId: "event_mock_1", image: eventImageFor({ city: "Santorini", category: "wellness" }), title: "Sunset Yoga", location: "Santorini" },
-      { type: "event", eventId: "event_mock_3", image: eventImageFor({ city: "Lisbon", category: "wine" }), title: "Wine & Paint", location: "Lisbon" },
-      { type: "event", eventId: "event_mock_7", image: eventImageFor({ city: "Paris", category: "cafes" }), title: "Paris café crawl", location: "Paris" },
-      { type: "event", eventId: "event_mock_4", image: eventImageFor({ city: "Zermatt", category: "hiking" }), title: "Coffee Crawl", location: "Berlin" },
+      { type: "event", eventId: "event_mock_9", image: eventImageFor({ city: "Canggu", category: "beach" }), title: "Canggu beach sunset", location: "Canggu" },
+      { type: "event", eventId: "event_mock_15", image: eventImageFor({ city: "Paris", category: "shopping" }), title: "Paris vintage Sunday", location: "Paris" },
+      { type: "event", eventId: "event_mock_17", image: eventImageFor({ city: "Marrakech", category: "sightseeing" }), title: "Marrakech souk morning", location: "Marrakech" },
+      { type: "event", eventId: "event_mock_8", image: eventImageFor({ city: "Tulum", category: "yoga" }), title: "Tulum sunrise yoga", location: "Tulum" },
+      { type: "event", eventId: "event_mock_18", image: eventImageFor({ city: "Cape Town", category: "hiking" }), title: "Cape Town coastal hike", location: "Cape Town" },
+      { type: "event", eventId: "event_mock_16", image: eventImageFor({ city: "Tokyo", category: "dinner" }), title: "Tokyo ramen night", location: "Tokyo" },
     ],
   },
   {

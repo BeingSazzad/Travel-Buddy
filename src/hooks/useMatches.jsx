@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/AuthContext";
 
 
 
-import { MOCK_MEMBERS } from "@/lib/member-profile";
+import { MOCK_MEMBERS, resolveMemberAvatar } from "@/lib/member-profile";
 
 import { formatDates } from "@/lib/trip-utils";
 import { useDemoFallbacks } from "@/lib/demo-fallbacks";
@@ -101,7 +101,10 @@ export function useMatches() {
 
       const res = await base44.functions.invoke("trip-matches", {});
 
-      const list = res.data?.suggestions || [];
+      const list = (res.data?.suggestions || []).map((m) => ({
+        ...m,
+        avatar: m.avatar || resolveMemberAvatar(m.user_id || m.memberId),
+      }));
 
       setMatches(list.length > 0 ? list : useDemoFallbacks ? MOCK_MATCHES : []);
 

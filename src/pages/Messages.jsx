@@ -8,7 +8,7 @@ import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import ScreenHeader from "@/components/common/ScreenHeader";
 import { useDemoFallbacks } from "@/lib/demo-fallbacks";
-import { getMockConversations } from "@/lib/member-profile";
+import { getMockConversations, resolveMemberAvatar } from "@/lib/member-profile";
 import { onRefresh } from "@/lib/refresh-bus";
 
 function timeLabel(iso) {
@@ -74,7 +74,7 @@ export default function Messages() {
           id: c.id,
           otherId,
           name: c.participant_names?.[otherIndex] || "Travel friend",
-          avatar: c.participant_avatars?.[otherIndex] || "",
+          avatar: c.participant_avatars?.[otherIndex] || resolveMemberAvatar(otherId),
           lastMessage: c.last_message || "",
           time: timeLabel(c.last_message_at || c.created_date),
           unread: c.unread?.[user?.id] || 0,
@@ -124,7 +124,7 @@ export default function Messages() {
                   <img
                     src={r.avatar}
                     alt={r.name}
-                    className="w-14 h-14 rounded-full object-cover border-2 border-primary shadow-soft"
+                    className="w-14 h-14 rounded-full object-cover object-top border-2 border-primary shadow-soft"
                   />
                   {r.unread > 0 && (
                     <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-primary ring-2 ring-card rounded-full" />

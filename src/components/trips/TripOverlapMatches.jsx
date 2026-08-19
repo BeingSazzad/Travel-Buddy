@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Users, ChevronRight } from 'lucide-react';
 import { formatDates } from '@/lib/trip-utils';
 import { memberIdForTripCreator } from '@/lib/mock-trips';
+import { resolveMemberAvatar } from '@/lib/member-profile';
 
 export default function TripOverlapMatches({ matches, city }) {
   const navigate = useNavigate();
@@ -23,13 +24,11 @@ export default function TripOverlapMatches({ matches, city }) {
             onClick={() => navigate(`/members/${memberIdForTripCreator(m.creatorId)}`)}
             className="w-full flex items-center gap-3 rounded-2xl border border-border bg-card p-3 tap-feedback text-left"
           >
-            {m.photo ? (
-              <img src={m.photo} alt="" className="w-11 h-11 rounded-full object-cover border border-border shrink-0" />
-            ) : (
-              <div className="w-11 h-11 rounded-full bg-primary/15 flex items-center justify-center text-primary font-medium shrink-0">
-                {(m.name || '?')[0]}
-              </div>
-            )}
+            <img
+              src={m.photo || resolveMemberAvatar(memberIdForTripCreator(m.creatorId))}
+              alt=""
+              className="w-11 h-11 rounded-full object-cover object-top border border-border shrink-0"
+            />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold truncate">{m.name}</p>
               <p className="text-xs text-muted-foreground truncate">

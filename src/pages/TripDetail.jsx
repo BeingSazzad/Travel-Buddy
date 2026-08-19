@@ -25,8 +25,9 @@ import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { tripStatus, formatDates, imageForCity, tripsOverlap } from "@/lib/trip-utils";
 import { findMockTrip, memberIdForTripCreator, cityKeyMatch } from "@/lib/mock-trips";
-import { getMockConversationId, findMockMember } from "@/lib/member-profile";
-import { eventsForCity, resolveEventId } from "@/lib/mock-events";
+import { getMockConversationId, findMockMember, resolveMemberAvatar } from "@/lib/member-profile";
+import { eventsForCity, resolveEventId, eventGoingAvatars, hydrateEventPeople } from "@/lib/mock-events";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 import { isSameAppUser } from "@/lib/demo-user";
 import { cn } from "@/lib/utils";
 import { useTrips } from "@/hooks/useTrips";
@@ -99,7 +100,7 @@ export default function TripDetail() {
           byWoman[key] = {
             creatorId: key,
             name: name || mockMember?.name || "Member",
-            photo: photo || mockMember?.main_photo,
+            photo: photo || mockMember?.main_photo || mockMember?.avatar || resolveMemberAvatar(memberIdForTripCreator(key)),
             trips: [],
           };
         }
@@ -113,7 +114,7 @@ export default function TripDetail() {
 
   const cityEvents = useMemo(() => {
     if (!trip?.city) return [];
-    return eventsForCity(trip.city).slice(0, 3);
+    return eventsForCity(trip.city).slice(0, 3).map(hydrateEventPeople);
   }, [trip?.city]);
 
   if (loading) {
@@ -320,13 +321,11 @@ export default function TripDetail() {
               onClick={openProfile}
               className="w-full flex items-center gap-3 rounded-2xl border border-border bg-card p-3 tap-feedback text-left"
             >
-              {creatorPhoto ? (
-                <img src={creatorPhoto} alt="" className="w-11 h-11 rounded-full object-cover border border-border" />
-              ) : (
-                <div className="w-11 h-11 rounded-full bg-primary/15 flex items-center justify-center text-primary font-medium">
-                  {(creatorName || "?")[0]}
-                </div>
-              )}
+              <img
+                src={creatorPhoto || resolveMemberAvatar(memberId)}
+                alt=""
+                className="w-11 h-11 rounded-full object-cover object-top border border-border"
+              />
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-muted-foreground">Planned by</p>
                 <p className="text-sm font-semibold truncate">{creatorName || "Member"}</p>
@@ -370,6 +369,8 @@ export default function TripDetail() {
                 {cityEvents.map((event) => {
                   const eventId = resolveEventId(event);
                   const meta = [fmtEventDate(event.date), fmtEventTime(event.time)].filter(Boolean).join(" · ");
+                  const faces = eventGoingAvatars(event);
+                  const going = event.attendees_count || event.attendees?.length || 0;
                   return (
                     <button
                       key={event.id || event.title}
@@ -381,6 +382,18 @@ export default function TripDetail() {
                         <p className="text-sm font-semibold truncate">{event.title}</p>
                         {meta && <p className="text-xs text-muted-foreground mt-0.5">{meta}</p>}
                       </div>
+                      {going > 0 && (
+                        <div className="flex items-center shrink-0">
+                          {faces.map((src, i) => (
+                            <img
+                              key={i}
+                              src={src || FALLBACK_AVATAR_URL}
+                              alt=""
+                              className="w-6 h-6 rounded-full object-cover object-top border-2 border-card -ml-1.5 first:ml-0"
+                            />
+                          ))}
+                        </div>
+                      )}
                       <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
                     </button>
                   );

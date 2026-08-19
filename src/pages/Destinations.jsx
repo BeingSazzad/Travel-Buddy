@@ -128,7 +128,7 @@ export default function Destinations() {
             }}
           />
         ) : (
-          filtered.map((d) => <DestinationCard key={d.city} destination={d} />)
+          filtered.map((d) => <DestinationCard key={d.city} destination={d} liveTrips={trips} />)
         )}
       </div>
     </div>

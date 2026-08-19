@@ -22,7 +22,7 @@ export default function SaveButton({ item, className, variant = "surface" }) {
         "w-8 h-8 rounded-full flex items-center justify-center tap-feedback pointer-events-auto relative z-30",
         overlay
           ? saved
-            ? "bg-primary/90 backdrop-blur-md border border-brand-gold/45 shadow-md"
+            ? "bg-black/50 backdrop-blur-md border border-brand-gold/55 shadow-md"
             : "bg-black/50 backdrop-blur-md border border-white/30 shadow-md active:bg-black/65"
           : variant === "ghost"
             ? "bg-transparent border-0 shadow-none"
@@ -36,9 +36,7 @@ export default function SaveButton({ item, className, variant = "surface" }) {
           className={cn(
             "w-4 h-4",
             saved
-              ? overlay
-                ? "fill-brand-gold text-brand-gold"
-                : "fill-primary text-primary"
+              ? "fill-brand-gold text-brand-gold"
               : overlay
                 ? "text-white"
                 : "text-muted-foreground"

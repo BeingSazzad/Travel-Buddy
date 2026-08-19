@@ -35,6 +35,8 @@ import TripDetail from '@/pages/TripDetail';
 import DealDetail from '@/pages/DealDetail';
 import CreateEvent from '@/pages/CreateEvent';
 import EventDetail from '@/pages/EventDetail';
+import EventAttendees from '@/pages/EventAttendees';
+import MyEvents from '@/pages/MyEvents';
 import Destinations from '@/pages/Destinations';
 import DestinationDetail from '@/pages/DestinationDetail';
 import Cafes from '@/pages/Cafes';
@@ -253,6 +255,7 @@ const AuthenticatedApp = () => {
       <Route path="/trips/:id" element={<PageTransition><TripDetail /></PageTransition>} />
       <Route path="/deals/:id" element={<PageTransition><DealDetail /></PageTransition>} />
       <Route path="/events/new" element={<PageTransition><CreateEvent /></PageTransition>} />
+      <Route path="/events/:id/attendees" element={<PageTransition><EventAttendees /></PageTransition>} />
       <Route path="/events/:id" element={<PageTransition><EventDetail /></PageTransition>} />
       <Route path="/cafes/:name" element={<PageTransition><CafeDetail /></PageTransition>} />
       <Route path="/restaurants/:name" element={<PageTransition><RestaurantDetail /></PageTransition>} />
@@ -274,6 +277,7 @@ const AuthenticatedApp = () => {
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/help" element={<HelpSupport />} />
+        <Route path="/events/mine" element={<MyEvents />} />
         <Route path="/events" element={<Events />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/profile/edit/photos" element={<EditPhotos />} />

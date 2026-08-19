@@ -5,6 +5,7 @@ import ScreenHeader from "@/components/common/ScreenHeader";
 import EmptyState from "@/components/common/EmptyState";
 import { useConnectionRequests } from "@/hooks/useConnectionRequests";
 import { base44 } from "@/api/base44Client";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 
 export default function ConnectionRequests() {
   const navigate = useNavigate();
@@ -60,9 +61,9 @@ export default function ConnectionRequests() {
                 className="shrink-0 self-start"
               >
                 <img
-                  src={m.avatar}
+                  src={m.avatar || FALLBACK_AVATAR_URL}
                   alt=""
-                  className="w-[68px] h-[68px] rounded-full object-cover"
+                  className="w-[68px] h-[68px] rounded-full object-cover object-top"
                 />
               </button>
               <div className="flex-1 min-w-0 pt-0.5">

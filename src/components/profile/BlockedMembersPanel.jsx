@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Trash2, ShieldOff, UserCircle2 } from "lucide-react";
+import { Trash2, ShieldOff } from "lucide-react";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useDemoFallbacks } from "@/lib/demo-fallbacks";
@@ -69,11 +70,11 @@ export default function BlockedMembersPanel({ embedded = false }) {
             const p = profiles[b.blocked_user_id];
             return (
               <div key={b.id} className="flex items-center gap-3 rounded-xl border border-border/80 p-3">
-                {p?.avatar || p?.main_photo ? (
-                  <img src={p.avatar || p.main_photo} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
-                ) : (
-                  <UserCircle2 className="w-9 h-9 text-muted-foreground shrink-0" />
-                )}
+                <img
+                  src={p?.avatar || p?.main_photo || FALLBACK_AVATAR_URL}
+                  alt=""
+                  className="w-9 h-9 rounded-full object-cover object-top shrink-0"
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{p?.name || "Seluna member"}</p>
                   <p className="text-sm text-muted-foreground">

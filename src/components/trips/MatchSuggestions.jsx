@@ -3,18 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { MapPin, ChevronRight, Calendar } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
+import { resolveMemberAvatar } from "@/lib/member-profile";
 
 function Avatar({ match }) {
-  if (match.avatar) {
-    return (
-      <div className="w-14 h-14 rounded-2xl overflow-hidden border border-border/80 shadow-soft shrink-0">
-        <Image src={match.avatar} alt={match.name} fittingType="fill" className="w-full h-full object-cover" />
-      </div>
-    );
-  }
   return (
-    <div className="w-14 h-14 rounded-2xl bg-primary/12 border border-primary/20 flex items-center justify-center text-primary font-display text-lg shrink-0">
-      {(match.name || "?")[0].toUpperCase()}
+    <div className="w-14 h-14 rounded-2xl overflow-hidden border border-border/80 shadow-soft shrink-0">
+      <Image
+        src={match.avatar || resolveMemberAvatar(match.user_id || match.memberId)}
+        alt={match.name}
+        fittingType="fill"
+        className="w-full h-full object-cover object-top"
+      />
     </div>
   );
 }

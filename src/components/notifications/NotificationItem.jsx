@@ -7,6 +7,43 @@ import {
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { cn } from "@/lib/utils";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
+import { findMockMember, resolveMemberAvatar } from "@/lib/member-profile";
+import { findMockEvent, eventGoingAvatars } from "@/lib/mock-events";
+
+const PERSON_TYPES = new Set([
+  "new_match",
+  "match",
+  "new_message",
+  "message",
+  "event_invitation",
+  "event",
+  "event_approval",
+  "event_reminder",
+  "member_travelling",
+  "trip_reminder",
+]);
+
+function notificationFace(n) {
+  if (n.image) return n.image;
+  const actor = n.actor_id || n.from_user_id || n.user_id || n.member_id;
+  if (actor) return resolveMemberAvatar(actor);
+  const link = String(n.link || n.action_url || "");
+  const memberPath = link.match(/\/members\/([^/?#]+)/)?.[1];
+  if (memberPath) return resolveMemberAvatar(memberPath);
+  const convId = link.match(/\/conversations\/([^/?#]+)/)?.[1];
+  if (convId?.startsWith("sim_conv_")) {
+    const rest = convId.slice("sim_conv_".length).replace(/_sophie$/, "");
+    if (findMockMember(rest)) return resolveMemberAvatar(rest);
+  }
+  const eventId = link.match(/\/events\/([^/?#]+)/)?.[1];
+  if (eventId) {
+    const ev = findMockEvent(eventId);
+    if (ev) return eventGoingAvatars(ev, 1)[0] || ev.host_avatar;
+  }
+  if (PERSON_TYPES.has(n.type)) return FALLBACK_AVATAR_URL;
+  return null;
+}
 
 const ICONS = {
   new_match: Sparkles,
@@ -28,6 +65,7 @@ export default function NotificationItem({ n, onMarkRead }) {
   const navigate = useNavigate();
   const Icon = ICONS[n.type] || BellRing;
   const target = n.link || n.action_url;
+  const face = notificationFace(n);
 
   const open = async () => {
     if (!n.read) {
@@ -52,8 +90,8 @@ export default function NotificationItem({ n, onMarkRead }) {
       )}
     >
       <div className="relative shrink-0 mt-0.5">
-        {n.image ? (
-          <img src={n.image} alt="" className="w-10 h-10 rounded-full object-cover" />
+        {face ? (
+          <img src={face} alt="" className="w-10 h-10 rounded-full object-cover object-top" />
         ) : (
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
             <Icon className="w-4 h-4 text-primary" strokeWidth={1.5} />

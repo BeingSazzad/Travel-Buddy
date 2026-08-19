@@ -2,6 +2,7 @@ import { DESTINATIONS } from "@/lib/destinations";
 import { MOCK_MEMBERS } from "@/lib/member-profile";
 import { getMockTrips, memberIdForTripCreator } from "@/lib/mock-trips";
 import { tripStatus } from "@/lib/trip-utils";
+import { memberAvatar } from "@/lib/images";
 
 /**
  * Integrate this same rule on the backend:
@@ -45,7 +46,7 @@ function addTraveller(ids, city, trip, userId) {
   ids.add(String(userId));
 }
 
-export function countTravellersHere(city, liveTrips = []) {
+export function travellerIdsForCity(city, liveTrips = []) {
   const ids = new Set();
 
   MOCK_MEMBERS.forEach((m) => {
@@ -56,7 +57,22 @@ export function countTravellersHere(city, liveTrips = []) {
     addTraveller(ids, city, t, memberIdForTripCreator(t.created_by_id) || t.created_by_id);
   });
 
-  return ids.size;
+  return ids;
+}
+
+export function countTravellersHere(city, liveTrips = []) {
+  return travellerIdsForCity(city, liveTrips).size;
+}
+
+export function travellerAvatarsForCity(city, liveTrips = [], limit = 3) {
+  const urls = [];
+  for (const id of travellerIdsForCity(city, liveTrips)) {
+    const m = MOCK_MEMBERS.find((x) => x.user_id === id);
+    const src = m?.avatar || m?.main_photo || memberAvatar(id);
+    if (src) urls.push(src);
+    if (urls.length >= limit) break;
+  }
+  return urls;
 }
 
 export function travellingHereLabel(count) {

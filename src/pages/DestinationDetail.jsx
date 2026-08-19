@@ -12,15 +12,13 @@ import EventCard from "@/components/events/EventCard";
 import { contentFor, samePlace } from "@/lib/destination-content";
 import { PageLoading, PageNotFound } from "@/components/common/PageStatus";
 import { useDestinations } from "@/lib/useContent";
-import { eventsForCity } from "@/lib/mock-events";
+import { eventsForCity, hydrateEventPeople } from "@/lib/mock-events";
 import { demoVisitorsForCity, memberIdForTripCreator } from "@/lib/mock-trips";
-import { findMockMember } from "@/lib/member-profile";
+import { findMockMember, resolveMemberAvatar } from "@/lib/member-profile";
 import { DEMO_USER, isSameAppUser } from "@/lib/demo-user";
-import { FALLBACK_AVATAR_URL } from "@/lib/images";
 import SaveButton from "@/components/common/SaveButton";
 import { formatDates } from "@/lib/trip-utils";
 
-const AV = FALLBACK_AVATAR_URL;
 const today = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 
 function Section({ icon: Icon, title, children }) {
@@ -69,9 +67,9 @@ export default function DestinationDetail() {
         const mocks = eventsForCity(dest.city, dest.country);
         const ids = new Set((list || []).map((e) => e.id));
         const merged = [...(list || []), ...mocks.filter((m) => !ids.has(m.id))];
-        setEvents(merged.length ? merged : mocks);
+        setEvents((merged.length ? merged : mocks).map(hydrateEventPeople));
       })
-      .catch(() => setEvents(eventsForCity(dest.city, dest.country)));
+      .catch(() => setEvents(eventsForCity(dest.city, dest.country).map(hydrateEventPeople)));
   }, [dest?.city]);
 
   useEffect(() => {
@@ -117,9 +115,20 @@ export default function DestinationDetail() {
               onClick={() => memberId && navigate(`/members/${memberId}`)}
               className="w-full flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-2.5 text-left tap-feedback"
             >
-              <img src={p?.avatar || AV} alt="" className="w-9 h-9 rounded-full object-cover" />
+              <img
+                src={
+                  p?.avatar ||
+                  p?.main_photo ||
+                  (typeof t.created_by === "object" ? t.created_by?.main_photo : null) ||
+                  resolveMemberAvatar(memberId)
+                }
+                alt=""
+                className="w-9 h-9 rounded-full object-cover object-top"
+              />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{p?.name || "Seluna member"}</p>
+                <p className="text-sm font-medium truncate">
+                  {p?.name || (typeof t.created_by === "object" ? t.created_by?.name : null) || "Seluna member"}
+                </p>
                 <p className="text-xs text-muted-foreground truncate">{formatDates(t)}</p>
               </div>
             </button>

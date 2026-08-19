@@ -5,6 +5,7 @@ import { Image } from "@/components/ui/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { MessageCircle, User, Compass, Ban, Flag, UserMinus, Users } from "lucide-react";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 
 export default function MatchModal({ open, myAvatar, theirAvatar, theirName, onMessage, onProfile, onKeepExploring, onUnmatch, onBlock, onReport }) {
   const [blockOpen, setBlockOpen] = useState(false);
@@ -25,7 +26,7 @@ export default function MatchModal({ open, myAvatar, theirAvatar, theirName, onM
             transition={{ delay: 0.05, type: "spring", stiffness: 300, damping: 24 }}
             className="w-24 h-24 rounded-full overflow-hidden border-4 border-card shadow-soft -mr-5 z-10"
           >
-            <Image src={myAvatar} alt="You" fittingType="fill" className="w-full h-full" />
+            <Image src={myAvatar || FALLBACK_AVATAR_URL} alt="You" fittingType="fill" className="w-full h-full object-cover object-top" />
           </motion.div>
           <motion.div
             initial={{ x: 16, opacity: 0 }}
@@ -33,7 +34,7 @@ export default function MatchModal({ open, myAvatar, theirAvatar, theirName, onM
             transition={{ delay: 0.05, type: "spring", stiffness: 300, damping: 24 }}
             className="w-24 h-24 rounded-full overflow-hidden border-4 border-card shadow-soft"
           >
-            <Image src={theirAvatar} alt="Match" fittingType="fill" className="w-full h-full" />
+            <Image src={theirAvatar || FALLBACK_AVATAR_URL} alt="Match" fittingType="fill" className="w-full h-full object-cover object-top" />
           </motion.div>
         </motion.div>
 

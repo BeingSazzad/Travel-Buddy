@@ -76,7 +76,7 @@ export default function DealDetail() {
             aria-label={saved ? "Unsave" : "Save"}
           >
             <Bookmark
-              className={cn("w-5 h-5", saved ? "fill-primary text-primary" : "text-foreground")}
+              className={cn("w-5 h-5", saved ? "fill-brand-gold text-brand-gold" : "text-foreground")}
               strokeWidth={1.5}
             />
           </button>

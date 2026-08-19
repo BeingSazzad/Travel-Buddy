@@ -296,7 +296,17 @@ export function eventImageFor(event = {}) {
   if (city.includes("paris")) return CITY_IMAGES.paris;
   if (city.includes("zermatt") || city.includes("switzerland")) return CITY_IMAGES.zermatt;
   if (city.includes("berlin")) return CITY_IMAGES.berlin;
-  if (city.includes("bali") || city.includes("ubud")) return CITY_IMAGES.ubud;
+  if (city.includes("bali") || city.includes("ubud") || city.includes("canggu") || city.includes("seminyak")) {
+    return city.includes("canggu") ? CITY_IMAGES.canggu : CITY_IMAGES.ubud;
+  }
+  if (city.includes("tokyo")) return CITY_IMAGES.tokyo;
+  if (city.includes("tulum")) return CITY_IMAGES.tulum;
+  if (city.includes("marrakech")) return CITY_IMAGES.marrakech;
+  if (city.includes("copenhagen")) return CITY_IMAGES.copenhagen;
+  if (city.includes("london")) return CITY_IMAGES.london;
+  if (city.includes("rome")) return CITY_IMAGES.rome;
+  if (city.includes("cape town") || city.includes("capetown")) return CITY_IMAGES.capetown;
+  if (city.includes("oslo") || city.includes("norway")) return CITY_IMAGES.oslo;
   return defaultEventImage(event.category);
 }
 

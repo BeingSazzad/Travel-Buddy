@@ -7,8 +7,9 @@ import NotificationItem from "@/components/notifications/NotificationItem";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 
-import { memberDisplayName } from "@/lib/member-profile";
+import { memberDisplayName, resolveMemberAvatar } from "@/lib/member-profile";
 import { useDemoFallbacks } from "@/lib/demo-fallbacks";
+import { findMockEvent } from "@/lib/mock-events";
 
 const MOCK_NOTIFICATIONS = [
   {
@@ -19,6 +20,7 @@ const MOCK_NOTIFICATIONS = [
     read: false,
     created_date: new Date(Date.now() - 30 * 60000).toISOString(),
     link: "/conversations/sim_conv_mock_1",
+    image: resolveMemberAvatar("mock_1"),
   },
   {
     id: "notif_mock_2",
@@ -28,6 +30,7 @@ const MOCK_NOTIFICATIONS = [
     read: false,
     created_date: new Date(Date.now() - 3 * 3600000).toISOString(),
     link: "/events/event_mock_1",
+    image: findMockEvent("event_mock_1")?.host_avatar || resolveMemberAvatar("mock_1"),
   },
   {
     id: "notif_mock_3",
@@ -37,6 +40,7 @@ const MOCK_NOTIFICATIONS = [
     read: true,
     created_date: new Date(Date.now() - 24 * 3600000).toISOString(),
     link: "/conversations/sim_conv_mock_3",
+    image: resolveMemberAvatar("mock_4"),
   },
 ];
 

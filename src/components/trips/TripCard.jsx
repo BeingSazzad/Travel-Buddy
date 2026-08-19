@@ -3,6 +3,7 @@ import { MapPin } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { tripStatus, formatDates, imageForCity } from "@/lib/trip-utils";
+import GoingFaces from "@/components/common/GoingFaces";
 
 const STATUS_CONFIG = {
   upcoming: {
@@ -22,6 +23,7 @@ const STATUS_CONFIG = {
 export default function TripCard({
   trip,
   overlapCount = null,
+  overlapAvatars = [],
   onPress,
   note = "",
 }) {
@@ -80,8 +82,15 @@ export default function TripCard({
         </p>
         <p className="text-[11px] text-brand-gold font-medium mt-1 truncate drop-shadow-[0_1px_3px_rgba(0,0,0,0.65)]">
           {formatDates(trip)}
-          {overlapCount > 0 ? ` · ${overlapCount} overlapping` : ""}
         </p>
+        {overlapCount > 0 ? (
+          <GoingFaces
+            className="mt-1.5"
+            count={overlapCount}
+            avatars={overlapAvatars}
+            label={`${overlapCount} overlapping`}
+          />
+        ) : null}
         {note ? (
           <p className="text-[11px] text-brand-gold font-medium mt-1 truncate">{note}</p>
         ) : null}

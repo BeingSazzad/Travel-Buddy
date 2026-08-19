@@ -266,6 +266,7 @@ export default function CreateEvent() {
       host_id: event.host_id || hostId,
       created_by_id: event.created_by_id || hostId,
       host_name: event.host_name || hostName,
+      created_locally: true,
     });
     try {
       if (editId) {

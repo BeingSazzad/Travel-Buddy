@@ -10,6 +10,7 @@ import ScreenHeader from "@/components/common/ScreenHeader";
 import ReportSheet from "@/components/reports/ReportSheet";
 import EmptyState from "@/components/common/EmptyState";
 import { memberAvatar } from "@/lib/images";
+import { resolveMemberAvatar } from "@/lib/member-profile";
 
 const DEFAULT_FILTERS = {
   ageMin: "",
@@ -170,7 +171,7 @@ export default function Discover() {
       <MatchModal
         open={!!matched}
         myAvatar={myAvatar}
-        theirAvatar={matched?.avatar || ""}
+        theirAvatar={matched?.avatar || resolveMemberAvatar(matched?.match_user_id || matched?.user_id)}
         theirName={matched?.name}
         onMessage={() => matched?.conversation_id && navigate(`/conversations/${matched.conversation_id}`)}
         onProfile={handleProfile}

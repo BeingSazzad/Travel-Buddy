@@ -43,7 +43,7 @@ export default function RestaurantDetail() {
         <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full flex items-center justify-center"><ArrowLeft className="w-5 h-5" strokeWidth={1.5} /></button>
         <div className="flex items-center gap-2">
           <button onClick={() => toggle({ type: "restaurant", title: r.name, location: r.city, country: r.country, image: r.image, rating: r.rating })} className="w-9 h-9 rounded-full flex items-center justify-center">
-            <Bookmark className={cn("w-5 h-5", saved ? "fill-primary text-primary" : "text-foreground")} strokeWidth={1.5} />
+            <Bookmark className={cn("w-5 h-5", saved ? "fill-brand-gold text-brand-gold" : "text-foreground")} strokeWidth={1.5} />
           </button>
         </div>
       </header>

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { getDiscoverDeckMembers } from "@/lib/member-profile";
+import { getDiscoverDeckMembers, resolveMemberAvatar } from "@/lib/member-profile";
 import { useDemoFallbacks } from "@/lib/demo-fallbacks";
 
 export function useDiscover() {
@@ -18,7 +18,14 @@ export function useDiscover() {
       if (members.length > 0) {
         const rows = await base44.entities.Match.list("-created_date", 100).catch(() => []);
         const connectedIds = new Set(rows.map((m) => m.match_user_id).filter(Boolean));
-        setDeck(members.filter((m) => !connectedIds.has(m.user_id)));
+        setDeck(
+          members
+            .filter((m) => !connectedIds.has(m.user_id))
+            .map((m) => ({
+              ...m,
+              avatar: m.avatar || m.main_photo || resolveMemberAvatar(m.user_id),
+            }))
+        );
       } else {
         setDeck(useDemoFallbacks ? getDiscoverDeckMembers() : []);
       }

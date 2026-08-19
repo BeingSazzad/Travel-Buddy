@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useTrips } from "@/hooks/useTrips";
 import { useMatches } from "@/hooks/useMatches";
 import { tripStatus, tripsOverlap } from "@/lib/trip-utils";
+import { overlapTravellerAvatars } from "@/lib/mock-trips";
 import TripCard from "@/components/trips/TripCard";
 import MatchSuggestions from "@/components/trips/MatchSuggestions";
 import ScreenHeader from "@/components/common/ScreenHeader";
@@ -72,6 +73,7 @@ export default function Trips() {
                         key={t.id}
                         trip={t}
                         overlapCount={overlapFor(t)}
+                        overlapAvatars={overlapTravellerAvatars(t, otherTrips)}
                         onPress={() => navigate(`/trips/${t.id}`)}
                       />
                     ))}

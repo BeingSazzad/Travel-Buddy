@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { base44 } from "@/api/base44Client";
 import { Check, ChevronRight, MessageCircle, Trash2, X } from "lucide-react";
-import { findMockEvent, padDemoAttendees } from "@/lib/mock-events";
+import { findMockEvent, hydrateEventPeople } from "@/lib/mock-events";
+import { getMockConversationId } from "@/lib/member-profile";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 
-const FALLBACK = "https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&w=120&q=80";
+const FALLBACK = FALLBACK_AVATAR_URL;
 
 function fallbackAttendees(event, initialAttendees) {
   if (initialAttendees?.length) return initialAttendees;
@@ -27,7 +28,7 @@ export function AttendeeProfileRow({ attendee, onOpen, actions }) {
         <img
           src={attendee.avatar || FALLBACK}
           alt=""
-          className="w-12 h-12 rounded-full object-cover border border-border shrink-0"
+          className="w-12 h-12 rounded-full object-cover object-top border border-border shrink-0"
         />
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-sm truncate">{name}</p>
@@ -42,29 +43,28 @@ export function AttendeeProfileRow({ attendee, onOpen, actions }) {
   );
 }
 
-export default function ManageAttendees({ open, onOpenChange, event, initialAttendees, onChange, isHost }) {
+export default function AttendeeList({ event, initialAttendees, onChange, isHost }) {
   const navigate = useNavigate();
   const [attendees, setAttendees] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const openProfile = (uid) => {
-    onOpenChange(false);
-    navigate(`/members/${uid}`);
-  };
+  const openProfile = (uid) => navigate(`/members/${uid}`);
 
   const load = async () => {
     if (!event) return;
-    const local = padDemoAttendees(
-      event.id,
-      fallbackAttendees(event, initialAttendees),
-      event.attendees_count
-    );
+    const local = hydrateEventPeople({
+      ...event,
+      attendees: fallbackAttendees(event, initialAttendees),
+    }).attendees;
     try {
       setLoading(true);
       const res = await base44.functions.invoke("event-attendees", { event_id: event.id });
       const remote = res.data?.attendees || [];
       setAttendees(
-        padDemoAttendees(event.id, remote.length ? remote : local, event.attendees_count)
+        hydrateEventPeople({
+          ...event,
+          attendees: remote.length ? remote : local,
+        }).attendees
       );
     } catch {
       setAttendees(local);
@@ -74,8 +74,8 @@ export default function ManageAttendees({ open, onOpenChange, event, initialAtte
   };
 
   useEffect(() => {
-    if (open) load();
-  }, [open, event?.id]);
+    load();
+  }, [event?.id]);
 
   const act = async (action, attendance_id) => {
     try {
@@ -98,12 +98,13 @@ export default function ManageAttendees({ open, onOpenChange, event, initialAtte
     try {
       const res = await base44.functions.invoke("start-conversation", { target_user_id: uid });
       if (res.data?.conversation_id) {
-        onOpenChange(false);
-        window.location.href = `/conversations/${res.data.conversation_id}`;
+        navigate(`/conversations/${res.data.conversation_id}`);
+        return;
       }
     } catch {
-      /* ignore */
+      /* demo */
     }
+    navigate(`/conversations/${getMockConversationId(uid)}`);
   };
 
   const going = attendees.filter((a) => a.status === "going");
@@ -111,95 +112,88 @@ export default function ManageAttendees({ open, onOpenChange, event, initialAtte
   const max = event?.max_attendees;
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl max-h-[85vh] overflow-y-auto pb-6">
-        <SheetHeader>
-          <SheetTitle className="font-display">Who’s coming</SheetTitle>
-          <SheetDescription>
-            {going.length} going
-            {max != null ? ` · max ${max}` : ""}
-            {isHost && pending.length > 0 ? ` · ${pending.length} interested` : ""}
-          </SheetDescription>
-        </SheetHeader>
-        <div className="px-4 mt-2">
-          {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
+    <div>
+      <p className="text-sm text-muted-foreground mb-4">
+        {going.length} going
+        {max != null ? ` · max ${max}` : ""}
+        {isHost && pending.length > 0 ? ` · ${pending.length} interested` : ""}
+      </p>
+      {loading && <p className="text-sm text-muted-foreground mb-3">Loading…</p>}
 
-          {isHost && pending.length > 0 && (
-            <>
-              <p className="text-xs font-medium uppercase text-muted-foreground mb-2">
-                Interested — waiting for you ({pending.length})
-              </p>
-              <div className="space-y-2 mb-4">
-                {pending.map((a) => (
-                  <AttendeeProfileRow
-                    key={a.attendance_id || a.user_id}
-                    attendee={a}
-                    onOpen={openProfile}
-                    actions={
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => act("approve", a.attendance_id)}
-                          className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center shrink-0"
-                          aria-label="Approve"
-                        >
-                          <Check className="w-4 h-4" strokeWidth={1.5} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => act("reject", a.attendance_id)}
-                          className="w-8 h-8 rounded-full border border-border flex items-center justify-center shrink-0"
-                          aria-label="Decline"
-                        >
-                          <X className="w-4 h-4" strokeWidth={1.5} />
-                        </button>
-                      </>
-                    }
-                  />
-                ))}
-              </div>
-            </>
-          )}
-
+      {isHost && pending.length > 0 && (
+        <>
           <p className="text-xs font-medium uppercase text-muted-foreground mb-2">
-            Going ({going.length}{max != null ? ` of max ${max}` : ""})
+            Interested — waiting for you ({pending.length})
           </p>
-          <div className="space-y-2">
-            {going.length === 0 && (
-              <p className="text-sm text-muted-foreground">No confirmed attendees yet.</p>
-            )}
-            {going.map((a) => (
+          <div className="space-y-2 mb-5">
+            {pending.map((a) => (
               <AttendeeProfileRow
                 key={a.attendance_id || a.user_id}
                 attendee={a}
                 onOpen={openProfile}
                 actions={
-                  isHost ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => message(a.user_id)}
-                        className="w-8 h-8 rounded-full border border-border flex items-center justify-center shrink-0"
-                        aria-label="Message"
-                      >
-                        <MessageCircle className="w-4 h-4" strokeWidth={1.5} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => act("remove", a.attendance_id)}
-                        className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-destructive shrink-0"
-                        aria-label="Remove"
-                      >
-                        <Trash2 className="w-4 h-4" strokeWidth={1.5} />
-                      </button>
-                    </>
-                  ) : null
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => act("approve", a.attendance_id)}
+                      className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center shrink-0"
+                      aria-label="Approve"
+                    >
+                      <Check className="w-4 h-4" strokeWidth={1.5} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => act("reject", a.attendance_id)}
+                      className="w-8 h-8 rounded-full border border-border flex items-center justify-center shrink-0"
+                      aria-label="Decline"
+                    >
+                      <X className="w-4 h-4" strokeWidth={1.5} />
+                    </button>
+                  </>
                 }
               />
             ))}
           </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+        </>
+      )}
+
+      <p className="text-xs font-medium uppercase text-muted-foreground mb-2">
+        Going ({going.length}{max != null ? ` of max ${max}` : ""})
+      </p>
+      <div className="space-y-2">
+        {going.length === 0 && (
+          <p className="text-sm text-muted-foreground">No confirmed attendees yet.</p>
+        )}
+        {going.map((a) => (
+          <AttendeeProfileRow
+            key={a.attendance_id || a.user_id}
+            attendee={a}
+            onOpen={openProfile}
+            actions={
+              isHost ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => message(a.user_id)}
+                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center shrink-0"
+                    aria-label="Message"
+                  >
+                    <MessageCircle className="w-4 h-4" strokeWidth={1.5} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => act("remove", a.attendance_id)}
+                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-destructive shrink-0"
+                    aria-label="Remove"
+                  >
+                    <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+                  </button>
+                </>
+              ) : null
+            }
+          />
+        ))}
+      </div>
+    </div>
   );
 }

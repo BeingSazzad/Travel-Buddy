@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Star, ThumbsUp, Flag, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ReportSheet from "@/components/reports/ReportSheet";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 
 const fmtDate = (d) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "");
 
@@ -18,11 +19,11 @@ export default function ReviewItem({ review, isAdmin, voted, voting, onVote, onR
   return (
     <div className="rounded-2xl border border-border bg-card p-3">
       <div className="flex items-center gap-2">
-        {review.author_avatar ? (
-          <img src={review.author_avatar} alt={review.author_name} className="w-8 h-8 rounded-full object-cover" />
-        ) : (
-          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium">{(review.author_name || "?")[0]}</div>
-        )}
+        <img
+          src={review.author_avatar || FALLBACK_AVATAR_URL}
+          alt={review.author_name}
+          className="w-8 h-8 rounded-full object-cover object-top"
+        />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate">{review.author_name}</p>
           <span className="flex items-center gap-0.5">

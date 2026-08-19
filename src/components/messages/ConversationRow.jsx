@@ -1,5 +1,6 @@
 import React from "react";
 import { Image } from "@/components/ui/image";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 
 export default function ConversationRow({ name, avatar, lastMessage, time, unread, online, onClick }) {
   return (
@@ -9,7 +10,7 @@ export default function ConversationRow({ name, avatar, lastMessage, time, unrea
     >
       <div className="relative shrink-0">
         <div className="w-14 h-14 rounded-full overflow-hidden border border-border">
-          <Image src={avatar} alt={name} fittingType="fill" className="w-full h-full" />
+          <Image src={avatar || FALLBACK_AVATAR_URL} alt={name} fittingType="fill" className="w-full h-full object-cover object-top" />
         </div>
         {online && (
           <span className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full bg-green-500 border-2 border-card" />

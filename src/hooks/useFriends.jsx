@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { MOCK_MEMBERS, getMockConversationId, DEMO_FRIEND_MEMBER_IDS } from "@/lib/member-profile";
+import { MOCK_MEMBERS, getMockConversationId, DEMO_FRIEND_MEMBER_IDS, resolveMemberAvatar } from "@/lib/member-profile";
 import { useDemoFallbacks } from "@/lib/demo-fallbacks";
 
 const MOCK_FRIENDS = DEMO_FRIEND_MEMBER_IDS.map((memberId, i) => {
@@ -21,11 +21,12 @@ function mapMatchRow(m) {
   const city = m.city || m.data?.city;
   const country = m.country || m.data?.country;
   const loc = [city, country].filter(Boolean).join(", ");
+  const memberId = m.match_user_id || m.data?.match_user_id;
   return {
     matchId: m.id,
-    memberId: m.match_user_id || m.data?.match_user_id,
+    memberId,
     name: m.match_name || m.data?.match_name || "Seluna member",
-    avatar: m.match_avatar || m.data?.match_avatar || "",
+    avatar: resolveMemberAvatar(memberId, m.match_avatar || m.data?.match_avatar),
     loc,
     convId: m.conversation_id || null,
   };

@@ -1,23 +1,49 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { CalendarHeart, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { useEvents } from "@/hooks/useEvents";
+import { eventGoingAvatars } from "@/lib/mock-events";
+import { FALLBACK_AVATAR_URL } from "@/lib/images";
 
-const fmt = (d) => d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "";
+const fmt = (d) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "");
 
 export default function ProfileEvents({ embedded = false }) {
   const { hosted, joined } = useEvents();
   const navigate = useNavigate();
 
-  const Row = ({ e }) => (
-    <button onClick={() => navigate(`/events/${e.id}`)} className="w-full text-left flex items-center gap-3 bg-card border border-border shadow-soft rounded-2xl p-3">
-      <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center"><CalendarHeart className="w-4 h-4 text-primary" strokeWidth={1.5} /></div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{e.title}</p>
-        <p className="text-xs text-muted-foreground truncate">{fmt(e.date)} · {e.city}</p>
-      </div>
-    </button>
-  );
+  const Row = ({ e }) => {
+    const faces = eventGoingAvatars(e);
+    return (
+      <button
+        onClick={() => navigate(`/events/${e.id}`)}
+        className="w-full text-left flex items-center gap-3 bg-card border border-border shadow-soft rounded-2xl p-3"
+      >
+        <img
+          src={e.host_avatar || faces[0] || FALLBACK_AVATAR_URL}
+          alt=""
+          className="w-11 h-11 rounded-full object-cover object-top border border-border shrink-0"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium truncate">{e.title}</p>
+          <p className="text-xs text-muted-foreground truncate">
+            {fmt(e.date)} · {e.city}
+          </p>
+        </div>
+        {faces.length > 0 && (
+          <div className="flex items-center shrink-0">
+            {faces.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt=""
+                className="w-6 h-6 rounded-full object-cover object-top border-2 border-card -ml-1.5 first:ml-0"
+              />
+            ))}
+          </div>
+        )}
+      </button>
+    );
+  };
 
   return (
     <div className={embedded ? "" : "mt-6"}>
@@ -26,11 +52,16 @@ export default function ProfileEvents({ embedded = false }) {
           <h3 className="font-display font-semibold text-base flex items-center gap-1.5">
             <Users className="w-4 h-4 text-primary" strokeWidth={1.5} /> My events
           </h3>
-          <button onClick={() => navigate("/events")} className="text-xs text-primary">View all</button>
+          <button onClick={() => navigate("/events?tab=mine")} className="text-xs text-primary">
+            View all
+          </button>
         </div>
       )}
       {hosted.length === 0 && joined.length === 0 ? (
-        <button onClick={() => navigate("/events")} className="w-full rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground text-center">
+        <button
+          onClick={() => navigate("/events")}
+          className="w-full rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground text-center"
+        >
           No events yet — discover or host one
         </button>
       ) : (
@@ -38,13 +69,21 @@ export default function ProfileEvents({ embedded = false }) {
           {hosted.length > 0 && (
             <div>
               <p className="text-xs text-muted-foreground mb-1.5">Hosted ({hosted.length})</p>
-              <div className="space-y-2">{hosted.slice(0, 3).map((e) => <Row key={e.id} e={e} />)}</div>
+              <div className="space-y-2">
+                {hosted.slice(0, 3).map((e) => (
+                  <Row key={e.id} e={e} />
+                ))}
+              </div>
             </div>
           )}
           {joined.length > 0 && (
             <div>
               <p className="text-xs text-muted-foreground mb-1.5">Joined ({joined.length})</p>
-              <div className="space-y-2">{joined.slice(0, 3).map((e) => <Row key={e.id} e={e} />)}</div>
+              <div className="space-y-2">
+                {joined.slice(0, 3).map((e) => (
+                  <Row key={e.id} e={e} />
+                ))}
+              </div>
             </div>
           )}
         </div>

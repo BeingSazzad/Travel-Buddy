@@ -1,6 +1,7 @@
 import { findMockMember, MOCK_MEMBERS, DEMO_FRIEND_MEMBER_IDS } from "@/lib/member-profile";
 import { DEMO_USER_DISPLAY_NAME } from "@/lib/demo-user";
-import { imageForCity } from "@/lib/trip-utils";
+import { imageForCity, tripsOverlap } from "@/lib/trip-utils";
+import { memberAvatar } from "@/lib/images";
 
 /** Maps demo trip creator ids to member profile ids */
 export const TRIP_CREATOR_MEMBER_MAP = {
@@ -238,6 +239,27 @@ export function travellersForCity(city, liveTrips = []) {
 export function travellingHereLabel(count) {
   if (!count) return "";
   return count === 1 ? "1 travelling here" : `${count} travelling here`;
+}
+
+export function overlapTravellerAvatars(trip, otherTrips, limit = 3) {
+  const urls = [];
+  const seen = new Set();
+  for (const o of otherTrips || []) {
+    if (!tripsOverlap(trip, o)) continue;
+    const id = o.created_by_id;
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    const mid = memberIdForTripCreator(id);
+    const mock = findMockMember(mid);
+    const photo =
+      (typeof o.created_by === "object" && (o.created_by?.main_photo || o.created_by?.avatar)) ||
+      mock?.avatar ||
+      mock?.main_photo ||
+      memberAvatar(mid);
+    if (photo) urls.push(photo);
+    if (urls.length >= limit) break;
+  }
+  return urls;
 }
 
 export function mockTripsForCity(city, userId = "demo_user") {
