@@ -14,6 +14,9 @@ export default function TripActionsMenu({
   disabled = false,
   overlay = false,
   align = "start",
+  ariaLabel = "Trip options",
+  editLabel = "Edit trip",
+  deleteLabel = "Delete trip",
 }) {
   return (
     <DropdownMenu>
@@ -28,7 +31,7 @@ export default function TripActionsMenu({
               ? "w-8 h-8 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-white hover:bg-black/70"
               : "w-9 h-9 rounded-full hover:bg-muted/50"
           )}
-          aria-label="Trip options"
+          aria-label={ariaLabel}
         >
           <MoreVertical className="w-4 h-4" strokeWidth={1.75} />
         </button>
@@ -42,7 +45,7 @@ export default function TripActionsMenu({
           className="gap-2 cursor-pointer"
         >
           <Pencil className="w-4 h-4" strokeWidth={1.5} />
-          Edit trip
+          {editLabel}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={(e) => {
@@ -52,7 +55,7 @@ export default function TripActionsMenu({
           className="gap-2 cursor-pointer text-destructive focus:text-destructive"
         >
           <Trash2 className="w-4 h-4" strokeWidth={1.5} />
-          Delete trip
+          {deleteLabel}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

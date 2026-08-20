@@ -26,8 +26,7 @@ import { Button } from "@/components/ui/button";
 import { tripStatus, formatDates, imageForCity, tripsOverlap } from "@/lib/trip-utils";
 import { findMockTrip, memberIdForTripCreator, cityKeyMatch } from "@/lib/mock-trips";
 import { getMockConversationId, findMockMember, resolveMemberAvatar } from "@/lib/member-profile";
-import { eventsForCity, resolveEventId, eventGoingAvatars, hydrateEventPeople } from "@/lib/mock-events";
-import { FALLBACK_AVATAR_URL } from "@/lib/images";
+import { eventsForCity, resolveEventId, hydrateEventPeople } from "@/lib/mock-events";
 import { isSameAppUser } from "@/lib/demo-user";
 import { cn } from "@/lib/utils";
 import { useTrips } from "@/hooks/useTrips";
@@ -369,7 +368,6 @@ export default function TripDetail() {
                 {cityEvents.map((event) => {
                   const eventId = resolveEventId(event);
                   const meta = [fmtEventDate(event.date), fmtEventTime(event.time)].filter(Boolean).join(" · ");
-                  const faces = eventGoingAvatars(event);
                   const going = event.attendees_count || event.attendees?.length || 0;
                   return (
                     <button
@@ -383,16 +381,7 @@ export default function TripDetail() {
                         {meta && <p className="text-xs text-muted-foreground mt-0.5">{meta}</p>}
                       </div>
                       {going > 0 && (
-                        <div className="flex items-center shrink-0">
-                          {faces.map((src, i) => (
-                            <img
-                              key={i}
-                              src={src || FALLBACK_AVATAR_URL}
-                              alt=""
-                              className="w-6 h-6 rounded-full object-cover object-top border-2 border-card -ml-1.5 first:ml-0"
-                            />
-                          ))}
-                        </div>
+                        <span className="text-xs text-muted-foreground shrink-0">{going} going</span>
                       )}
                       <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
                     </button>

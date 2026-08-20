@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { fmtEventDate, fmtEventTime } from "@/lib/event-options";
-import { eventGoingAvatars } from "@/lib/mock-events";
 
 function formatMeta(event) {
   const parts = [];
@@ -28,7 +27,6 @@ function formatMeta(event) {
 export default function EventListItem({ event }) {
   const navigate = useNavigate();
   const going = event.attendees_count || 0;
-  const avatars = eventGoingAvatars(event);
   const meta = formatMeta(event);
 
   return (
@@ -54,19 +52,7 @@ export default function EventListItem({ event }) {
           <p className="text-xs text-muted-foreground mt-0.5 truncate">{meta}</p>
         )}
         {going > 0 && (
-          <div className="flex items-center gap-2 mt-1.5 min-w-0">
-            <div className="flex items-center shrink-0">
-              {avatars.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt=""
-                    className="w-6 h-6 rounded-full object-cover object-top border-2 border-card -ml-1.5 first:ml-0"
-                />
-              ))}
-            </div>
-            <span className="text-xs text-muted-foreground truncate">{going} going</span>
-          </div>
+          <p className="text-xs text-muted-foreground mt-1.5">{going} going</p>
         )}
       </div>
 

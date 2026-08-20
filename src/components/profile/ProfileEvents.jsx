@@ -11,17 +11,18 @@ export default function ProfileEvents({ embedded = false }) {
   const { hosted, joined } = useEvents();
   const navigate = useNavigate();
 
-  const Row = ({ e }) => {
-    const faces = eventGoingAvatars(e);
+  const Row = ({ e, hosted }) => {
+    const faces = hosted ? eventGoingAvatars(e) : [];
+    const going = e.attendees_count || e.attendees?.length || 0;
     return (
       <button
         onClick={() => navigate(`/events/${e.id}`)}
         className="w-full text-left flex items-center gap-3 bg-card border border-border shadow-soft rounded-2xl p-3"
       >
         <img
-          src={e.host_avatar || faces[0] || FALLBACK_AVATAR_URL}
+          src={e.image || e.host_avatar || faces[0] || FALLBACK_AVATAR_URL}
           alt=""
-          className="w-11 h-11 rounded-full object-cover object-top border border-border shrink-0"
+          className="w-11 h-11 rounded-xl object-cover object-top border border-border shrink-0"
         />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium truncate">{e.title}</p>
@@ -29,7 +30,7 @@ export default function ProfileEvents({ embedded = false }) {
             {fmt(e.date)} · {e.city}
           </p>
         </div>
-        {faces.length > 0 && (
+        {hosted && faces.length > 0 ? (
           <div className="flex items-center shrink-0">
             {faces.map((src, i) => (
               <img
@@ -40,7 +41,9 @@ export default function ProfileEvents({ embedded = false }) {
               />
             ))}
           </div>
-        )}
+        ) : going > 0 ? (
+          <span className="text-xs text-muted-foreground shrink-0">{going} going</span>
+        ) : null}
       </button>
     );
   };
@@ -71,7 +74,7 @@ export default function ProfileEvents({ embedded = false }) {
               <p className="text-xs text-muted-foreground mb-1.5">Hosted ({hosted.length})</p>
               <div className="space-y-2">
                 {hosted.slice(0, 3).map((e) => (
-                  <Row key={e.id} e={e} />
+                  <Row key={e.id} e={e} hosted />
                 ))}
               </div>
             </div>

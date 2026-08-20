@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { EVENT_CATEGORIES, defaultEventImage, capitalize, fmtEventDate, fmtEventTime } from "@/lib/event-options";
+import { isEventHost } from "@/lib/demo-user";
 import { COUNTRIES, LANGUAGES } from "@/lib/profile-options";
 import InterestPicker from "@/components/profile/InterestPicker";
 import EventCard from "@/components/events/EventCard";
@@ -104,20 +105,22 @@ export default function CreateEvent() {
   useEffect(() => {
     if (!editId) return;
     (async () => {
-      const local = isLocalEventId(editId) ? findMockEvent(editId) : null;
-      if (local) {
-        setData(fromEntity(local));
+      let record = findMockEvent(editId);
+      if (!record && !isLocalEventId(editId)) {
+        try {
+          record = await base44.entities.Event.get(editId);
+        } catch {
+          record = findMockEvent(editId);
+        }
+      }
+      if (!record) return;
+      if (!isEventHost(record, user)) {
+        navigate(`/events/${editId}`, { replace: true });
         return;
       }
-      try {
-        const e = await base44.entities.Event.get(editId);
-        setData(fromEntity(e));
-      } catch {
-        const mock = findMockEvent(editId);
-        if (mock) setData(fromEntity(mock));
-      }
+      setData(fromEntity(record));
     })();
-  }, [editId]);
+  }, [editId, user, navigate]);
 
   const set = (k, v) => setData((d) => ({ ...d, [k]: v }));
 

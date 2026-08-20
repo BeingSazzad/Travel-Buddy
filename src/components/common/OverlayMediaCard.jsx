@@ -16,6 +16,7 @@ export default function OverlayMediaCard({
   reviews,
   badge,
   saveItem,
+  topRight,
   onClick,
   ariaLabel,
   className = "w-full h-48",
@@ -79,13 +80,13 @@ export default function OverlayMediaCard({
         </span>
       ) : null}
 
-      {saveItem ? (
+      {topRight || saveItem ? (
         <div
           className="absolute top-3.5 right-3.5 z-20"
           onClick={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
         >
-          <SaveButton item={saveItem} variant="overlay" className="w-9 h-9" />
+          {topRight || <SaveButton item={saveItem} variant="overlay" className="w-9 h-9" />}
         </div>
       ) : null}
 

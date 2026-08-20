@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import AttendeeList from "@/components/events/ManageAttendees";
 import ScreenHeader from "@/components/common/ScreenHeader";
 import { findMockEvent, isLocalEventId, hydrateEventPeople } from "@/lib/mock-events";
-import { isSameAppUser } from "@/lib/demo-user";
+import { isEventHost } from "@/lib/demo-user";
 import { PageLoading, PageNotFound } from "@/components/common/PageStatus";
 
 export default function EventAttendees() {
@@ -65,18 +65,20 @@ export default function EventAttendees() {
     load();
   }, [load]);
 
+  const isHost = isEventHost(event, user);
+
+  useEffect(() => {
+    if (loading || !event || isHost) return;
+    navigate(`/events/${event.id}`, { replace: true });
+  }, [loading, event, isHost, navigate]);
+
   if (loading) return <PageLoading />;
   if (!event) {
     return (
       <PageNotFound title="Event not found" backLabel="Back to events" onBack={() => navigate("/events")} />
     );
   }
-
-  const isHost =
-    event.demo_mine ||
-    isSameAppUser(event.host_id, user?.id) ||
-    isSameAppUser(event.created_by_id, user?.id) ||
-    isSameAppUser(event.created_by?.id, user?.id);
+  if (!isHost) return <PageLoading />;
 
   return (
     <div className="max-w-app mx-auto min-h-dvh overflow-y-auto app-scroll bg-background page-shell">

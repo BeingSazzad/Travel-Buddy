@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { useSaved } from "@/lib/SavedContext";
-import { MOCK_EVENTS, getLocalEvents, isLocalEventId, stampDemoMineHost, hydrateEventPeople } from "@/lib/mock-events";
+import { MOCK_EVENTS, getLocalEvents, isLocalEventId, stampDemoMineHost, hydrateEventPeople, hideEvent, getHiddenEventIds } from "@/lib/mock-events";
 import { useDemoFallbacks } from "@/lib/demo-fallbacks";
 import { isSameAppUser } from "@/lib/demo-user";
 
@@ -26,8 +26,9 @@ export function useEvents() {
         base44.entities.EventAttendance.list("-created_date", 200),
         base44.entities.Trip.list("-start_date", 100),
       ]);
-      const dbById = new Map(evs.map((e) => [e.id, e]));
-      const mockToAdd = useDemoFallbacks ? MOCK_EVENTS.filter((m) => !dbById.has(m.id)) : [];
+      const hidden = new Set(getHiddenEventIds());
+      const dbById = new Map(evs.filter((e) => !hidden.has(e.id)).map((e) => [e.id, e]));
+      const mockToAdd = useDemoFallbacks ? MOCK_EVENTS.filter((m) => !dbById.has(m.id) && !hidden.has(m.id)) : [];
       for (const local of getLocalEvents()) {
         const existing = dbById.get(local.id);
         if (!existing) {
@@ -52,9 +53,9 @@ export function useEvents() {
       setTripCities(new Set(upcoming.map((t) => t.city).filter(Boolean)));
     } catch {
       setEvents(
-        [...getLocalEvents(), ...(useDemoFallbacks ? MOCK_EVENTS : [])].map((e) =>
-          hydrateEventPeople(stampDemoMineHost(e, user))
-        )
+        [...getLocalEvents(), ...(useDemoFallbacks ? MOCK_EVENTS : [])]
+          .filter((e) => !getHiddenEventIds().includes(e.id))
+          .map((e) => hydrateEventPeople(stampDemoMineHost(e, user)))
       );
       setAttendance([]);
     } finally {
@@ -149,5 +150,15 @@ export function useEvents() {
   const saved = useMemo(() => events.filter((e) => savedEventTitles.has(e.title)), [events, savedEventTitles]);
   const atTrips = useMemo(() => events.filter((e) => tripCities.has(e.city)), [events, tripCities]);
 
-  return { events, loading, rsvp, reload: load, joinedIds, byCategory, nearby, popular, hosted, joined, saved, atTrips };
+  const remove = useCallback(async (id) => {
+    hideEvent(id);
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+    try {
+      await base44.functions.invoke("rsvp-event", { action: "cancel", event_id: id });
+    } catch {
+      /* local / demo events have no backend row */
+    }
+  }, []);
+
+  return { events, loading, rsvp, reload: load, remove, joinedIds, byCategory, nearby, popular, hosted, joined, saved, atTrips };
 }

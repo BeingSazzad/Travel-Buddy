@@ -9,13 +9,13 @@ import {
   MessageCircle,
   Bookmark,
   Pencil,
-  UserX,
   UserCheck,
   ChevronDown,
   Users,
   UserRound,
   Navigation,
   ChevronRight,
+  Trash2,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
@@ -24,11 +24,12 @@ import { Button } from "@/components/ui/button";
 import EventMap from "@/components/events/EventMap";
 import { AttendeeProfileRow } from "@/components/events/ManageAttendees";
 import ReportSheet from "@/components/reports/ReportSheet";
+import DeleteEventDialog from "@/components/events/DeleteEventDialog";
 import { capitalize, fmtEventWhen } from "@/lib/event-options";
 import { useSaved } from "@/lib/SavedContext";
 import { savedItemKey } from "@/lib/saved-item-key";
-import { findMockEvent, isLocalEventId, hydrateEventPeople } from "@/lib/mock-events";
-import { isSameAppUser } from "@/lib/demo-user";
+import { findMockEvent, isLocalEventId, hydrateEventPeople, hideEvent } from "@/lib/mock-events";
+import { isSameAppUser, isEventHost } from "@/lib/demo-user";
 import { getMockConversationId } from "@/lib/member-profile";
 import { cn } from "@/lib/utils";
 import { FALLBACK_AVATAR_URL } from "@/lib/images";
@@ -60,6 +61,7 @@ export default function EventDetail() {
   const [busy, setBusy] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [safetyOpen, setSafetyOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -174,10 +176,7 @@ export default function EventDetail() {
     );
   }
 
-  const isHost =
-    isSameAppUser(event.host_id, user?.id) ||
-    isSameAppUser(event.created_by_id, user?.id) ||
-    isSameAppUser(event.created_by?.id, user?.id);
+  const isHost = isEventHost(event, user);
   const myAtt = attendees.find((a) => a.user_id === user?.id);
   const going = attendees.filter((a) => a.status === "going");
   const pending = attendees.filter((a) => a.status === "pending");
@@ -279,9 +278,16 @@ export default function EventDetail() {
   };
 
   const cancelEvent = async () => {
-    if (!window.confirm("Cancel this event? This can't be undone.")) return;
-    await base44.functions.invoke("rsvp-event", { action: "cancel", event_id: event.id });
-    navigate("/events");
+    setBusy(true);
+    hideEvent(event.id);
+    try {
+      await base44.functions.invoke("rsvp-event", { action: "cancel", event_id: event.id });
+    } catch {
+      /* local / demo events have no backend row */
+    } finally {
+      setBusy(false);
+    }
+    navigate("/events?tab=mine");
   };
 
   const primaryCtaLabel = () => {
@@ -309,6 +315,16 @@ export default function EventDetail() {
             <ArrowLeft className="w-5 h-5" strokeWidth={2} />
           </button>
           <div className="flex items-center gap-2">
+            {isHost && (
+              <button
+                type="button"
+                onClick={() => navigate(`/events/new?edit=${event.id}`)}
+                className={HERO_BTN}
+                aria-label="Edit event"
+              >
+                <Pencil className="w-4.5 h-4.5" strokeWidth={2} />
+              </button>
+            )}
             <button
               type="button"
               onClick={() => toggle(savedItem)}
@@ -375,6 +391,7 @@ export default function EventDetail() {
             </p>
           </div>
 
+          {isHost && (
           <section className="rounded-2xl border border-border bg-card/50 p-4">
             <button
               type="button"
@@ -383,7 +400,7 @@ export default function EventDetail() {
             >
               <div className="min-w-0">
                 <p className="section-header mb-0.5">
-                  {isHost && pending.length > 0 ? "Join requests & who’s coming" : "Who’s coming"}
+                  {pending.length > 0 ? "Join requests & who’s coming" : "Who’s coming"}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {goingCount > 0
@@ -393,9 +410,7 @@ export default function EventDetail() {
                     : event.max_attendees != null
                       ? `No one yet · max ${event.max_attendees}`
                       : "No one has joined yet"}
-                  {isHost && pending.length > 0
-                    ? ` · ${pending.length} interested`
-                    : ""}
+                  {pending.length > 0 ? ` · ${pending.length} interested` : ""}
                 </p>
               </div>
               <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" strokeWidth={1.5} />
@@ -413,11 +428,11 @@ export default function EventDetail() {
               </div>
             ) : (
               <p className="text-sm text-muted-foreground mt-3">
-                {isHost ? "People who join will show up here." : "Be the first to join."}
+                People who join will show up here.
               </p>
             )}
 
-            {isHost && pending.length > 0 && (
+            {pending.length > 0 && (
               <button
                 type="button"
                 onClick={() => navigate(`/events/${event.id}/attendees`)}
@@ -427,8 +442,9 @@ export default function EventDetail() {
               </button>
             )}
           </section>
+          )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-soft">
             <button
               type="button"
               onClick={!isHost && event.host_id ? () => navigate(`/members/${event.host_id}`) : undefined}
@@ -440,10 +456,10 @@ export default function EventDetail() {
               <img
                 src={host?.avatar || event.host_avatar || FALLBACK_AVATAR}
                 alt=""
-                className="w-10 h-10 rounded-full object-cover object-top shrink-0"
+                className="w-11 h-11 rounded-full object-cover object-top border border-border shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-muted-foreground">Hosted by</p>
+                <p className="text-xs text-muted-foreground">{isHost ? "You’re hosting" : "Hosted by"}</p>
                 <p className="text-sm font-semibold truncate">{event.host_name || "Seluna host"}</p>
               </div>
             </button>
@@ -451,7 +467,7 @@ export default function EventDetail() {
               <button
                 type="button"
                 onClick={() => messageUser(event.host_id)}
-                className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 tap-feedback"
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center shrink-0 tap-feedback"
                 aria-label="Message host"
               >
                 <MessageCircle className="w-5 h-5" strokeWidth={1.5} />
@@ -516,32 +532,36 @@ export default function EventDetail() {
           {isHost && (
             <section>
               <h2 className="section-header mb-2">Host tools</h2>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  variant="outline"
-                  className="justify-start gap-2"
-                  onClick={() => navigate(`/events/new?edit=${event.id}`)}
-                >
-                  <Pencil className="w-4 h-4" strokeWidth={1.5} /> Edit
-                </Button>
-                <Button variant="outline" className="justify-start gap-2" onClick={() => navigate(`/events/${event.id}/attendees`)}>
-                  <UserCheck className="w-4 h-4" strokeWidth={1.5} />
-                  Who’s coming{pending.length > 0 ? ` (${pending.length})` : ""}
-                </Button>
-                <Button
-                  variant="outline"
-                  className="justify-start gap-2 col-span-2 text-destructive"
-                  onClick={cancelEvent}
-                >
-                  <UserX className="w-4 h-4" strokeWidth={1.5} /> Cancel event
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2 text-destructive"
+                onClick={() => setDeleteOpen(true)}
+                disabled={busy}
+              >
+                <Trash2 className="w-4 h-4" strokeWidth={1.5} /> Delete event
+              </Button>
             </section>
           )}
         </div>
       </div>
 
       <div className="sticky bottom-0 z-30 app-px pt-3 safe-pb bg-background/95 backdrop-blur border-t border-border flex gap-2">
+        {isHost ? (
+          <>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => navigate(`/events/${event.id}/attendees`)}
+            >
+              <UserCheck className="w-4 h-4" strokeWidth={1.5} />
+              {pending.length > 0 ? `Requests (${pending.length})` : "Who’s coming"}
+            </Button>
+            <Button className="flex-1" onClick={() => navigate(`/events/new?edit=${event.id}`)}>
+              <Pencil className="w-4 h-4" strokeWidth={1.5} /> Edit
+            </Button>
+          </>
+        ) : (
+          <>
         <a
           href={directionsUrl || "#"}
           target="_blank"
@@ -555,12 +575,7 @@ export default function EventDetail() {
             <Navigation className="w-4 h-4" strokeWidth={1.5} /> Directions
           </Button>
         </a>
-        {isHost ? (
-          <Button className="flex-1" onClick={() => navigate(`/events/${event.id}/attendees`)}>
-            <UserCheck className="w-4 h-4" strokeWidth={1.5} />
-            {pending.length > 0 ? `Requests (${pending.length})` : "Who’s coming"}
-          </Button>
-        ) : myAtt?.status === "going" ? (
+        {myAtt?.status === "going" ? (
           <Button variant="outline" className="flex-1" onClick={() => rsvp("leave")} disabled={busy}>
             Leave event
           </Button>
@@ -573,12 +588,20 @@ export default function EventDetail() {
             {primaryCtaLabel()}
           </Button>
         )}
+          </>
+        )}
       </div>
 
       <ReportSheet
         open={reportOpen}
         onOpenChange={setReportOpen}
         target={{ type: "event", id: event.id, title: event.title, ownerId: event.host_id }}
+      />
+      <DeleteEventDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        event={event}
+        onConfirm={cancelEvent}
       />
     </div>
   );

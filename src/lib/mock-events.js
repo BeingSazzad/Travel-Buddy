@@ -719,11 +719,37 @@ export function removeLocalEvent(id) {
   localStorage.setItem(LOCAL_EVENTS_KEY, JSON.stringify(next));
 }
 
+const HIDDEN_EVENTS_KEY = "seluna_hidden_events";
+
+export function getHiddenEventIds() {
+  try {
+    const raw = localStorage.getItem(HIDDEN_EVENTS_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}
+
+export function hideEvent(id) {
+  if (!id) return;
+  removeLocalEvent(id);
+  const ids = getHiddenEventIds();
+  if (!ids.includes(id)) {
+    localStorage.setItem(HIDDEN_EVENTS_KEY, JSON.stringify([...ids, id]));
+  }
+}
+
+export function isEventHidden(id) {
+  return getHiddenEventIds().includes(String(id || ""));
+}
+
 export function isLocalEventId(id) {
   return typeof id === "string" && id.startsWith("event_local_");
 }
 
 export function findMockEvent(id) {
+  if (isEventHidden(id)) return null;
   return getLocalEvents().find((e) => e.id === id) || MOCK_EVENTS.find((e) => e.id === id) || null;
 }
 

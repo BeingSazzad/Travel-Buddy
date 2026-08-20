@@ -3,12 +3,12 @@ import EventCard from "./EventCard";
 import { cn } from "@/lib/utils";
 
 /** One full-width event card per row. */
-export default function EventList({ events, className = "" }) {
+export default function EventList({ events, className = "", manage = false, onDelete }) {
   if (!events?.length) return null;
   return (
     <div className={cn("flex flex-col gap-3", className)}>
       {events.map((event) => (
-        <EventCard key={event.id} event={event} />
+        <EventCard key={event.id} event={event} manage={manage} onDelete={onDelete} />
       ))}
     </div>
   );

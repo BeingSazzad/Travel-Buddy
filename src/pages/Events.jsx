@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useEvents } from "@/hooks/useEvents";
 import { onRefresh } from "@/lib/refresh-bus";
 import EventList from "@/components/events/EventList";
+import DeleteEventDialog from "@/components/events/DeleteEventDialog";
 import ScrollFilterChips from "@/components/common/ScrollFilterChips";
 import ListSkeleton from "@/components/common/ListSkeleton";
 import ScreenHeader from "@/components/common/ScreenHeader";
@@ -24,7 +25,7 @@ function filterCategory(list, category) {
 }
 
 export default function Events() {
-  const { loading, reload, nearby, hosted, joined, atTrips } = useEvents();
+  const { loading, reload, nearby, hosted, joined, atTrips, remove } = useEvents();
   const [searchParams, setSearchParams] = useSearchParams();
   const [category, setCategory] = useState("all");
   const navigate = useNavigate();
@@ -38,6 +39,11 @@ export default function Events() {
     setSearchParams(next, { replace: true });
   };
 
+  const [pendingDelete, setPendingDelete] = useState(null);
+
+  const deleteHosted = async (event) => {
+    await remove(event.id);
+  };
   const hostedIds = useMemo(() => new Set(hosted.map((e) => e.id)), [hosted]);
   const goingIds = useMemo(() => new Set(joined.map((e) => e.id)), [joined]);
 
@@ -149,10 +155,19 @@ export default function Events() {
               onAction={() => navigate("/events/new")}
             />
           ) : (
-            <EventList events={hosted} />
+            <EventList events={hosted} manage onDelete={setPendingDelete} />
           )}
         </TabsContent>
       </Tabs>
+
+      <DeleteEventDialog
+        open={!!pendingDelete}
+        event={pendingDelete}
+        onOpenChange={(open) => {
+          if (!open) setPendingDelete(null);
+        }}
+        onConfirm={deleteHosted}
+      />
     </div>
   );
 }

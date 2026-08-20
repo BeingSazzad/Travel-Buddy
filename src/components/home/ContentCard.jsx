@@ -2,7 +2,7 @@ import React from "react";
 import OverlayMediaCard from "@/components/common/OverlayMediaCard";
 import GoingFaces from "@/components/common/GoingFaces";
 import { countTravellersHere, travellingHereLabel, travellerAvatarsForCity } from "@/lib/destination-stats";
-import { findMockEvent, eventGoingAvatars } from "@/lib/mock-events";
+import { findMockEvent } from "@/lib/mock-events";
 import { fmtEventDate } from "@/lib/event-options";
 
 const FRAME = {
@@ -15,7 +15,7 @@ const FRAME = {
 function eventGoing(item) {
   const ev = findMockEvent(item.eventId) || item;
   const count = ev?.attendees_count || ev?.attendees?.length || 0;
-  return { count, faces: eventGoingAvatars(ev) };
+  return { count };
 }
 
 export default function ContentCard({ item, onClick, variant = "destination" }) {
@@ -46,7 +46,7 @@ export default function ContentCard({ item, onClick, variant = "destination" }) 
       imageClassName={item.type === "member" ? "object-top" : undefined}
       endSlot={
         going?.count > 0
-          ? <GoingFaces count={going.count} avatars={going.faces} />
+          ? <span className="text-[11px] text-white font-semibold whitespace-nowrap drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)]">{going.count} going</span>
           : destCount > 0
             ? <GoingFaces count={destCount} avatars={destFaces} label="" />
             : undefined

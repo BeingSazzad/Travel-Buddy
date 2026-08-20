@@ -47,3 +47,13 @@ export function isSameAppUser(userId, otherId) {
   if (userId === otherId) return true;
   return DEMO_USER_IDS.has(userId) && DEMO_USER_IDS.has(otherId);
 }
+
+export function isEventHost(event, user) {
+  if (!event) return false;
+  if (event.demo_mine) return true;
+  return (
+    isSameAppUser(event.host_id, user?.id) ||
+    isSameAppUser(event.created_by_id, user?.id) ||
+    isSameAppUser(event.created_by?.id, user?.id)
+  );
+}
